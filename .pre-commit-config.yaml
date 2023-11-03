@@ -2,7 +2,7 @@ default_install_hook_types:
   - pre-commit
   - pre-push
 default_language_version:
-  python: python3.9.16
+  python: python3.10
 repos:
   - hooks:
       - id: check-added-large-files
