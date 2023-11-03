@@ -1,6 +1,6 @@
-![GESIS](https://upload.wikimedia.org/wikipedia/commons/4/42/GESIS-Logo.svg)
-
 # Web Tracker Backend
+
+![GESIS](https://upload.wikimedia.org/wikipedia/commons/4/42/GESIS-Logo.svg)
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
 
