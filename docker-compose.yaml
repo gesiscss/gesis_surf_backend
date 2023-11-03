@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   app:
+    container_name: app_GESIS
     build:
       context: .
       args:
@@ -19,6 +20,7 @@ services:
       - DB_PASSWORD=changeme
 
   db:
+    container_name: db_GESIS
     image: postgres:13.3-alpine
     environment:
       - POSTGRES_DB=devdb
@@ -26,6 +28,21 @@ services:
       - POSTGRES_PASSWORD=changeme
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+
+  pgadmin:
+    container_name: pgadmin_GESIS
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_LISTEN_PORT: 5433
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_UPGRADE_CHECK_ENABLED: "False"
+    ports:
+      - "5433:5433"
+    depends_on:
+      - db
 
 volumes:
   postgres_data:
