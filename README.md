@@ -23,3 +23,18 @@ docker compose up -d
 
 visit the service  
 [backend service](127.0.0.1:8000)
+
+## Data Base
+
+Structured set of data held in a computer. We will be using a Relation SQL database, specifically, a PostgreSQL database.
+
+A relational database is composed of tables and references. Describes entities and relationships between them. The Data is well-structured.
+
+Relational Model Edgar F Codd. Structuring data as entities and relationships with entities.
+
+Entity is a named object composed of data fields (attributes)
+Att can be data types. primitive data types. Time stamps, UUID
+
+Normalization
+
+ER diagram. Mixing data ownership of entities
