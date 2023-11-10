@@ -38,3 +38,20 @@ Att can be data types. primitive data types. Time stamps, UUID
 Normalization
 
 ER diagram. Mixing data ownership of entities
+
+Integrity constrains
+Keep data clean in a database
+data is consistent and correct not incorrect or dirty.
+enforces set of rules defined by database admin
+enhances performance of data base queries
+validity, prevent incertion of incorrect data.
+
+Nullability
+Nullable - can be null, depicted with normal line
+Non-nullable - must have a value , required. Bold line.
+
+None, can be not Non thick line
+
+Uniqueness
+an attributer is unique for given entity
+unterline when they should be unique
