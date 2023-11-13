@@ -6,3 +6,5 @@ exclude =
     settings.py
 
 max-line-length = 120
+; Class itself ignored in app/.flake8
+extend-ignore = ANN101

@@ -20,6 +20,8 @@ services:
       - DB_NAME=devdb
       - DB_USER=devuser
       - DB_PASSWORD=changeme
+    depends_on:
+      - db
 
   db:
     container_name: db_GESIS
