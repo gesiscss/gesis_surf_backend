@@ -5,7 +5,7 @@ description = "GESIS Backend for Web Tracking Tool"
 authors = ["geomario <marm1984@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "web_tracker_backend"}]
+packages = [{ include = "web_tracker_backend" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -38,3 +38,10 @@ major_version_zero = true
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "app.app.settings"
