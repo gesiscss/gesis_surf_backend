@@ -68,3 +68,33 @@ class Participant(AbstractBaseUser, PermissionsMixin):
         Returns the string representation of the user.
         """
         return self.token
+
+
+class Wave(models.Model):
+    """
+    Custom wave model.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    client_id = models.CharField(max_length=32)
+    wave_number = models.IntegerField()
+    wave_name = models.CharField(max_length=32)
+    wave_type = models.CharField(max_length=32)
+    wave_status = models.CharField(max_length=32)
+    participants = models.ManyToManyField(Participant, through="WaveParticipant")
+
+    def __str__(self) -> str:
+        return f"{self.client_id} - {self.wave_number} - {self.start_date} to {self.end_date}"
+
+
+class WaveParticipant(models.Model):
+    """
+    Custom wave participant model.
+    """
+
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+    wave = models.ForeignKey(Wave, on_delete=models.CASCADE)
+    addtional_field = models.CharField(max_length=32)
