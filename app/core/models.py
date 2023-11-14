@@ -20,7 +20,9 @@ class UserManager(BaseUserManager):
     User manager class.
     """
 
-    def create_user(self, is_active: bool = True, **extra_fields: Any) -> "Participant":
+    def create_user(
+        self, token, password=None, is_active: bool = True, **extra_fields: Any
+    ) -> "Participant":
         """
         Creates and saves a new user just with a random Token.
 
@@ -31,12 +33,20 @@ class UserManager(BaseUserManager):
         Returns:
             object: The created user instance.
         """
-        token = self.generate_token()
+        # token = self.generate_token()
         user = self.model(token=token, is_active=is_active, **extra_fields)
+        if password:
+            user.set_password(password)
         user.save(using=self._db)
+
         return user
 
-    def create_superuser(self, **extra_fields: Any) -> "Participant":
+    def create_superuser(
+        self,
+        token,
+        password,
+        **extra_fields: Any,
+    ) -> "Participant":
         """
         Creates and saves a new superuser.
 
@@ -46,10 +56,11 @@ class UserManager(BaseUserManager):
         Returns:
             object: The created superuser instance.
         """
-        user = self.create_user(**extra_fields)
+        user = self.create_user(token, password, **extra_fields)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
+
         return user
 
     @staticmethod
