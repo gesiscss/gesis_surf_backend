@@ -12,7 +12,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
-from typing import Dict, Any
+from typing import Any
 
 
 class UserManager(BaseUserManager):
