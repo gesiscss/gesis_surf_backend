@@ -5,14 +5,12 @@ This file is used to create models for the core app.
 import secrets
 import string
 import uuid
-
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    BaseUserManager,
-    PermissionsMixin,
-)
-from django.db import models
 from typing import Any
+
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
+from django.db import models
 
 
 class UserManager(BaseUserManager):
@@ -21,7 +19,11 @@ class UserManager(BaseUserManager):
     """
 
     def create_user(
-        self, token, password=None, is_active: bool = True, **extra_fields: Any
+        self,
+        token: str,
+        password: Any = None,
+        is_active: bool = True,
+        **extra_fields: Any,
     ) -> "Participant":
         """
         Creates and saves a new user just with a random Token.
@@ -34,17 +36,27 @@ class UserManager(BaseUserManager):
             object: The created user instance.
         """
         # token = self.generate_token()
-        user = self.model(token=token, is_active=is_active, **extra_fields)
-        if password:
+        if not token:
+            raise ValueError("Users must have a token.")
+        if password is not None:
+            user = self.model(
+                token=token, password=password, is_active=is_active, **extra_fields
+            )
             user.set_password(password)
-        user.save(using=self._db)
+            user.save(using=self._db)
+        else:
+            user = self.model(
+                token=token, password=password, is_active=is_active, **extra_fields
+            )
+            user.set_unusable_password()
+            user.save(using=self._db)
 
         return user
 
     def create_superuser(
         self,
-        token,
-        password,
+        token: str,
+        password: Any = None,
         **extra_fields: Any,
     ) -> "Participant":
         """
@@ -75,7 +87,10 @@ class UserManager(BaseUserManager):
         return "".join(secrets.choice(alphabet) for i in range(32))
 
 
-class Participant(AbstractBaseUser, PermissionsMixin):
+class Participant(
+    AbstractBaseUser,
+    PermissionsMixin,
+):
     """
     Custom participant model.
     """
@@ -93,8 +108,17 @@ class Participant(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "token"
 
+    class Meta:
+        """
+        Meta class for the participant model.
+        """
+
+        verbose_name = "Participant"
+        verbose_name_plural = "Participants"
+
     def __str__(self) -> str:
         """
+
         Returns the string representation of the participant.
 
         Returns:

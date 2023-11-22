@@ -4,7 +4,7 @@
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
 
-Backend for GESIS Web Tracking services. By [Geomario](https://github.com/geomario).  
+Backend for GESIS Web Tracking services. By [Geomario](https://github.com/geomario).
 Questions? -> <mario.ramirez@gesis.org>
 
 ## Commands
@@ -21,7 +21,19 @@ Testing service, up & running
 docker compose up -d
 ```
 
-visit the service  
+Running specific migrations
+
+```bsh
+docker-compose run --rm app sh -c "python manage.py makemigrations APP_NAME"
+```
+
+Specific testing
+
+```bsh
+docker-compose run --rm app sh -c "python manage.py test APP_NAME"
+```
+
+visit the service
 [backend service](127.0.0.1:8000)
 
 ## Data Base Design
@@ -63,48 +75,48 @@ The next table summarizes the modeling of a database.
 
 ## Relationship Types
 
-Many - Many  
-Many - One  
+Many - Many
+Many - One
 One - One
 
 ### Example
 
-User - Wave **(Many to Many)**  
-A User must have a token.  
-A Wave must have a client_id.  
-A Wave must have a wave number.  
-A Wave must have a start date.  
-A Wave must have an end date.  
-A User belongs to 1 or more Waves.  
-A User belongs at to least 1 Wave.  
+User - Wave **(Many to Many)**
+A User must have a token.
+A Wave must have a client_id.
+A Wave must have a wave number.
+A Wave must have a start date.
+A Wave must have an end date.
+A User belongs to 1 or more Waves.
+A User belongs at to least 1 Wave.
 A Wave must have at least 1 User.
 
-User - Window **(Many to One)**  
-A User must have a token.  
-A Window must have a start time.  
-A Window must have a closing time.  
-A Window must have a creation time.  
-A Window must have at most one and a single User. (Possible Change)  
+User - Window **(Many to One)**
+A User must have a token.
+A Window must have a start time.
+A Window must have a closing time.
+A Window must have a creation time.
+A Window must have at most one and a single User. (Possible Change)
 A User must have 1 or more Windows.
 
-Window - Tab **(Many to One)**  
-A Window must have at least one Tab.  
+Window - Tab **(Many to One)**
+A Window must have at least one Tab.
 A Tab belongs to at most one Window.
 
-Tab - Domain **(Many to One)**  
-A Tab has at most one Domain.  
+Tab - Domain **(Many to One)**
+A Tab has at most one Domain.
 A Domain belongs to at least one Tab.
 
-Tab - HTML **(Many to Many)**  
-A Tab has at least one HTML.  
+Tab - HTML **(Many to Many)**
+A Tab has at least one HTML.
 An HTML belongs to at least one Tab.
 
-Tab - Click **(Many to One)**  
-A Tab can have clicks.  
+Tab - Click **(Many to One)**
+A Tab can have clicks.
 A Click belongs to at least and only one Tab.
 
-Tab - Scroll **(Many to One)**  
-A Tab can have scrolls.  
+Tab - Scroll **(Many to One)**
+A Tab can have scrolls.
 A Scroll belongs to at least one and only Tab.
 
 ## ERD Diagram

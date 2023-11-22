@@ -1,10 +1,13 @@
 [flake8]
-exclude = 
+exclude =
     migrations,
     __pycache__,
     manage.py,
     settings.py
 
 max-line-length = 120
+max-complexity = 18
+select = B,C,E,F,W,T4,B9
+per-file-ignores = manage.py:INP001
 ; Class itself ignored in app/.flake8
-extend-ignore = ANN101
+ignore = E203, E266, E501, W503, F403, F401, ANN101,

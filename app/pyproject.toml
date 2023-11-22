@@ -26,6 +26,9 @@ pytest = "^7.4.3"
 mypy = "^1.6.1"
 commitizen = "^3.12.0"
 pre-commit = "^3.5.0"
+djangorestframework-stubs = "^3.14.4"
+django-stubs = "^4.2.6"
+pylint-django = "^2.5.5"
 
 
 [tool.commitizen]
@@ -44,4 +47,12 @@ build-backend = "poetry.core.masonry.api"
 plugins = ["mypy_django_plugin.main"]
 
 [tool.django-stubs]
-django_settings_module = "app.app.settings"
+django_settings_module = "app.settings"
+
+[tool.isort]
+profile = "black"
+remove_imports = "from __future__ import annotations"
+force_single_line = true
+
+[tool.black]
+target-version = ["py310"]
