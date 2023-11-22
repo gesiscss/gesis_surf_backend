@@ -36,9 +36,9 @@ sqlparse==0.4.4 ; python_version >= "3.10" and python_version < "4.0" \
 tomli==2.0.1 ; python_version >= "3.10" and python_version < "3.11" \
     --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
     --hash=sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f
-types-psycopg2==2.9.21.15 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:cc80479def02e4dd1ef21649d82f04426c73bc0693bcc0a8b5223c7c168472af \
-    --hash=sha256:cf99b62ab32cd4ef412fc3c4da1c29ca5a130847dff06d709b84a523802406f0
+types-psycopg2==2.9.21.16 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:44a3ae748173bb637cff31654d6bd12de9ad0c7ad73afe737df6152830ed82ed \
+    --hash=sha256:e2f24b651239ccfda320ab3457099af035cf37962c36c9fa26a4dc65991aebed
 types-pytz==2023.3.1.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:1999a123a3dc0e39a2ef6d19f3f8584211de9e6a77fe7a0259f04a524e90a5cf \
     --hash=sha256:cc23d0192cd49c8f6bba44ee0c81e4586a8f30204970fc0894d209a6b08dab9a
