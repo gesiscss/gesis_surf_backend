@@ -2,8 +2,6 @@
 This file is used to create models for the core app.
 """
 
-import secrets
-import string
 import uuid
 from typing import Any
 
@@ -21,9 +19,9 @@ class UserManager(BaseUserManager):
     def create_user(
         self,
         user_id: str,
-        token_gesis: Any = None,
+        password: Any = None,
         **extra_fields: Any,
-    ) -> "Participant":
+    ) -> "User":
         """
         Creates and saves a new user with a generated GESIS user_id.
 
@@ -37,7 +35,7 @@ class UserManager(BaseUserManager):
         if not user_id:
             raise ValueError("Users must have an user_id")
         user = self.model(user_id=user_id, **extra_fields)
-        user.set_password(token_gesis)
+        user.set_password(password)
         user.save(using=self._db)
 
         return user
@@ -45,9 +43,9 @@ class UserManager(BaseUserManager):
     def create_superuser(
         self,
         user_id: str,
-        token_gesis: Any = None,
+        password: Any,
         **extra_fields: Any,
-    ) -> "Participant":
+    ) -> "User":
         """
         Creates and saves a new superuser with the given GESIS user_id.
 
@@ -66,10 +64,10 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        return self.create_user(user_id, token_gesis, **extra_fields)
+        return self.create_user(user_id, password, **extra_fields)
 
 
-class Participant(
+class User(
     AbstractBaseUser,
     PermissionsMixin,
 ):
