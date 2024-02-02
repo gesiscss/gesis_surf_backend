@@ -39,6 +39,7 @@ class UserManager(BaseUserManager):
         user = self.model(user_id=user_id, **extra_fields)
         user.set_password(token_gesis)
         user.save(using=self._db)
+
         return user
 
     def create_superuser(
@@ -52,7 +53,7 @@ class UserManager(BaseUserManager):
 
         Args:
             user_id (str): The id of the user from GESIS.
-            extra_fields (dict): Extra fields to be saved.
+            token_gesis (Any): The token of the user from GESIS.
 
         Returns:
             object: The created superuser instance.
