@@ -14,9 +14,9 @@ class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users"""
 
     ordering = ["id"]
-    list_display = ["token", "is_active", "is_staff", "is_superuser"]
+    list_display = ["user_id", "is_active", "is_staff", "is_superuser"]
     fieldsets = (
-        (None, {"fields": ("token", "password")}),
+        (None, {"fields": ("user_id", "password")}),
         (
             _("Permissions"),
             {"fields": ("is_active", "is_staff", "is_superuser")},
@@ -30,7 +30,7 @@ class UserAdmin(BaseUserAdmin):
             {
                 "classes": ("wide",),
                 "fields": (
-                    "token",
+                    "user_id",
                     "password1",
                     "password2",
                     "is_active",
