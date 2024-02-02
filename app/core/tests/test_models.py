@@ -25,13 +25,22 @@ class ModelTests(TestCase):
         self.assertTrue(user.check_password(token_gesis))
         self.assertFalse(user.is_staff)
 
-    # def test_create_superuser(self) -> None:
-    #     """
-    #     Tests creating a new superuser.
-    #     """
-    #     user = get_user_model().objects.create_superuser(token="test")
-    #     self.assertTrue(user.is_staff)
-    #     self.assertTrue(user.is_superuser)
+    def test_new_user_invalid_user_id(self) -> None:
+        """
+        Tests creating a new user with no user_id raises an error.
+        """
+        with self.assertRaises(ValueError):
+            get_user_model().objects.create_user(user_id="", token_gesis="test123")
+
+    def test_create_superuser(self) -> None:
+        """
+        Tests creating a new superuser.
+        """
+        user = get_user_model().objects.create_superuser(
+            user_id="test", token_gesis="test123"
+        )
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_staff)
 
     # def test_str_method(self) -> None:
     #     """

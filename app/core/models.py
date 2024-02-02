@@ -25,19 +25,47 @@ class UserManager(BaseUserManager):
         **extra_fields: Any,
     ) -> "Participant":
         """
-        Creates and saves a new user just with a random Token.
+        Creates and saves a new user with a generated GESIS user_id.
 
         Args:
-            user_id (str): The id of the user.
+            user_id (str): The id of the user from GESIS.
             extra_fields (dict): Extra fields to be saved.
 
         Returns:
             object: The created user instance.
         """
+        if not user_id:
+            raise ValueError("Users must have an user_id")
         user = self.model(user_id=user_id, **extra_fields)
         user.set_password(token_gesis)
         user.save(using=self._db)
         return user
+
+    def create_superuser(
+        self,
+        user_id: str,
+        token_gesis: Any = None,
+        **extra_fields: Any,
+    ) -> "Participant":
+        """
+        Creates and saves a new superuser with the given GESIS user_id.
+
+        Args:
+            user_id (str): The id of the user from GESIS.
+            extra_fields (dict): Extra fields to be saved.
+
+        Returns:
+            object: The created superuser instance.
+        """
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self.create_user(user_id, token_gesis, **extra_fields)
 
 
 class Participant(
