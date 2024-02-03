@@ -19,7 +19,7 @@ class ModelTests(TestCase):
         password = "test123"
         user = get_user_model().objects.create_user(
             user_id=user_id,
-            token_gesis=password,
+            password=password,
         )
         self.assertEqual(user.user_id, user_id)
         self.assertTrue(user.check_password(password))
