@@ -46,7 +46,7 @@ repos:
         stages:
           - push
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.14.0
+    rev: v3.14.1
   - repo: https://github.com/adamchainz/django-upgrade
     rev: 1.15.0
     hooks:

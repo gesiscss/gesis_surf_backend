@@ -10,6 +10,7 @@ from rest_framework.test import APIClient
 
 CREATE_USER_URL = reverse("user:create")
 TOKEN_URL = reverse("user:token")
+ME_URL = reverse("user:me")
 
 
 def create_user(**params) -> get_user_model():
@@ -108,3 +109,46 @@ class PublicUserApiTests(TestCase):
 
         self.assertNotIn("token", response.data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrive_user_unauthorized(self) -> None:
+        """Tests that authentication is required for users."""
+        response = self.client.get(ME_URL)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateUserApiTests(TestCase):
+    """Test API requests that require authentication."""
+
+    def setUp(self) -> None:
+        """Creates a client for the tests."""
+        self.user = create_user(
+            user_id="test",
+            password="test123",
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_profile_success(self) -> None:
+        """Tests retrieving profile for logged in used."""
+        response = self.client.get(ME_URL)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data,
+            {
+                "user_id": self.user.user_id,
+            },
+        )
+
+    def test_update_user_profile(self) -> None:
+        """Tests updating the profile for authenticated user."""
+        payload = {
+            "password": "newpassword",
+        }
+
+        response = self.client.patch(ME_URL, payload)
+
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password(payload["password"]))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
