@@ -7,11 +7,50 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from core import models
+
+
+class WaveSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the wave object.
+    """
+
+    class Meta:
+        """
+        Meta class for the wave serializer.
+        """
+
+        model = models.Wave
+        fields = (
+            "id",
+            "start_date",
+            "end_date",
+            "created_at",
+            "client_id",
+            "wave_number",
+            "wave_name",
+            "wave_type",
+            "wave_status",
+        )
+        read_only_fields = ("id",)
+
+
+class WaveUserSerializer(serializers.ModelSerializer):
+    """Serializer for the wave user object."""
+
+    class Meta:
+        """Meta class for the wave user serializer."""
+
+        model = models.WaveUser
+        fields = "__all__"
+
 
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for the user object GESIS.
     """
+
+    wave_users = WaveUserSerializer(many=True, read_only=True)
 
     class Meta:
         """
@@ -19,7 +58,7 @@ class UserSerializer(serializers.ModelSerializer):
         """
 
         model = get_user_model()
-        fields = ("user_id", "password")
+        fields = ("user_id", "password", "wave_users")
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
     def create(self, validated_data):

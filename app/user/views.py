@@ -43,3 +43,19 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         Retrieve and return authentication user.
         """
         return self.request.user
+
+
+class CreateUserWaveView(generics.CreateAPIView):
+    """
+    Create a new wave in the system.
+    """
+
+    serializer_class = UserSerializer
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        """
+        Create a new wave.
+        """
+        serializer.save(user=self.request.user)

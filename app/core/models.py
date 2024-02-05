@@ -88,59 +88,42 @@ class User(
 
     USERNAME_FIELD = "user_id"
 
-    # class Meta:
-    #     """
-    #     Meta class for the participant model.
-    #     """
 
-    #     verbose_name = "Participant"
-    #     verbose_name_plural = "Participants"
+class WaveUser(models.Model):
+    """
+    Custom wave participant model.
+    """
 
-    # def __str__(self) -> str:
-    #     """
-
-    #     Returns the string representation of the participant.
-
-    #     Returns:
-    #         str: The token of the participant.
-    #     """
-    #     return str(self.user_id)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
+    wave = models.ForeignKey("Wave", on_delete=models.CASCADE)
+    additional_field = models.CharField(max_length=32)
 
 
-# class WaveParticipant(models.Model):
-#     """
-#     Custom wave participant model.
-#     """
+class Wave(models.Model):
+    """
+    Custom wave model.
+    """
 
-#     participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
-#     wave = models.ForeignKey("Wave", on_delete=models.CASCADE)
-#     additional_field = models.CharField(max_length=32)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    start_date = models.DateTimeField(blank=False)
+    end_date = models.DateTimeField(blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    client_id = models.CharField(max_length=32, blank=False)
+    wave_number = models.IntegerField(blank=False)
+    wave_name = models.CharField(max_length=32, blank=False)
+    wave_type = models.CharField(max_length=32, blank=False)
+    wave_status = models.CharField(max_length=32, blank=False)
+    participants = models.ManyToManyField("User", through=WaveUser)
 
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the wave.
 
-# class Wave(models.Model):
-#     """
-#     Custom wave model.
-#     """
+        Returns:
+            str: A formatted string with wave information.
+        """
 
-#     id = models.UUIDField(
-#         primary_key=True, default=uuid.uuid4, editable=False, blank=False
-#     )
-#     start_date = models.DateTimeField(blank=False)
-#     end_date = models.DateTimeField(blank=False)
-#     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-#     client_id = models.CharField(max_length=32, blank=False)
-#     wave_number = models.IntegerField(blank=False)
-#     wave_name = models.CharField(max_length=32, blank=False)
-#     wave_type = models.CharField(max_length=32, blank=False)
-#     wave_status = models.CharField(max_length=32, blank=False)
-#     participants = models.ManyToManyField(Participant, through="WaveParticipant")
-
-#     def __str__(self) -> str:
-#         """
-#         Returns the string representation of the wave.
-
-#         Returns:
-#             str: A formatted string with wave information.
-#         """
-
-#         return f"{self.client_id} - {self.wave_number} - {self.start_date} to {self.end_date}"
+        return f"{self.client_id} - {self.wave_number} - {self.start_date} to {self.end_date}"
