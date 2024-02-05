@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 CREATE_USER_URL = reverse("user:create")
+TOKEN_URL = reverse("user:token")
 
 
 def create_user(**params) -> get_user_model():
@@ -67,17 +68,43 @@ class PublicUserApiTests(TestCase):
         )
         self.assertFalse(user_exists)
 
-    # def test_create_token_for_user(self) -> None:
-    #     """Tests that a token is created for the user."""
-    #     payload = {
-    #         "user_id": "test",
-    #         "password": "test123",
-    #     }
-    #     create_user(**payload)
-    #     response = self.client.post(
-    #         reverse("user:token"),
-    #         payload,
-    #     )
+    def test_create_token_for_user(self) -> None:
+        """Tests that a token is created for the user with valid credentials."""
+        payload = {
+            "user_id": "test",
+            "password": "test123",
+        }
+        create_user(**payload)
+        response = self.client.post(
+            TOKEN_URL,
+            payload,
+        )
 
-    #     self.assertIn("token", response.data)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("token", response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_token_bad_credentials(self) -> None:
+        """Tests that a token is not created for the user with invalid credentials."""
+        create_user(user_id="test", password="test123")
+        payload = {
+            "user_id": "test",
+            "password": "wrong",
+        }
+        response = self.client.post(TOKEN_URL, payload)
+
+        self.assertNotIn("token", response.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_token_blank_credentials(self) -> None:
+        """Tests that a token is not created for the user with blank credentials."""
+        response = self.client.post(TOKEN_URL, {"user_id": "", "password": ""})
+
+        self.assertNotIn("token", response.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_token_blank_password(self) -> None:
+        """Tests that a token is not created for the user with blank password."""
+        response = self.client.post(TOKEN_URL, {"user_id": "test", "password": ""})
+
+        self.assertNotIn("token", response.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

@@ -2,13 +2,15 @@
 Serializers for the user API views.
 """
 
+from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
     """
-    Serializer for the user object.
+    Serializer for the user object GESIS.
     """
 
     class Meta:
@@ -25,3 +27,36 @@ class UserSerializer(serializers.ModelSerializer):
         Create a new user with encrypted password and return it.
         """
         return get_user_model().objects.create_user(**validated_data)
+
+
+# pylint: disable=W0223
+# Check the issue here: https://shorturl.at/hwzZ5
+class AuthTokenSerializer(serializers.Serializer):
+    """
+    Serializer for the user authentication object.
+    """
+
+    user_id = serializers.CharField()
+    password = serializers.CharField(
+        style={"input_type": "password"},
+        trim_whitespace=False,
+    )
+
+    def validate(self, attrs) -> dict:
+        """
+        Validate and authenticate the user.
+        """
+        user_id = attrs.get("user_id")
+        password = attrs.get("password")
+
+        user = authenticate(
+            request=self.context.get("request"),
+            username=user_id,
+            password=password,
+        )
+        if not user:
+            message = _("Unable to authenticate with provided credentials")
+            raise serializers.ValidationError(message, code="authentication")
+
+        attrs["user"] = user
+        return attrs
