@@ -112,6 +112,7 @@ class Wave(models.Model):
     start_date = models.DateTimeField(blank=False)
     end_date = models.DateTimeField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL)
     # username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
