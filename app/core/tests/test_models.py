@@ -4,6 +4,7 @@ Tests for the models.
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from typing import Any
 
 from core import models
 
@@ -46,21 +47,27 @@ class ModelTests(TestCase):
 
     def test_create_wave(self) -> None:
         """
-        Tests creating a new wave with its information fields.
+        Tests creating a new wave.
         """
+        user = get_user_model().objects.create_user(
+            user_id="test", password="test123"
+        )
         wave = models.Wave.objects.create(
+            user=user,
             start_date="2021-01-01",
-            end_date="2021-01-01",
+            end_date="2021-01-31",
             created_at="2021-01-01",
             client_id="test",
-            wave_number=1,
+            wave_number="test",
             wave_name="test",
             wave_type="test",
             wave_status="test",
         )
+
+        self.assertEqual(wave.start_date, "2021-01-01")
+        self.assertEqual(wave.end_date, "2021-01-31")
+        self.assertEqual(wave.client_id, "test")
+        self.assertEqual(wave.wave_number, "test")
         self.assertEqual(wave.wave_name, "test")
         self.assertEqual(wave.wave_type, "test")
         self.assertEqual(wave.wave_status, "test")
-        self.assertEqual(wave.wave_number, 1)
-        self.assertEqual(wave.client_id, "test")
-        self.assertEqual(wave.start_date, "2021-01-01")

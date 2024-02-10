@@ -10,48 +10,45 @@ from rest_framework import serializers
 from core import models
 
 
-class WaveSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the wave object.
-    """
+# class WaveSerializer(serializers.ModelSerializer):
+#     """
+#     Serializer for the wave object.
+#     """
 
-    class Meta:
-        """
-        Meta class for the wave serializer.
-        """
+#     class Meta:
+#         """
+#         Meta class for the wave serializer.
+#         """
 
-        model = models.Wave
-        fields = (
-            "id",
-            "start_date",
-            "end_date",
-            "created_at",
-            "client_id",
-            "wave_number",
-            "wave_name",
-            "wave_type",
-            "wave_status",
-        )
-        read_only_fields = ("id",)
+#         model = models.Wave
+#         fields = (
+#             "id",
+#             "start_date",
+#             "end_date",
+#             "created_at",
+#             "client_id",
+#             "wave_number",
+#             "wave_name",
+#             "wave_type",
+#             "wave_status",
+#         )
+#         read_only_fields = ("id",)
 
 
-class WaveUserSerializer(serializers.ModelSerializer):
-    """Serializer for the wave user object."""
+# class WaveUserSerializer(serializers.ModelSerializer):
+#     """Serializer for the wave user object."""
 
-    class Meta:
-        """Meta class for the wave user serializer."""
+#     class Meta:
+#         """Meta class for the wave user serializer."""
 
-        model = models.WaveUser
-        fields = "__all__"
+#         model = models.WaveUser
+#         fields = "__all__"
 
 
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for the user object GESIS.
     """
-
-    wave_users = WaveUserSerializer(many=True, read_only=True)
-
     class Meta:
         """
         Meta class for the user serializer.

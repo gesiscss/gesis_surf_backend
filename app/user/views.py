@@ -40,7 +40,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         """
-        Retrieve and return authentication user.
+        Retrieve and return authentication user with wave information.
         """
         return self.request.user
 
