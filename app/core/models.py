@@ -84,7 +84,7 @@ class User(
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    waves = models.ManyToManyField("Wave")
+    # waves = models.ManyToManyField("Wave")
 
     objects = UserManager()
 
@@ -112,12 +112,7 @@ class Wave(models.Model):
     start_date = models.DateTimeField(blank=False)
     end_date = models.DateTimeField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-    client_id = models.CharField(max_length=32, blank=False)
-    wave_number = models.IntegerField(blank=False)
-    wave_name = models.CharField(max_length=32, blank=False)
-    wave_type = models.CharField(max_length=32, blank=False)
-    wave_status = models.CharField(max_length=32, blank=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         """
