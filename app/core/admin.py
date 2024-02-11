@@ -14,7 +14,7 @@ class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users"""
 
     ordering = ["id"]
-    list_display = ["user_id", "is_active", "is_staff", "is_superuser"]
+    list_display = ["user_id", "is_active", "is_staff", "is_superuser", "last_login", "created_at"]
     fieldsets = (
         (None, {"fields": ("user_id", "password")}),
         (
@@ -43,3 +43,4 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Wave)

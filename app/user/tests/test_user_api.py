@@ -137,7 +137,7 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(
             response.data,
             {
-                "user_id": self.user.user_id,
+                "user_id": self.user.user_id
             },
         )
 

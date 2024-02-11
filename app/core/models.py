@@ -84,21 +84,11 @@ class User(
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    # waves = models.ManyToManyField("Wave")
+    waves = models.ManyToManyField("Wave")
 
     objects = UserManager()
 
     USERNAME_FIELD = "user_id"
-
-
-# class WaveUser(models.Model):
-#     """
-#     Custom wave participant model.
-#     """
-
-#     user = models.ForeignKey("User", on_delete=models.CASCADE)
-#     wave = models.ForeignKey("Wave", on_delete=models.CASCADE)
-#     additional_field = models.CharField(max_length=32)
 
 
 class Wave(models.Model):
@@ -109,11 +99,9 @@ class Wave(models.Model):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, blank=False
     )
-    start_date = models.DateTimeField(blank=False)
+    start_date = models.DateTimeField(blank=False, auto_now_add=True)
     end_date = models.DateTimeField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL)
-    # username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         """
@@ -123,4 +111,4 @@ class Wave(models.Model):
             str: A formatted string with wave information.
         """
 
-        return f"{self.client_id} - {self.wave_number} - {self.start_date} to {self.end_date}"
+        return f"{self.start_date} to {self.end_date}"

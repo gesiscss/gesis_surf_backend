@@ -9,6 +9,13 @@ from typing import Any
 from core import models
 
 
+def create_user(user_id="test", password="test123") -> Any:
+    """
+    Helper function to create a user.
+    """
+    return get_user_model().objects.create_user(user_id=user_id, password=password)
+
+
 class ModelTests(TestCase):
     """
     Tests for the models.
@@ -49,25 +56,23 @@ class ModelTests(TestCase):
         """
         Tests creating a new wave.
         """
-        user = get_user_model().objects.create_user(
-            user_id="test", password="test123"
-        )
+        user = create_user()
         wave = models.Wave.objects.create(
-            user=user,
+            # user=user,
             start_date="2021-01-01",
             end_date="2021-01-31",
             created_at="2021-01-01",
-            client_id="test",
-            wave_number="test",
-            wave_name="test",
-            wave_type="test",
-            wave_status="test",
+            # client_id="test",
+            # wave_number="test",
+            # wave_name="test",
+            # wave_type="test",
+            # wave_status="test",
         )
 
         self.assertEqual(wave.start_date, "2021-01-01")
         self.assertEqual(wave.end_date, "2021-01-31")
-        self.assertEqual(wave.client_id, "test")
-        self.assertEqual(wave.wave_number, "test")
-        self.assertEqual(wave.wave_name, "test")
-        self.assertEqual(wave.wave_type, "test")
-        self.assertEqual(wave.wave_status, "test")
+        # self.assertEqual(wave.client_id, "test")
+        # self.assertEqual(wave.wave_number, "test")
+        # self.assertEqual(wave.wave_name, "test")
+        # self.assertEqual(wave.wave_type, "test")
+        # self.assertEqual(wave.wave_status, "test")

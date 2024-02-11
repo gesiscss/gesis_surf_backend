@@ -10,59 +10,56 @@ from rest_framework import serializers
 from core import models
 
 
-# class WaveSerializer(serializers.ModelSerializer):
-#     """
-#     Serializer for the wave object.
-#     """
+class WaveSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the wave object.
+    """
 
-#     class Meta:
-#         """
-#         Meta class for the wave serializer.
-#         """
+    class Meta:
+        """
+        Meta class for the wave serializer.
+        """
 
-#         model = models.Wave
-#         fields = (
-#             "id",
-#             "start_date",
-#             "end_date",
-#             "created_at",
-#             "client_id",
-#             "wave_number",
-#             "wave_name",
-#             "wave_type",
-#             "wave_status",
-#         )
-#         read_only_fields = ("id",)
-
-
-# class WaveUserSerializer(serializers.ModelSerializer):
-#     """Serializer for the wave user object."""
-
-#     class Meta:
-#         """Meta class for the wave user serializer."""
-
-#         model = models.WaveUser
-#         fields = "__all__"
+        model = models.Wave
+        fields = (
+            # "id",
+            "start_date",
+            "end_date",
+            "created_at",
+            # "client_id",
+            # "wave_number",
+            # "wave_name",
+            # "wave_type",
+            # "wave_status",
+        )
+        read_only_fields = ("id",)
 
 
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for the user object GESIS.
     """
+
+    waves = WaveSerializer(many=True, read_only=True, required=False)
+
     class Meta:
         """
         Meta class for the user serializer.
         """
 
         model = get_user_model()
-        fields = ("user_id", "password", "wave_users")
+        fields = ("user_id", "password", "waves")
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
     def create(self, validated_data):
         """
         Create a new user with encrypted password and return it.
         """
-        return get_user_model().objects.create_user(**validated_data)
+        waves = validated_data.pop("waves", [])
+        user = get_user_model().objects.create_user(**validated_data)
+        for wave in waves:
+            user.waves.add(wave)
+        return user
 
     def update(self, instance, validated_data):
         """
