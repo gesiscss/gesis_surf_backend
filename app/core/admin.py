@@ -44,3 +44,4 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Wave)
+admin.site.register(models.Window)

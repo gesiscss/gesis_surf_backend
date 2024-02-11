@@ -112,3 +112,31 @@ class Wave(models.Model):
         """
 
         return f"{self.start_date} to {self.end_date}"
+
+
+class Window(models.Model):
+    """
+    Custom window model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="windows",
+    )
+    start_time = models.DateTimeField(blank=True)
+    closing_time = models.DateTimeField(blank=True)
+    created_at = models.DateTimeField(blank=True)
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the window.
+
+        Returns:
+            str: A formatted string with window information.
+        """
+
+        return f"{self.start_time} to {self.closing_time}"
