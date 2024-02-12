@@ -5,14 +5,14 @@ Tests for the recipe API
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APIClient
-from core.models import Window
 
-from recipe.serializers import WindowSerializer
+from core.models import Window
+from window.serializers import WindowSerializer
 
 WINDOW_URL = reverse("window:window-list")
+
 
 def create_window(user, **params):
     """
@@ -67,3 +67,17 @@ class PrivateWindowApiTests(TestCase):
         serializer = WindowSerializer(windows, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_windows_limited_to_user(self):
+        """
+        Test retrieving windows for user
+        """
+        user2 = get_user_model().objects.create_user("other", "testpass")
+        create_window(user=user2)
+        window = create_window(user=self.user)
+
+        res = self.client.get(WINDOW_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data[0]["id"], window.id)

@@ -2,9 +2,10 @@
 Tests for the models.
 """
 
+from typing import Any
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from typing import Any
 
 from core import models
 
@@ -58,7 +59,7 @@ class ModelTests(TestCase):
         """
         user = create_user()
         wave = models.Wave.objects.create(
-            # user=user,
+            user=user,
             start_date="2021-01-01",
             end_date="2021-01-31",
             created_at="2021-01-01",
