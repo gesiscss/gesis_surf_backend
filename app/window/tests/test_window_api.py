@@ -21,7 +21,6 @@ def create_window(user, **params):
     defaults = {
         "start_time": "2021-06-01 08:00:00",
         "closing_time": "2021-06-01 17:00:00",
-        "created_at": "2021-06-01 08:00:00",
     }
     defaults.update(params)
     return Window.objects.create(user=user, **defaults)
@@ -80,4 +79,4 @@ class PrivateWindowApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data[0]["id"], window.id)
+        self.assertEqual(res.data[0]["id"], str(window.id))

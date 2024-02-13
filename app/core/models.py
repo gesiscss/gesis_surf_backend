@@ -129,7 +129,7 @@ class Window(models.Model):
     )
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
-    created_at = models.DateTimeField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
 
     def __str__(self) -> str:
         """
