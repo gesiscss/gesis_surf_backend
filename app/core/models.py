@@ -99,7 +99,7 @@ class Wave(models.Model):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, blank=False
     )
-    start_date = models.DateTimeField(blank=False, auto_now_add=True)
+    start_date = models.DateTimeField(blank=False)
     end_date = models.DateTimeField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
 
