@@ -15,10 +15,10 @@ class WindowViewSet(viewsets.ModelViewSet):
     Manage windows in the database.
     """
 
+    serializer_class = serializers.WindowDetailSerializer
+    queryset = Window.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    queryset = Window.objects.all()
-    serializer_class = serializers.WindowSerializer
 
     def get_queryset(self):
         """
@@ -26,8 +26,11 @@ class WindowViewSet(viewsets.ModelViewSet):
         """
         return self.queryset.filter(user=self.request.user).order_by("-id")
 
-    def perform_create(self, serializer):
+    def get_serializer_class(self):
         """
-        Create a new window.
+        Return appropriate serializer class.
         """
-        serializer.save(user=self.request.user)
+        if self.action == "list":
+            return serializers.WindowSerializer
+
+        return self.serializer_class

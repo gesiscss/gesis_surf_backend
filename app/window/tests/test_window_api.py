@@ -9,9 +9,17 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Window
+from window.serializers import WindowDetailSerializer
 from window.serializers import WindowSerializer
 
 WINDOW_URL = reverse("window:window-list")
+
+
+def detail_url(window_id) -> str:
+    """
+    Return window detail URL
+    """
+    return reverse("window:window-detail", args=[window_id])
 
 
 def create_window(user, **params):
@@ -80,3 +88,15 @@ class PrivateWindowApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]["id"], str(window.id))
+
+    def test_get_window_detail(self):
+        """
+        Test viewing a window detail
+        """
+        window = create_window(user=self.user)
+
+        url = detail_url(window.id)
+        res = self.client.get(url)
+
+        serializer = WindowDetailSerializer(window)
+        self.assertEqual(res.data, serializer.data)

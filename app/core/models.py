@@ -5,11 +5,11 @@ This file is used to create models for the core app.
 import uuid
 from typing import Any
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
-from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -84,7 +84,7 @@ class User(
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    waves = models.ManyToManyField("Wave")
+    # waves = models.ManyToManyField("Wave")
 
     objects = UserManager()
 

@@ -26,4 +26,17 @@ class WindowSerializer(serializers.ModelSerializer):
             "user",
         )
         read_only_fields = ("id",)
-        extra_kwargs = {"user": {"read_only": True}}
+        # extra_kwargs = {"user": {"read_only": True}}
+
+
+class WindowDetailSerializer(WindowSerializer):
+    """
+    Serialize a window detail.
+    """
+
+    class Meta(WindowSerializer.Meta):
+        """
+        Meta class for the window detail serializer.
+        """
+
+        fields = WindowSerializer.Meta.fields + ("user",)

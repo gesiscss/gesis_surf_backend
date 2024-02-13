@@ -66,9 +66,9 @@ class ModelTests(TestCase):
         """
         Tests creating a new wave.
         """
-        user = create_user()
+        # user = create_user()
         wave = models.Wave.objects.create(
-            user=user,
+            # user=user,
             start_date=datetime.strptime("2021-01-01", "%Y-%m-%d"),
             end_date=datetime.strptime("2021-02-28", "%Y-%m-%d"),
         )
