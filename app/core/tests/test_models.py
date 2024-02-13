@@ -2,13 +2,14 @@
 Tests for the models.
 """
 
+from datetime import datetime
+from datetime import timezone
 from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from core import models
-from datetime import datetime, timezone
 
 
 def create_user(user_id="test", password="test123") -> Any:
@@ -55,11 +56,11 @@ class ModelTests(TestCase):
         self.assertTrue(user.is_staff)
 
     @staticmethod
-    def round_datetime(dt: datetime) -> datetime:
+    def round_datetime(d_t: datetime) -> datetime:
         """
         Rounds a datetime to the nearest minute.
         """
-        return dt.replace(second=0, microsecond=0)
+        return d_t.replace(second=0, microsecond=0)
 
     def test_create_wave(self) -> None:
         """
@@ -70,18 +71,11 @@ class ModelTests(TestCase):
             user=user,
             start_date=datetime.strptime("2021-01-01", "%Y-%m-%d"),
             end_date=datetime.strptime("2021-02-28", "%Y-%m-%d"),
-            # client_id="test",
-            # wave_number="test",
-            # wave_name="test",
-            # wave_type="test",
-            # wave_status="test",
         )
 
         self.assertEqual(wave.start_date, datetime.strptime("2021-01-01", "%Y-%m-%d"))
         self.assertEqual(wave.end_date, datetime.strptime("2021-02-28", "%Y-%m-%d"))
-        self.assertEqual(self.round_datetime(wave.created_at), self.round_datetime(datetime.now(timezone.utc)))
-        # self.assertEqual(wave.client_id, "test")
-        # self.assertEqual(wave.wave_number, "test")
-        # self.assertEqual(wave.wave_name, "test")
-        # self.assertEqual(wave.wave_type, "test")
-        # self.assertEqual(wave.wave_status, "test")
+        self.assertEqual(
+            self.round_datetime(wave.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
