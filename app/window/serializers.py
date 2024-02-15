@@ -1,5 +1,5 @@
 """
-Serializer for the window app
+Serializers for the window APIs.
 """
 
 from rest_framework import serializers
@@ -18,25 +18,21 @@ class WindowSerializer(serializers.ModelSerializer):
         """
 
         model = Window
-        fields = (
-            "id",
-            "start_time",
-            "closing_time",
-            "created_at",
-            "user",
-        )
-        read_only_fields = ("id",)
-        # extra_kwargs = {"user": {"read_only": True}}
+        fields = ["id", "start_time", "closing_time", "created_at"]
+
+        # Able to change the fields, but not the id.
+        read_only_fields = ["id"]
+        extra_kwargs = {"user": {"read_only": True}}
 
 
-class WindowDetailSerializer(WindowSerializer):
-    """
-    Serialize a window detail.
-    """
+# class WindowDetailSerializer(WindowSerializer):
+#     """
+#     Serialize a window detail.
+#     """
 
-    class Meta(WindowSerializer.Meta):
-        """
-        Meta class for the window detail serializer.
-        """
+#     class Meta(WindowSerializer.Meta):
+#         """
+#         Meta class for the window detail serializer.
+#         """
 
-        fields = WindowSerializer.Meta.fields + ("user",)
+#         fields = WindowSerializer.Meta.fields

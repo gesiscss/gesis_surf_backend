@@ -79,3 +79,28 @@ class ModelTests(TestCase):
             self.round_datetime(wave.created_at),
             self.round_datetime(datetime.now(timezone.utc)),
         )
+
+    def test_create_window(self) -> None:
+        """
+        Tests creating a new window.
+        """
+        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        window = models.Window.objects.create(
+            user=user,
+            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+
+        self.assertEqual(
+            window.start_time,
+            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(
+            window.closing_time,
+            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(
+            self.round_datetime(window.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
+        self.assertEqual(window.user, user)

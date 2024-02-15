@@ -122,10 +122,12 @@ class Window(models.Model):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, blank=False
     )
+    # Store the user who created the window
+    # Relationship with the user model
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="windows",
+        # related_name="windows",
     )
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
@@ -138,5 +140,5 @@ class Window(models.Model):
         Returns:
             str: A formatted string with window information.
         """
-
+        # Return information about the window at admin panel
         return f"{self.start_time} to {self.closing_time}"
