@@ -42,6 +42,6 @@ class WindowViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        Create a new window.
+        Create a new window that belongs to the authenticated user.
         """
         serializer.save(user=self.request.user)
