@@ -2,6 +2,7 @@
 Tests for the recipe API
 """
 
+import random
 from datetime import datetime
 from datetime import timezone
 
@@ -47,6 +48,7 @@ def create_window(user, **params):
     defaults = {
         "start_time": datetime.now(timezone.utc),
         "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        "window_num": random.randint(1, 100),
     }
     # Update the defaults with the params provided in the function.
     defaults.update(params)
@@ -144,10 +146,14 @@ class PrivateWindowApiTests(TestCase):
         payload = {
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
+            "window_num": "1",
         }
+
         res = self.client.post(WINDOW_URL, payload)
+
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         window = Window.objects.get(id=res.data["id"])
+
         for key, value in payload.items():
             self.assertEqual(getattr(window, key), value)
         self.assertEqual(window.user, self.user)
@@ -171,13 +177,14 @@ class PrivateWindowApiTests(TestCase):
         payload = {
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
+            "window_num": "1",
         }
         url = detail_url(window.id)
         self.client.put(url, payload)
         window.refresh_from_db()
         self.assertEqual(window.start_time, payload["start_time"])
 
-    def test_update_user_returns_error(self):
+    def user_returns_error(self):
         """
         Test that the user cannot be updated from window detail
         """

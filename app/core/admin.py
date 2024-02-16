@@ -2,7 +2,6 @@
 Django admin customization.
 """
 
-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
@@ -14,7 +13,14 @@ class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users"""
 
     ordering = ["id"]
-    list_display = ["user_id", "is_active", "is_staff", "is_superuser", "last_login", "created_at"]
+    list_display = [
+        "user_id",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "last_login",
+        "created_at",
+    ]
     fieldsets = (
         (None, {"fields": ("user_id", "password")}),
         (
@@ -45,3 +51,4 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Wave)
 admin.site.register(models.Window)
+admin.site.register(models.Tab)

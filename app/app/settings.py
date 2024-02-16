@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "user",
     "window",
+    # "tab",
 ]
 
 MIDDLEWARE = [

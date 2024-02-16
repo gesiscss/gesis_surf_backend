@@ -84,7 +84,6 @@ class User(
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    # waves = models.ManyToManyField("Wave")
 
     objects = UserManager()
 
@@ -102,6 +101,12 @@ class Wave(models.Model):
     start_date = models.DateTimeField(blank=False)
     end_date = models.DateTimeField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    wave_status = models.CharField(max_length=32, blank=False)
+    wave_type = models.CharField(max_length=32, blank=False)
+    wave_number = models.CharField(max_length=32, blank=False)
+    clent_id = models.CharField(max_length=32, blank=False)
+    # Create a relationship with the user model
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL)
 
     def __str__(self) -> str:
         """
@@ -132,6 +137,7 @@ class Window(models.Model):
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    window_num = models.CharField(max_length=32, blank=False, unique=True)
 
     def __str__(self) -> str:
         """
@@ -141,4 +147,42 @@ class Window(models.Model):
             str: A formatted string with window information.
         """
         # Return information about the window at admin panel
+        return f"{self.start_time} to {self.closing_time}"
+
+
+class Tab(models.Model):
+    """
+    Custom tab model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # Store the user who created the tab
+    # Relationship with the user model
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="tabs",
+    )
+    start_time = models.DateTimeField(blank=True)
+    closing_time = models.DateTimeField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    snapshot_html = models.TextField(blank=True)
+    tab_id = models.CharField(max_length=32, blank=False, unique=True)
+    # Create a relationship with the window model
+    window = models.ForeignKey(
+        Window,
+        on_delete=models.CASCADE,
+        related_name="tabs",
+    )
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the tab.
+
+        Returns:
+            str: A formatted string with tab information.
+        """
+        # Return information about the tab at admin panel
         return f"{self.start_time} to {self.closing_time}"
