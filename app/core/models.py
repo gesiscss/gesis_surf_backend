@@ -104,7 +104,7 @@ class Wave(models.Model):
     wave_status = models.CharField(max_length=32, blank=False)
     wave_type = models.CharField(max_length=32, blank=False)
     wave_number = models.CharField(max_length=32, blank=False)
-    clent_id = models.CharField(max_length=32, blank=False)
+    client_id = models.CharField(max_length=32, blank=False)
     # Create a relationship with the user model
     users = models.ManyToManyField(settings.AUTH_USER_MODEL)
 

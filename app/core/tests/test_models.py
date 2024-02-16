@@ -71,6 +71,11 @@ class ModelTests(TestCase):
             # user=user,
             start_date=datetime.strptime("2021-01-01", "%Y-%m-%d"),
             end_date=datetime.strptime("2021-02-28", "%Y-%m-%d"),
+            created_at=datetime.now(timezone.utc),
+            wave_status="active",
+            wave_type="test",
+            wave_number="1",
+            client_id="test",
         )
 
         self.assertEqual(wave.start_date, datetime.strptime("2021-01-01", "%Y-%m-%d"))
@@ -79,6 +84,10 @@ class ModelTests(TestCase):
             self.round_datetime(wave.created_at),
             self.round_datetime(datetime.now(timezone.utc)),
         )
+        self.assertEqual(wave.wave_status, "active")
+        self.assertEqual(wave.wave_type, "test")
+        self.assertEqual(wave.wave_number, "1")
+        self.assertEqual(wave.client_id, "test")
 
     def test_create_window(self) -> None:
         """
@@ -89,6 +98,8 @@ class ModelTests(TestCase):
             user=user,
             start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
             closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            created_at=datetime.now(timezone.utc),
+            window_num=1,
         )
 
         self.assertEqual(
@@ -104,3 +115,45 @@ class ModelTests(TestCase):
             self.round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(window.user, user)
+        self.assertEqual(window.window_num, 1)
+
+    def test_create_tab(self) -> None:
+        """
+        Tests creating a new tab instance.
+        """
+        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        tab = models.Tab.objects.create(
+            user=user,
+            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            created_at=datetime.now(timezone.utc),
+            snapshot_html="<html><body><h1>Test</h1></body></html>",
+            tab_id="test",
+            window=models.Window.objects.create(
+                user=user,
+                start_time=datetime.strptime(
+                    "2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"
+                ),
+                closing_time=datetime.strptime(
+                    "2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+                ),
+                created_at=datetime.now(timezone.utc),
+                window_num=1,
+            ),
+        )
+        self.assertEqual(
+            tab.start_time,
+            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(
+            tab.closing_time,
+            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(
+            self.round_datetime(tab.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
+        self.assertEqual(tab.user, user)
+        self.assertEqual(tab.snapshot_html, "<html><body><h1>Test</h1></body></html>")
+        self.assertEqual(tab.tab_id, "test")
+        self.assertEqual(tab.window.window_num, 1)
