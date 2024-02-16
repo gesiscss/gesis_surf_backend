@@ -176,6 +176,7 @@ class Tab(models.Model):
         on_delete=models.CASCADE,
         related_name="tabs",
     )
+    domains = models.ManyToManyField("Domain")
 
     def __str__(self) -> str:
         """
@@ -186,3 +187,35 @@ class Tab(models.Model):
         """
         # Return information about the tab at admin panel
         return f"{self.start_time} to {self.closing_time}"
+
+
+class Domain(models.Model):
+    """
+    Custom domain model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # Store the user who created the domain
+    # Relationship with the user model
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="domains",
+    )
+    domain_title = models.CharField(max_length=32, blank=False)
+    domain_url = models.CharField(max_length=32, blank=False)
+    domain_fav_icon = models.CharField(max_length=32, blank=False)
+    domain_status = models.CharField(max_length=32, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the domain.
+
+        Returns:
+            str: A formatted string with domain information.
+        """
+        # Return information about the domain at admin panel
+        return f"{self.domain_title} to {self.domain_url}"

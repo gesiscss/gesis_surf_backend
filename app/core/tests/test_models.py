@@ -66,9 +66,8 @@ class ModelTests(TestCase):
         """
         Tests creating a new wave.
         """
-        # user = create_user()
+
         wave = models.Wave.objects.create(
-            # user=user,
             start_date=datetime.strptime("2021-01-01", "%Y-%m-%d"),
             end_date=datetime.strptime("2021-02-28", "%Y-%m-%d"),
             created_at=datetime.now(timezone.utc),
@@ -157,3 +156,26 @@ class ModelTests(TestCase):
         self.assertEqual(tab.snapshot_html, "<html><body><h1>Test</h1></body></html>")
         self.assertEqual(tab.tab_id, "test")
         self.assertEqual(tab.window.window_num, 1)
+
+    def test_create_domain(self) -> None:
+        """
+        Tests creating a new domain instance.
+        """
+        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        domain = models.Domain.objects.create(
+            user=user,
+            domain_title="Test",
+            domain_url="https://www.test.com",
+            domain_fav_icon="test.ico",
+            domain_status="active",
+            created_at=datetime.now(timezone.utc),
+        )
+        self.assertEqual(domain.domain_title, "Test")
+        self.assertEqual(domain.domain_url, "https://www.test.com")
+        self.assertEqual(domain.domain_fav_icon, "test.ico")
+        self.assertEqual(domain.domain_status, "active")
+        self.assertEqual(
+            self.round_datetime(domain.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
+        self.assertEqual(domain.user, user)
