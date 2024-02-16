@@ -179,3 +179,35 @@ class ModelTests(TestCase):
             self.round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(domain.user, user)
+
+    def test_create_click(self) -> None:
+        """
+        Test creating a new click instance.
+        """
+        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        click = models.Click.objects.create(
+            user=user,
+            click_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            click_type="click",
+            click_location="test",
+            created_at=datetime.now(timezone.utc),
+            domain=models.Domain.objects.create(
+                user=user,
+                domain_title="Test",
+                domain_url="https://www.test.com",
+                domain_fav_icon="test.ico",
+                domain_status="active",
+                created_at=datetime.now(timezone.utc),
+            ),
+        )
+        self.assertEqual(
+            click.click_time,
+            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(click.click_type, "click")
+        self.assertEqual(click.click_location, "test")
+        self.assertEqual(
+            self.round_datetime(click.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
+        self.assertEqual(click.user, user)

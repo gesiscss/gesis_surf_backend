@@ -219,3 +219,39 @@ class Domain(models.Model):
         """
         # Return information about the domain at admin panel
         return f"{self.domain_title} to {self.domain_url}"
+
+
+class Click(models.Model):
+    """
+    Custom click model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # Store the user who created the click
+    # Relationship with the user model
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="clicks",
+    )
+    click_time = models.DateTimeField(blank=True)
+    click_type = models.CharField(max_length=32, blank=False)
+    click_location = models.CharField(max_length=32, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    domain = models.ForeignKey(
+        Domain,
+        on_delete=models.CASCADE,
+        related_name="clicks",
+    )
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the click.
+
+        Returns:
+            str: A formatted string with click information.
+        """
+        # Return information about the click at admin panel
+        return f"{self.click_time} to {self.click_type}"
