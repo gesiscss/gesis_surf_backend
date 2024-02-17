@@ -255,3 +255,31 @@ class Click(models.Model):
         """
         # Return information about the click at admin panel
         return f"{self.click_time} to {self.click_type}"
+
+
+class Scroll(models.Model):
+    """
+    Create a scroll model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # Store the user who created the scroll
+    # Relationship with the user model
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="scrolls",
+    )
+    scroll_time = models.DateTimeField(blank=True)
+    scroll_x = models.IntegerField(blank=False)
+    scroll_y = models.IntegerField(blank=False)
+    page_x_offset = models.IntegerField(blank=False)
+    page_y_offset = models.IntegerField(blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    domain = models.ForeignKey(
+        Domain,
+        on_delete=models.CASCADE,
+        related_name="scrolls",
+    )

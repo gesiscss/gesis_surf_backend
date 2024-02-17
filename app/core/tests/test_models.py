@@ -211,3 +211,40 @@ class ModelTests(TestCase):
             self.round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(click.user, user)
+
+    def test_create_scroll(self):
+        """
+        Test creating a new scroll instance.
+        """
+        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        scroll = models.Scroll.objects.create(
+            user=user,
+            scroll_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            scroll_x=0,
+            scroll_y=0,
+            page_x_offset=0,
+            page_y_offset=0,
+            created_at=datetime.now(timezone.utc),
+            # Create the domain_id for the scroll
+            domain=models.Domain.objects.create(
+                user=user,
+                domain_title="Test",
+                domain_url="https://www.test.com",
+                domain_fav_icon="test.ico",
+                domain_status="active",
+                created_at=datetime.now(timezone.utc),
+            ),
+        )
+        self.assertEqual(
+            scroll.scroll_time,
+            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(scroll.scroll_x, 0)
+        self.assertEqual(scroll.scroll_y, 0)
+        self.assertEqual(scroll.page_x_offset, 0)
+        self.assertEqual(scroll.page_y_offset, 0)
+        self.assertEqual(
+            self.round_datetime(scroll.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
+        self.assertEqual(scroll.user, user)
