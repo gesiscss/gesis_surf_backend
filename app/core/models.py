@@ -137,7 +137,7 @@ class Window(models.Model):
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-    window_num = models.CharField(max_length=32, blank=False, unique=True)
+    window_num = models.CharField(max_length=32, blank=False)
 
     def __str__(self) -> str:
         """
@@ -169,13 +169,14 @@ class Tab(models.Model):
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     snapshot_html = models.TextField(blank=True)
-    tab_id = models.CharField(max_length=32, blank=False, unique=True)
+    tab_id = models.CharField(max_length=32, blank=False)
+    window_num = models.CharField(max_length=32, blank=False)
     # Create a relationship with the window model
-    window = models.ForeignKey(
-        Window,
-        on_delete=models.CASCADE,
-        related_name="tabs",
-    )
+    # window = models.ForeignKey(
+    #     Window,
+    #     on_delete=models.CASCADE,
+    #     related_name="tabs",
+    # )
     domains = models.ManyToManyField("Domain")
 
     def __str__(self) -> str:

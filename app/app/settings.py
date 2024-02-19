@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "user",
     # "wave",
     "window",
-    # "tab",
+    "tab",
     # "domain",
     # "click",
 ]

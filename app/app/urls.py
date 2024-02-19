@@ -31,4 +31,5 @@ urlpatterns = [
     ),
     path("api/user/", include("user.urls")),
     path("api/window/", include("window.urls")),
+    path("api/tab/", include("tab.urls")),
 ]
