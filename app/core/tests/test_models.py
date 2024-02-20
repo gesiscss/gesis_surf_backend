@@ -127,7 +127,7 @@ class ModelTests(TestCase):
             closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
             created_at=datetime.now(timezone.utc),
             snapshot_html="<html><body><h1>Test</h1></body></html>",
-            tab_id="test",
+            tab_num="test",
         )
         self.assertEqual(
             tab.start_time,
@@ -143,7 +143,7 @@ class ModelTests(TestCase):
         )
         self.assertEqual(tab.user, user)
         self.assertEqual(tab.snapshot_html, "<html><body><h1>Test</h1></body></html>")
-        self.assertEqual(tab.tab_id, "test")
+        self.assertEqual(tab.tab_num, "test")
 
     def test_create_domain(self) -> None:
         """

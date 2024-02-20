@@ -20,7 +20,6 @@ class TabSerializer(serializers.ModelSerializer):
         model = Tab
         fields = [
             "id",
-            # "user",
             "start_time",
             "closing_time",
             "created_at",

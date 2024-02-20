@@ -32,7 +32,7 @@ class TabViewSet(viewsets.ModelViewSet):
         """
         return self.queryset.filter(user=self.request.user).order_by("-id")
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         """
         Create a new tab that belongs to the authenticated user.
         """

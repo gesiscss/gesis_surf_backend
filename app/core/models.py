@@ -169,7 +169,7 @@ class Tab(models.Model):
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     snapshot_html = models.TextField(blank=True)
-    tab_id = models.CharField(max_length=32, blank=False)
+    tab_num = models.CharField(max_length=32, blank=False)
     window_num = models.CharField(max_length=32, blank=False)
     # Create a relationship with the window model
     # window = models.ForeignKey(
