@@ -18,7 +18,13 @@ class WindowSerializer(serializers.ModelSerializer):
         """
 
         model = Window
-        fields = ["id", "start_time", "closing_time", "created_at", "window_num"]
+        fields = [
+            "id",
+            "start_time",
+            "closing_time",
+            "created_at",
+            "window_num",
+        ]
 
         # Able to change the fields, but not the id.
         read_only_fields = ["id"]

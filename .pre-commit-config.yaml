@@ -34,21 +34,21 @@ repos:
       - id: autoflake
         name: remove unused imports
     repo: https://github.com/PyCQA/autoflake
-    rev: v2.2.1
+    rev: v2.3.0
   - hooks:
       - id: black
         name: format
     repo: https://github.com/psf/black
-    rev: 24.1.1
+    rev: 24.2.0
   - hooks:
       - id: commitizen
       - id: commitizen-branch
         stages:
           - push
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.14.1
+    rev: v3.15.0
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.15.0
+    rev: 1.16.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.1"] # Replace with Django version
@@ -75,7 +75,7 @@ repos:
           - --fix
         id: eslint
     repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.0.0-alpha.2
+    rev: v9.0.0-beta.0
   - repo: https://github.com/pre-commit/mirrors-pylint
     rev: v3.0.0a5
     hooks:
@@ -111,11 +111,11 @@ repos:
           - --py310-plus
         id: pyupgrade
     repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
+    rev: v3.15.1
   - hooks:
       - id: black
     repo: https://github.com/psf/black
-    rev: 24.1.1
+    rev: 24.2.0
   - hooks:
       - additional_dependencies:
           - black==23.11.0

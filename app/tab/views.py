@@ -16,7 +16,7 @@ class TabViewSet(viewsets.ModelViewSet):
     Manage tabs in the database.
     """
 
-    serializer_class = serializers.TabSerializer
+    serializer_class = serializers.TabDetailSerializer
     # Objects available to the authenticated user.
     queryset = Tab.objects.all()
     authentication_classes = [
@@ -31,6 +31,15 @@ class TabViewSet(viewsets.ModelViewSet):
         Return objects for the current authenticated user only.
         """
         return self.queryset.filter(user=self.request.user).order_by("-id")
+
+    def get_serializer_class(self):
+        """
+        Return appropriate serializer class.
+        """
+        if self.action == "list":
+            return serializers.TabSerializer
+
+        return self.serializer_class
 
     def perform_create(self, serializer) -> None:
         """

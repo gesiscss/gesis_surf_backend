@@ -2,6 +2,9 @@
 Test for tab APIs.
 """
 
+from datetime import datetime
+from datetime import timezone
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -13,6 +16,13 @@ from tab.serializers import TabDetailSerializer
 from tab.serializers import TabSerializer
 
 TAB_URL = reverse("tab:tab-list")
+
+
+def round_datetime(d_t: datetime) -> datetime:
+    """
+    Round the datetime to the nearest second.
+    """
+    return d_t.replace(second=0, microsecond=0)
 
 
 def create_user(**params):
@@ -27,8 +37,8 @@ def create_tab(user, **params) -> Tab:
     Create and return a sample tab
     """
     defaults = {
-        "start_time": "2024-06-01 16:00:00",
-        "closing_time": "2024-06-01 17:00:00",
+        "start_time": datetime.now(timezone.utc),
+        "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
         "snapshot_html": "Test HTML",
         "tab_num": "Test Tab ID",
         "window_num": 1,  # it isnot unique such that can close the tab
@@ -107,7 +117,7 @@ class PrivateTabApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data[0]["tab_id"], tab.tab_id)
+        self.assertEqual(res.data[0]["tab_num"], tab.tab_num)
 
     def test_get_tab_detail(self) -> None:
         """
@@ -115,8 +125,93 @@ class PrivateTabApiTests(TestCase):
         """
         tab = create_tab(user=self.user)
         # The URL for the detail of the tab
-        url = detail_url(tab.tab_id)
+        url = detail_url(tab.id)
         res = self.client.get(url)
 
-        serializer = TabSerializer(tab)
+        serializer = TabDetailSerializer(tab)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_tab(self) -> None:
+        """
+        Test creating a tab
+        """
+        payload = {
+            "start_time": datetime.now(timezone.utc),
+            "closing_time": datetime.now(timezone.utc),
+            "snapshot_html": "Test HTML",
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+        }
+        res = self.client.post(TAB_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tab = Tab.objects.get(id=res.data["id"])
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(tab, key))
+
+    def test_partial_update_tab(self) -> None:
+        """
+        Test updating a tab with patch
+        """
+        tab = create_tab(user=self.user)
+        payload = {"start_time": datetime.now(timezone.utc)}
+        url = detail_url(tab.id)
+        self.client.patch(url, payload)
+
+        tab.refresh_from_db()
+        self.assertEqual(tab.start_time, payload["start_time"])
+
+    def test_full_update_tab(self) -> None:
+        """
+        Test updating a tab with put
+        """
+        tab = create_tab(user=self.user)
+        payload = {
+            "start_time": datetime.now(timezone.utc),
+            "closing_time": datetime.now(timezone.utc),
+            "snapshot_html": "Test HTML",
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+        }
+        url = detail_url(tab.id)
+        self.client.put(url, payload)
+        tab.refresh_from_db()
+        self.assertEqual(tab.start_time, payload["start_time"])
+
+    def user_returns_error(self) -> None:
+        """
+        Test that the user cannot be updated from tab detail
+        """
+        new_user = create_user(user_id="test2", password="test123")
+        tab = create_tab(user=self.user)
+
+        payload = {"user": new_user}
+        url = detail_url(tab.id)
+        self.client.patch(url, payload)
+
+        tab.refresh_from_db()
+        self.assertEqual(tab.user, self.user)
+
+    def test_delete_tab(self) -> None:
+        """
+        Test deleting a tab
+        """
+        tab = create_tab(user=self.user)
+        url = detail_url(tab.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Tab.objects.filter(id=tab.id).count(), 0)
+
+    def test_delete_other_user_recipe_error(self) -> None:
+        """
+        Test that the user cannot delete other user's tab
+        """
+        user2 = create_user(user_id="test2", password="test123")
+        tab = create_tab(user=user2)
+
+        url = detail_url(tab.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(Tab.objects.filter(id=tab.id).count(), 1)
