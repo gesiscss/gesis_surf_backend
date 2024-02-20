@@ -4,6 +4,7 @@ Test for tab APIs.
 
 from datetime import datetime
 from datetime import timezone
+from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -11,6 +12,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from core.models import Domain
 from core.models import Tab
 from tab.serializers import TabDetailSerializer
 from tab.serializers import TabSerializer
@@ -215,3 +217,35 @@ class PrivateTabApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(Tab.objects.filter(id=tab.id).count(), 1)
+
+    def test_create_tab_with_new_domains(self):
+        """
+        Test creating a Tab with new domains
+        """
+        payload: dict[str, Any] = {
+            "start_time": datetime.now(timezone.utc),
+            "closing_time": datetime.now(timezone.utc),
+            "snapshot_html": "Test HTML",
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "domains": [
+                {
+                    "domain_title": "Test Domain",
+                    "domain_url": "Test URL",
+                    "domain_fav_icon": "Test Icon",
+                    "domain_status": "Test Status",
+                }
+            ],
+        }
+        res = self.client.post(TAB_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tabs = Tab.objects.filter(user=self.user)
+        self.assertEqual(len(tabs), 1)
+        tab = tabs[0]
+        self.assertEqual(tab.domains.count(), 1)
+        for key in payload["domains"][0]:
+            exists = tab.domains.filter(
+                domain_title=payload["domains"][0][key]
+            ).exists()
+            self.assertTrue(exists)

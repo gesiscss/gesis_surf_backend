@@ -10,6 +10,8 @@ from tab import views
 
 router = DefaultRouter()
 router.register("tabs", views.TabViewSet)
+router.register("domains", views.DomainViewSet)
+
 
 app_name = "tab"
 

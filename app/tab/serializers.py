@@ -4,6 +4,7 @@ Serializers for the Tab APIs.
 
 from rest_framework import serializers
 
+from core.models import Domain
 from core.models import Tab
 
 
@@ -45,3 +46,24 @@ class TabDetailSerializer(TabSerializer):
 
         fields = TabSerializer.Meta.fields + ["user"]
         read_only_fields = TabSerializer.Meta.read_only_fields
+
+
+class DomainSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the domain object.
+    """
+
+    class Meta:
+        """
+        Meta class for the domain
+        """
+
+        model = Domain
+        fields = [
+            "id",
+            "domain_title",
+            "domain_url",
+            "domain_fav_icon",
+            "domain_status",
+        ]
+        read_only_fields = ["id"]
