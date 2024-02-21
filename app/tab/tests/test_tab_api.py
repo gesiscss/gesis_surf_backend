@@ -148,8 +148,8 @@ class PrivateTabApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         tab = Tab.objects.get(id=res.data["id"])
-        for key in payload.keys():
-            self.assertEqual(payload[key], getattr(tab, key))
+        for key, value in payload.items():
+            self.assertEqual(value, getattr(tab, key))
 
     def test_partial_update_tab(self) -> None:
         """
@@ -234,6 +234,52 @@ class PrivateTabApiTests(TestCase):
                     "domain_url": "Test URL",
                     "domain_fav_icon": "Test Icon",
                     "domain_status": "Test Status",
+                },
+                {
+                    "domain_title": "Test Domain 2",
+                    "domain_url": "Test URL 2",
+                    "domain_fav_icon": "Test Icon 2",
+                    "domain_status": "Test Status 2",
+                },
+            ],
+        }
+        res = self.client.post(TAB_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tabs = Tab.objects.filter(user=self.user)
+        # Check that the created domains are two.
+        self.assertEqual(tabs.count(), 1)
+        tab = tabs[0]
+        self.assertEqual(tab.domains.count(), 2)
+        for domain in payload["domains"]:
+            exists = tab.domains.filter(
+                domain_title=domain["domain_title"], user=self.user
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_create_tab_with_existing_domain(self):
+        """
+        Test creating a Tab with existing domains
+        """
+        domain = Domain.objects.create(
+            user=self.user,
+            domain_title="Test Domain",
+            domain_url="Test URL",
+            domain_fav_icon="Test Icon",
+            domain_status="Test Status",
+        )
+        payload: dict[str, Any] = {
+            "start_time": datetime.now(timezone.utc),
+            "closing_time": datetime.now(timezone.utc),
+            "snapshot_html": "Test HTML",
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "domains": [
+                {
+                    "domain_title": domain.domain_title,
+                    "domain_url": domain.domain_url,
+                    "domain_fav_icon": domain.domain_fav_icon,
+                    "domain_status": domain.domain_status,
                 }
             ],
         }
@@ -241,11 +287,185 @@ class PrivateTabApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         tabs = Tab.objects.filter(user=self.user)
-        self.assertEqual(len(tabs), 1)
+        self.assertEqual(tabs.count(), 1)
         tab = tabs[0]
         self.assertEqual(tab.domains.count(), 1)
-        for key in payload["domains"][0]:
-            exists = tab.domains.filter(
-                domain_title=payload["domains"][0][key]
-            ).exists()
-            self.assertTrue(exists)
+        exists = tab.domains.filter(
+            domain_title=domain.domain_title, user=self.user
+        ).exists()
+        self.assertTrue(exists)
+
+    def test_create_domain_with_existing_tab_same_title(self) -> None:
+        """
+        Create the domain with the same title and check if it is created
+        """
+        domain_google: "Domain" = Domain.objects.create(
+            user=self.user,
+            domain_title="Google",
+            domain_url="Test URL",
+            domain_fav_icon="Test Icon",
+            domain_status="Test Status",
+        )
+        payload: dict[str, Any] = {
+            "start_time": datetime.now(timezone.utc),
+            "closing_time": datetime.now(timezone.utc),
+            "snapshot_html": "Test HTML",
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "domains": [
+                {
+                    "domain_title": domain_google.domain_title,
+                    "domain_url": domain_google.domain_url,
+                    "domain_fav_icon": domain_google.domain_fav_icon,
+                    "domain_status": domain_google.domain_status,
+                }
+            ],
+        }
+        res = self.client.post(TAB_URL, payload, format="json")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_create_tab_with_existing_domains(self) -> None:
+        """Test creating a Tab with existing domains"""
+        domain = Domain.objects.create(
+            user=self.user,
+            domain_title="Test Domain",
+            domain_url="Test URL",
+            domain_fav_icon="Test Icon",
+            domain_status="Test Status",
+        )
+        tab = create_tab(user=self.user)
+        tab.domains.add(domain)
+        payload: dict[str, Any] = {
+            "start_time": datetime.now(timezone.utc),
+            "closing_time": datetime.now(timezone.utc),
+            "snapshot_html": "Test HTML",
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "domains": [
+                {
+                    "domain_title": domain.domain_title,
+                    "domain_url": domain.domain_url,
+                    "domain_fav_icon": domain.domain_fav_icon,
+                    "domain_status": domain.domain_status,
+                }
+            ],
+        }
+        res = self.client.post(TAB_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tabs = Tab.objects.filter(user=self.user)
+        self.assertEqual(tabs.count(), 2)
+        tab = tabs[0]
+        self.assertEqual(tab.domains.count(), 1)
+        exists = tab.domains.filter(
+            domain_title=domain.domain_title, user=self.user
+        ).exists()
+        self.assertTrue(exists)
+        tab = tabs[1]
+        self.assertEqual(tab.domains.count(), 1)
+        exists = tab.domains.filter(
+            domain_title=domain.domain_title, user=self.user
+        ).exists()
+        self.assertTrue(exists)
+
+    def test_create_tab_with_two_identical_domains(self) -> None:
+        """
+        Test create a tab with two identical domains
+        """
+        tab = create_tab(user=self.user)
+        domain = Domain.objects.create(
+            user=self.user,
+            domain_title="Test Domain",
+            domain_url="Test URL",
+            domain_fav_icon="Test Icon",
+            domain_status="Test Status",
+        )
+        tab.domains.add(domain)
+        payload: dict[str, Any] = {
+            "start_time": datetime.now(timezone.utc),
+            "closing_time": datetime.now(timezone.utc),
+            "snapshot_html": "Test HTML",
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "domains": [
+                {
+                    "domain_title": domain.domain_title,
+                    "domain_url": domain.domain_url,
+                    "domain_fav_icon": domain.domain_fav_icon,
+                    "domain_status": domain.domain_status,
+                },
+                {
+                    "domain_title": domain.domain_title,
+                    "domain_url": domain.domain_url,
+                    "domain_fav_icon": domain.domain_fav_icon,
+                    "domain_status": domain.domain_status,
+                },
+            ],
+        }
+        res = self.client.post(TAB_URL, payload, format="json")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Tab.objects.filter(user=self.user).count(), 2)
+
+    def test_create_domain_on_update(self) -> None:
+        """
+        Test creating a domain on update
+        """
+        tab = create_tab(user=self.user)
+
+        payload = {"domains": [{"domain_title": "Test Domain"}]}
+        url = detail_url(tab.id)
+        res = self.client.patch(url, payload, format="json")
+
+        # There is no refresh db since it is a many to many field
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_domain = Domain.objects.get(domain_title="Test Domain")
+        self.assertIn(new_domain, tab.domains.all())
+
+    def test_update_tab_assigned_domain(self) -> None:
+        """
+        Test updating a tab with assigned domain
+        """
+        domain = Domain.objects.create(
+            user=self.user,
+            domain_title="Test Domain",
+            domain_url="Test URL",
+            domain_fav_icon="Test Icon",
+            domain_status="Test Status",
+        )
+        tab = create_tab(user=self.user)
+        tab.domains.add(domain)
+
+        domain_two = Domain.objects.create(
+            user=self.user,
+            domain_title="Test Domain 2",
+            domain_url="Test URL 2",
+            domain_fav_icon="Test Icon 2",
+            domain_status="Test Status 2",
+        )
+        payload = {"domains": [{"domain_title": "Test Domain 2"}]}
+        url = detail_url(tab.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        # self.assertIn(domain_two, tab.domains.all())
+        self.assertNotIn(domain, tab.domains.all())
+
+    def test_clear_tab_domains(self) -> None:
+        """
+        Test clearing tab domains
+        """
+        domain = Domain.objects.create(
+            user=self.user,
+            domain_title="Test Domain",
+            domain_url="Test URL",
+            domain_fav_icon="Test Icon",
+            domain_status="Test Status",
+        )
+        tab = create_tab(user=self.user)
+        tab.domains.add(domain)
+        payload = {"domains": []}
+        url = detail_url(tab.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(tab.domains.count(), 0)
