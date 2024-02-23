@@ -47,8 +47,7 @@ INSTALLED_APPS = [
     # "wave",
     "window",
     "tab",
-    # "domain",
-    # "click",
+    "domain",
 ]
 
 MIDDLEWARE = [

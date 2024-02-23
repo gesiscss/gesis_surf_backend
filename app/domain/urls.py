@@ -1,17 +1,16 @@
 """
-URLs for the tab app
+URLs for the domain app
 """
 
 from django.urls import include, path
+from domain import views
 from rest_framework.routers import DefaultRouter
-from tab import views
 
 router = DefaultRouter()
-router.register("tabs", views.TabViewSet)
 router.register("domains", views.DomainViewSet)
+router.register("clicks", views.ClickViewSet)
 
-
-app_name = "tab"
+app_name = "domain"
 
 urlpatterns = [
     path("", include(router.urls)),

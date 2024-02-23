@@ -16,10 +16,8 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import include
-from django.urls import path
-from drf_spectacular.views import SpectacularAPIView
-from drf_spectacular.views import SpectacularSwaggerView
+from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -32,4 +30,5 @@ urlpatterns = [
     path("api/user/", include("user.urls")),
     path("api/window/", include("window.urls")),
     path("api/tab/", include("tab.urls")),
+    path("api/domain/", include("domain.urls")),
 ]
