@@ -2,12 +2,10 @@
 Serializers for the user API views.
 """
 
-from django.contrib.auth import authenticate
-from django.contrib.auth import get_user_model
+from core import models
+from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-
-from core import models
 
 
 class WaveSerializer(serializers.ModelSerializer):
@@ -22,15 +20,14 @@ class WaveSerializer(serializers.ModelSerializer):
 
         model = models.Wave
         fields = (
-            # "id",
+            "id",
             "start_date",
             "end_date",
             "created_at",
-            # "client_id",
-            # "wave_number",
-            # "wave_name",
-            # "wave_type",
-            # "wave_status",
+            "wave_status",
+            "wave_type",
+            "wave_number",
+            "client_id",
         )
         read_only_fields = ("id",)
 

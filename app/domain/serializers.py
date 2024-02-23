@@ -26,7 +26,7 @@ class ClickSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class DomainSerializer(serializers.ModelSerializer):
+class DomainSingleSerializer(serializers.ModelSerializer):
     """
     Serializer for the domain object.
     """
@@ -86,15 +86,15 @@ class DomainSerializer(serializers.ModelSerializer):
         return instance
 
 
-class DomainDetailSerializer(DomainSerializer):
+class DomainDetailSerializer(DomainSingleSerializer):
     """
     Serialize a domain detail
     """
 
-    class Meta(DomainSerializer.Meta):
+    class Meta(DomainSingleSerializer.Meta):
         """
         Meta class for the domain detail
         """
 
-        fields = DomainSerializer.Meta.fields + ["clicks"]
-        read_only_fields = DomainSerializer.Meta.read_only_fields + ["clicks"]
+        fields = DomainSingleSerializer.Meta.fields + ["clicks"]
+        read_only_fields = DomainSingleSerializer.Meta.read_only_fields + ["clicks"]

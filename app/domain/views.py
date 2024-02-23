@@ -36,7 +36,7 @@ class DomainViewSet(viewsets.ModelViewSet):
         Return appropriate serializer class.
         """
         if self.action == "list":
-            return serializers.DomainSerializer
+            return serializers.DomainSingleSerializer
 
         return self.serializer_class
 
