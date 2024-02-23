@@ -4,14 +4,36 @@ Serializers for the Tab APIs.
 
 from rest_framework import serializers
 
+from core.models import Click
 from core.models import Domain
 from core.models import Tab
+
+
+class ClickSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the click object.
+    """
+
+    class Meta:
+        """
+        Meta class for the click
+        """
+
+        model = Click
+        fields = [
+            "id",
+            "click_location",
+            "click_type",
+            "click_time",
+        ]
+        read_only_fields = ["id"]
 
 
 class DomainSerializer(serializers.ModelSerializer):
     """
     Serializer for the domain object.
     """
+    clicks = ClickSerializer(many=True, required=False)
 
     class Meta:
         """
@@ -25,6 +47,7 @@ class DomainSerializer(serializers.ModelSerializer):
             "domain_url",
             "domain_fav_icon",
             "domain_status",
+            "clicks",
         ]
         read_only_fields = ["id"]
 

@@ -11,6 +11,7 @@ from tab import views
 router = DefaultRouter()
 router.register("tabs", views.TabViewSet)
 router.register("domains", views.DomainViewSet)
+# router.register("clicks", views.ClickViewSet)
 
 
 app_name = "tab"

@@ -7,6 +7,8 @@ from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from core.models import Domain
 from core.models import Tab
@@ -74,3 +76,29 @@ class DomainViewSet(
         Return objects for the current authenticated user only.
         """
         return self.queryset.filter(user=self.request.user).order_by("-id")
+
+    # retrive all clicks for a domain
+    @action(detail=True, methods=["GET"])
+    def clicks(self, request, *args, **kwargs):
+        """
+        Retrieve all clicks for a domain.
+        """
+        domain = self.get_object()
+        serializer = serializers.ClickSerializer(
+            domain.clicks.all(), many=True
+        )
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["POST"])
+    def add_click(self, request, *args, **kwargs):
+        """
+        Add a click to a domain.
+        """
+        domain = self.get_object()
+        serializer = serializers.ClickSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(domain=domain)
+            return Response(serializer.data, status=201)
+        return Response(
+            serializer.errors, status=400
+        )
