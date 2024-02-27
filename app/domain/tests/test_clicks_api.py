@@ -10,7 +10,7 @@ from domain.serializers import ClickSerializer
 from rest_framework import status
 from rest_framework.test import APIClient
 
-DOMAIN_URL = reverse("tab:click-list")
+DOMAIN_URL = reverse("domain:click-list")
 
 
 def detail_url(click: Click) -> str:

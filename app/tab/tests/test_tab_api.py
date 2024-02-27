@@ -2,20 +2,16 @@
 Test for tab APIs.
 """
 
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 from typing import Any
 
+from core.models import Domain, Tab
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-
-from core.models import Domain
-from core.models import Tab
-from tab.serializers import TabDetailSerializer
-from tab.serializers import TabSerializer
+from tab.serializers import TabDetailSerializer, TabSerializer
 
 TAB_URL = reverse("tab:tab-list")
 
@@ -180,7 +176,7 @@ class PrivateTabApiTests(TestCase):
         tab.refresh_from_db()
         self.assertEqual(tab.start_time, payload["start_time"])
 
-    def user_returns_error(self) -> None:
+    def test_user_returns_error(self) -> None:
         """
         Test that the user cannot be updated from tab detail
         """

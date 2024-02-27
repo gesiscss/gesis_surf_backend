@@ -75,9 +75,16 @@ class DomainSingleSerializer(serializers.ModelSerializer):
         """
         clicks: list = validated_data.pop("clicks", [])
 
-        if clicks is not None:
-            instance.clicks.clear()
-            self._create_clicks(clicks, instance)
+        # Update or delete existing clicks
+        for click in instance.clicks.all():
+            click_data = next((item for item in clicks if item["id"] == click.id), None)
+            if click_data:
+                click_instance = Click.objects.get(id=click.id)
+                click_instance.update(**click_data)
+            else:
+                click.delete()
+
+        self._create_clicks(clicks, instance)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
