@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APIClient
 
-CLICK_URL = reverse("domain:click-list")
+CLICK_URL: str = reverse("domain:click-list")
 
 
 def detail_url(click: Click) -> str:
