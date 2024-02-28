@@ -10,14 +10,14 @@ from domain.serializers import ClickSerializer
 from rest_framework import status
 from rest_framework.test import APIClient
 
-DOMAIN_URL = reverse("domain:click-list")
+CLICK_URL = reverse("domain:click-list")
 
 
 def detail_url(click: Click) -> str:
     """
     Return the click detail URL
     """
-    return reverse("tab:click-detail", args=[click.id])
+    return reverse("domain:click-detail", args=[click.id])
 
 
 def create_user(username: str = "test", password: str = "testpass") -> User:
@@ -53,44 +53,45 @@ class PublicClickApiTests(TestCase):
         Test that login is required for retrieving clicks
         """
         # Make a request to the click URL without logging in.
-        res = self.client.get(DOMAIN_URL)
+        res = self.client.get(CLICK_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-# class PrivateClickApiTests(TestCase):
-#     """
-#     Test the private click API
-#     """
+class PrivateClickApiTests(TestCase):
+    """
+    Test the private click API
+    """
 
-#     def setUp(self) -> None:
-#         self.client = APIClient()
-#         self.user = create_user()
-#         self.client.force_authenticate(self.user)
+    def setUp(self) -> None:
+        self.client = APIClient()
+        self.user = create_user()
+        self.client.force_authenticate(self.user)
 
-#     def test_retrieve_clicks(self) -> None:
-#         """
-#         Test retrieving a list of clicks
-#         """
-#         create_click(user=self.user)
-#         create_click(user=self.user)
+    # def test_retrieve_clicks(self) -> None:
+    #     """
+    #     Test retrieving a list of clicks
+    #     """
+    #     create_click(user=self.user)
+    #     create_click(user=self.user)
 
-#         res = self.client.get(DOMAIN_URL)
-#         clicks = Click.objects.all().order_by("-id")
-#         # Serialize the clicks.
-#         serializer = ClickSerializer(clicks, many=True)
+    #     res = self.client.get(CLICK_URL)
 
-#         self.assertEqual(res.status_code, status.HTTP_200_OK)
-#         self.assertEqual(res.data, serializer.data)
+    #     clicks = Click.objects.all().order_by("-id")
+    #     # Serialize the clicks.
+    #     serializer = ClickSerializer(clicks, many=True)
 
-#     def test_clicks_limited_to_user(self) -> None:
-#         """
-#         Test that clicks for the authenticated user are returned
-#         """
-#         user2 = create_user(username="other", password="testpass")
-#         create_click(user=user2)
-#         click = create_click(user=self.user)
+    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(res.data, serializer.data)
 
-#         res = self.client.get(DOMAIN_URL)
-#         self.assertEqual(res.status_code, status.HTTP_200_OK)
-#         self.assertEqual(len(res.data), 1)
-#         self.assertEqual(res.data[0]["click_location"], click.click_location)
+    # def test_clicks_limited_to_user(self) -> None:
+    #     """
+    #     Test that clicks for the authenticated user are returned
+    #     """
+    #     user2 = create_user(username="other", password="testpass")
+    #     create_click(user=user2)
+    #     click = create_click(user=self.user)
+
+    #     res = self.client.get(DOMAIN_URL)
+    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(len(res.data), 1)
+    #     self.assertEqual(res.data[0]["click_location"], click.click_location)

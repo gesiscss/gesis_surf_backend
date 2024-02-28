@@ -73,22 +73,25 @@ class DomainSingleSerializer(serializers.ModelSerializer):
         """
         Update a domain.
         """
-        clicks: list = validated_data.pop("clicks", [])
+        clicks: list = validated_data.pop("clicks", None)
 
         # Update or delete existing clicks
-        for click in instance.clicks.all():
-            click_data = next((item for item in clicks if item["id"] == click.id), None)
-            if click_data:
-                click_instance = Click.objects.get(id=click.id)
-                click_instance.update(**click_data)
-            else:
-                click.delete()
-
-        self._create_clicks(clicks, instance)
-
+        if clicks is not None:
+            for click in clicks:
+                click_id = click.get("id", None)
+                if click_id:
+                    click_obj = Click.objects.get(id=click_id)
+                    click_obj.click_location = click.get(
+                        "click_location", click_obj.click_location
+                    )
+                    click_obj.click_type = click.get("click_type", click_obj.click_type)
+                    click_obj.click_time = click.get("click_time", click_obj.click_time)
+                    click_obj.save()
+                else:
+                    self._create_clicks([click], instance)
+        # Update the domain
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
         instance.save()
         return instance
 
