@@ -79,8 +79,8 @@ class PrivateClickApiTests(TestCase):
     """
 
     def setUp(self) -> None:
-        self.client = APIClient()
-        self.user = create_user()
+        self.client: APIClient = APIClient()
+        self.user: User = create_user()
         self.client.force_authenticate(self.user)
 
     def test_retrieve_clicks(self) -> None:
@@ -90,11 +90,11 @@ class PrivateClickApiTests(TestCase):
         create_click(user=self.user)
         create_click(user=self.user)
 
-        res = self.client.get(CLICK_URL)
+        res: Response = self.client.get(CLICK_URL)
 
-        clicks = Click.objects.all().order_by("-id")
+        clicks: Click = Click.objects.all().order_by("-id")
         # Serialize the clicks.
-        serializer = ClickSerializer(clicks, many=True)
+        serializer: ClickSerializer = ClickSerializer(clicks, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
@@ -103,11 +103,11 @@ class PrivateClickApiTests(TestCase):
         """
         Test that clicks for the authenticated user are returned
         """
-        user2 = create_user(username="other", password="testpass")
+        user2: User = create_user(username="other", password="testpass")
         create_click(user=user2)
-        click = create_click(user=self.user)
+        click: Click = create_click(user=self.user)
 
-        res = self.client.get(CLICK_URL)
+        res: Response = self.client.get(CLICK_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]["click_location"], click.click_location)
@@ -116,9 +116,9 @@ class PrivateClickApiTests(TestCase):
         """
         Test updating a click
         """
-        click = create_click(user=self.user)
-        url = detail_url(click)
-        payload = {"click_location": "New Location"}
+        click: Click = create_click(user=self.user)
+        url: str = detail_url(click)
+        payload: dict = {"click_location": "New Location"}
         self.client.patch(url, payload)
 
         click.refresh_from_db()
@@ -128,9 +128,9 @@ class PrivateClickApiTests(TestCase):
         """
         Test deleting a click
         """
-        click = create_click(user=self.user)
-        url = detail_url(click)
+        click: Click = create_click(user=self.user)
+        url: str = detail_url(click)
         self.client.delete(url)
 
-        clicks = Click.objects.all()
+        clicks: Click = Click.objects.all()
         self.assertEqual(len(clicks), 0)
