@@ -2,8 +2,30 @@
 Serializers for the Domain APIs.
 """
 
-from core.models import Click, Domain
+from core.models import Click, Domain, Scroll
 from rest_framework import serializers
+
+
+class ScrollSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the scroll object.
+    """
+
+    class Meta:
+        """
+        Meta class for the scroll
+        """
+
+        model = Scroll
+        fields = [
+            "id",
+            "scroll_x",
+            "scroll_y",
+            "page_x_offset",
+            "page_y_offset",
+            "scroll_time",
+        ]
+        read_only_fields = ["id"]
 
 
 class ClickSerializer(serializers.ModelSerializer):
@@ -32,6 +54,7 @@ class DomainSingleSerializer(serializers.ModelSerializer):
     """
 
     clicks = ClickSerializer(many=True, required=False)
+    scrolls = ScrollSerializer(many=True, required=False)
 
     class Meta:
         """
@@ -46,6 +69,7 @@ class DomainSingleSerializer(serializers.ModelSerializer):
             "domain_fav_icon",
             "domain_status",
             "clicks",
+            "scrolls",
         ]
         read_only_fields = ["id"]
         extra_kwargs = {"user": {"read_only": True}}
