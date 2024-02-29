@@ -14,9 +14,23 @@ from rest_framework.test import APIClient
 SCROLL_URL: str = reverse("domain:scroll-list")
 
 
+def detail_url(scroll: Scroll) -> str:
+    """
+    Return the scroll detail URL
+    """
+    return reverse("domain:scroll-detail", args=[scroll.id])
+
+
+def create_user(username: str = "test", password: str = "testpass") -> User:
+    """
+    Create and return a sample user.
+    """
+    return get_user_model().objects.create_user(username, password)
+
+
 def create_domain(user: User, **params: dict) -> Domain:
     """
-    Create and return a sample domain
+    Create and return a sample domain.
     """
     defaults: dict = {
         "domain_title": "test.com",
@@ -30,13 +44,13 @@ def create_domain(user: User, **params: dict) -> Domain:
 
 def create_scroll(user: User, **params: dict) -> Scroll:
     """
-    Create and return a sample scroll
+    Create and return a sample scroll.
     """
     defaults: dict = {
-        "scroll_x": "0",
-        "scroll_y": "0",
-        "page_x_offset": "0",
-        "page_y_offset": "0",
+        "scroll_x": 0,
+        "scroll_y": 0,
+        "page_x_offset": 0,
+        "page_y_offset": 0,
         "scroll_time": "2024-06-01 17:00:00",
         "domain": create_domain(user=user),
     }
@@ -46,10 +60,13 @@ def create_scroll(user: User, **params: dict) -> Scroll:
 
 class PublicScrollApiTests(TestCase):
     """
-    Test the publicly available scroll API
+    Test the publicly available scroll API.
     """
 
     def setUp(self):
+        """
+        Set up the test client.
+        """
         self.client: APIClient = APIClient()
 
     def test_login_required(self) -> None:
@@ -63,7 +80,7 @@ class PublicScrollApiTests(TestCase):
 
 class PrivateScrollApiTests(TestCase):
     """
-    Test the private scroll API
+    Test the private scroll API.
     """
 
     def setUp(self):
@@ -86,3 +103,34 @@ class PrivateScrollApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_scroll_limited_user(self) -> None:
+        """
+        Test scrolls for authenticated user.
+        """
+        user2: User = create_user(username="other", password="testpass")
+        create_scroll(user=user2)
+        scroll: Scroll = create_scroll(user=self.user)
+
+        res: Response = self.client.get(SCROLL_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data[0]["scroll_x"], scroll.scroll_x)
+
+    def test_update_scroll(self) -> None:
+        """
+        Test updating a scroll
+        """
+        scroll: Scroll = create_scroll(user=self.user)
+        url: str = detail_url(scroll)
+        payload: dict = {
+            "scroll_x": 100,
+            "scroll_y": 100,
+            "page_x_offset": 100,
+            "page_y_offset": 100,
+            "scroll_time": "2024-06-01 17:00:00",
+        }
+        self.client.patch(url, payload)
+
+        scroll.refresh_from_db()
+        self.assertEqual(scroll.scroll_x, payload["scroll_x"])

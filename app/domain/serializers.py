@@ -2,7 +2,7 @@
 Serializers for the Domain APIs.
 """
 
-from core.models import Click, Domain, Scroll
+from core.models import Click, Domain, Scroll, User
 from rest_framework import serializers
 
 
@@ -16,8 +16,8 @@ class ScrollSerializer(serializers.ModelSerializer):
         Meta class for the scroll
         """
 
-        model = Scroll
-        fields = [
+        model: Scroll = Scroll
+        fields: list = [
             "id",
             "scroll_x",
             "scroll_y",
@@ -25,7 +25,7 @@ class ScrollSerializer(serializers.ModelSerializer):
             "page_y_offset",
             "scroll_time",
         ]
-        read_only_fields = ["id"]
+        read_only_fields: list = ["id"]
 
 
 class ClickSerializer(serializers.ModelSerializer):
@@ -38,14 +38,14 @@ class ClickSerializer(serializers.ModelSerializer):
         Meta class for the click
         """
 
-        model = Click
-        fields = [
+        model: Click = Click
+        fields: list = [
             "id",
             "click_location",
             "click_type",
             "click_time",
         ]
-        read_only_fields = ["id"]
+        read_only_fields: list = ["id"]
 
 
 class DomainSingleSerializer(serializers.ModelSerializer):
@@ -53,16 +53,16 @@ class DomainSingleSerializer(serializers.ModelSerializer):
     Serializer for the domain object.
     """
 
-    clicks = ClickSerializer(many=True, required=False)
-    scrolls = ScrollSerializer(many=True, required=False)
+    clicks: ClickSerializer = ClickSerializer(many=True, required=False)
+    scrolls: ScrollSerializer = ScrollSerializer(many=True, required=False)
 
     class Meta:
         """
         Meta class for the domain
         """
 
-        model = Domain
-        fields = [
+        model: list = Domain
+        fields: list = [
             "id",
             "domain_title",
             "domain_url",
@@ -71,17 +71,19 @@ class DomainSingleSerializer(serializers.ModelSerializer):
             "clicks",
             "scrolls",
         ]
-        read_only_fields = ["id"]
-        extra_kwargs = {"user": {"read_only": True}}
+        read_only_fields: list = ["id"]
+        extra_kwargs: dict = {"user": {"read_only": True}}
 
     def _create_clicks(self, clicks: list, domain: Domain) -> None:
         """
         Create clicks for a domain
         """
         # Get authenticated user.
-        auth_user = self.context["request"].user
+        auth_user: User = self.context["request"].user
         for click in clicks:
-            click_obj = Click.objects.create(user=auth_user, domain=domain, **click)
+            click_obj: Click = Click.objects.create(
+                user=auth_user, domain=domain, **click
+            )
             domain.clicks.add(click_obj)
 
     def create(self, validated_data: dict) -> Domain:

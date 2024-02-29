@@ -2,7 +2,7 @@
 Views for the domain app
 """
 
-from core.models import Click, Domain
+from core.models import Click, Domain, Scroll
 from django.db.models.query import QuerySet
 from domain import serializers
 from rest_framework import mixins, viewsets
@@ -60,6 +60,32 @@ class ClickViewSet(
     serializer_class = serializers.ClickSerializer
     # Objects available to the authenticated user.
     queryset = Click.objects.all()
+    authentication_classes = [
+        TokenAuthentication,
+    ]
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self) -> QuerySet:
+        """
+        Return objects for the current authenticated user only.
+        """
+        return self.queryset.filter(user=self.request.user).order_by("-id")
+
+
+class ScrollViewSet(
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
+    """
+    Manage scrolls in the database.
+    """
+
+    serializer_class = serializers.ScrollSerializer
+    # Objects available to the authenticated user.
+    queryset = Scroll.objects.all()
     authentication_classes = [
         TokenAuthentication,
     ]
