@@ -2,7 +2,7 @@
 Test for Domain APIs.
 """
 
-from core.models import Domain, Tab
+from core.models import Click, Domain, Scroll
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -39,6 +39,40 @@ def create_domain(user, **params) -> Domain:
     }
     defaults.update(params)
     return Domain.objects.create(user=user, **defaults)
+
+
+def create_scroll(user, domain=None, **params) -> Scroll:
+    """
+    Create and return a sample scroll
+    """
+    if domain is None:
+        domain = create_domain(user=user)
+    defaults = {
+        "scroll_x": 0,
+        "scroll_y": 0,
+        "page_x_offset": 0,
+        "page_y_offset": 0,
+        "scroll_time": "2024-06-01 17:00:00",
+        "domain": domain,
+    }
+    defaults.update(params)
+    return Scroll.objects.create(user=user, **defaults)
+
+
+def create_click(user, domain=None, **params) -> Click:
+    """
+    Create and return a sample click
+    """
+    if domain is None:
+        domain = create_domain(user=user)
+    defaults = {
+        "click_location": "test",
+        "click_type": "click",
+        "click_time": "2024-06-01 17:00:00",
+        "domain": domain,
+    }
+    defaults.update(params)
+    return Click.objects.create(user=user, **defaults)
 
 
 class PublicDomainApiTests(TestCase):
@@ -176,3 +210,34 @@ class PrivateDomainApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Domain.objects.count(), 0)
+
+    def test_create_domain_with_new_scroll(self) -> None:
+        """
+        Test creating a domain with a new scroll
+        """
+        create_scroll(user=self.user)
+        self.assertEqual(Scroll.objects.count(), 1)
+        self.assertEqual(Domain.objects.count(), 1)
+        domains = Domain.objects.filter(user=self.user)
+        scrolls = domains[0].scrolls.all()
+        self.assertEqual(domains.count(), 1)
+        self.assertEqual(scrolls.count(), 1)
+        for scroll in scrolls:
+            self.assertEqual(scroll.user, self.user)
+            self.assertEqual(scroll.domain, domains[0])
+            self.assertEqual(scroll.scroll_x, 0)
+
+    def test_create_domain_with_new_scroll_and_click(self) -> None:
+        """
+        Test creating a domain with a new scroll and click
+        """
+        domain = create_domain(user=self.user)
+        click = create_click(user=self.user, domain=domain)
+        scroll = create_scroll(user=self.user, domain=domain)
+        self.assertEqual(Scroll.objects.count(), 1)
+        self.assertEqual(Click.objects.count(), 1)
+        self.assertEqual(Domain.objects.count(), 1)
+        click = domain.clicks.all()
+        scroll = domain.scrolls.all()
+        self.assertEqual(click.count(), 1)
+        self.assertEqual(scroll.count(), 1)

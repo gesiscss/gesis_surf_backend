@@ -86,13 +86,28 @@ class DomainSingleSerializer(serializers.ModelSerializer):
             )
             domain.clicks.add(click_obj)
 
+    def _create_scrolls(self, scrolls: list, domain: Domain) -> None:
+        """
+        Create scrolls for a domain
+        """
+        # Get authenticated user.
+        auth_user: User = self.context["request"].user
+        for scroll in scrolls:
+            scroll_obj: Scroll = Scroll.objects.create(
+                user=auth_user, domain=domain, **scroll
+            )
+            domain.scrolls.add(scroll_obj)
+
     def create(self, validated_data: dict) -> Domain:
         """
         Create a new domain.
         """
         clicks = validated_data.pop("clicks", [])
+        scrolls = validated_data.pop("scrolls", [])
         domain = Domain.objects.create(**validated_data)
         self._create_clicks(clicks, domain)
+        self._create_scrolls(scrolls, domain)
+
         return domain
 
     def update(self, instance: Domain, validated_data: dict) -> Domain:
