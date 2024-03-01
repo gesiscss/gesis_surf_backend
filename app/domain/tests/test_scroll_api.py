@@ -134,3 +134,15 @@ class PrivateScrollApiTests(TestCase):
 
         scroll.refresh_from_db()
         self.assertEqual(scroll.scroll_x, payload["scroll_x"])
+
+    def test_delete_scroll(self) -> None:
+        """
+        Test deleting a scroll
+        """
+        scroll: Scroll = create_scroll(user=self.user)
+        url: str = detail_url(scroll)
+
+        response: Response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        scrolls: Scroll = Scroll.objects.filter(user=self.user)
+        self.assertEqual(scrolls.exists(), False)

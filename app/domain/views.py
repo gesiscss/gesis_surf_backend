@@ -75,6 +75,7 @@ class ClickViewSet(
 
 
 class ScrollViewSet(
+    mixins.DestroyModelMixin,
     mixins.UpdateModelMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
