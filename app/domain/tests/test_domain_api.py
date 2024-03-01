@@ -11,6 +11,14 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 DOMAIN_URL = reverse("domain:domain-list")
+SCROLL_URL: str = reverse("domain:scroll-list")
+
+
+def detail_url_scroll(scroll: Scroll) -> str:
+    """
+    Return the scroll detail URL
+    """
+    return reverse("domain:scroll-detail", args=[scroll.id])
 
 
 def detail_url(domain_id: int) -> str:
@@ -246,15 +254,9 @@ class PrivateDomainApiTests(TestCase):
         """
         Test updating a scroll
         """
-        domain = create_domain(user=self.user)
-        scroll = create_scroll(user=self.user, domain=domain)
-        url = detail_url(scroll.id)
-        payload = {
-            "scroll_x": 100,
-            "scroll_y": 100,
-            "page_x_offset": 100,
-            "page_y_offset": 100,
-            "scroll_time": "2024-06-01 17:00:00",
-        }
+        scroll = create_scroll(user=self.user)
+        url = detail_url_scroll(scroll)
+        payload = {"scroll_x": 100, "scroll_y": 100, "page_x_offset": 100}
         self.client.patch(url, payload)
+        scroll.refresh_from_db()
         self.assertEqual(scroll.scroll_x, payload["scroll_x"])
