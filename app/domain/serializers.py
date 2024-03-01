@@ -115,6 +115,7 @@ class DomainSingleSerializer(serializers.ModelSerializer):
         Update a domain.
         """
         clicks: list = validated_data.pop("clicks", None)
+        scrolls: list = validated_data.pop("scrolls", None)
 
         # Update or delete existing clicks
         if clicks is not None:
@@ -130,6 +131,28 @@ class DomainSingleSerializer(serializers.ModelSerializer):
                     click_obj.save()
                 else:
                     self._create_clicks([click], instance)
+
+        # Update or delete existing scrolls
+        if scrolls is not None:
+            for scroll in scrolls:
+                scroll_id = scroll.get("id", None)
+                if scroll_id:
+                    scroll_obj = Scroll.objects.get(id=scroll_id)
+                    scroll_obj.scroll_x = scroll.get("scroll_x", scroll_obj.scroll_x)
+                    scroll_obj.scroll_y = scroll.get("scroll_y", scroll_obj.scroll_y)
+                    scroll_obj.page_x_offset = scroll.get(
+                        "page_x_offset", scroll_obj.page_x_offset
+                    )
+                    scroll_obj.page_y_offset = scroll.get(
+                        "page_y_offset", scroll_obj.page_y_offset
+                    )
+                    scroll_obj.scroll_time = scroll.get(
+                        "scroll_time", scroll_obj.scroll_time
+                    )
+                    scroll_obj.save()
+                else:
+                    self._create_scrolls([scroll], instance)
+
         # Update the domain
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

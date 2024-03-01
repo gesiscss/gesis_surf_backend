@@ -241,3 +241,20 @@ class PrivateDomainApiTests(TestCase):
         scroll = domain.scrolls.all()
         self.assertEqual(click.count(), 1)
         self.assertEqual(scroll.count(), 1)
+
+    def test_update_scroll(self) -> None:
+        """
+        Test updating a scroll
+        """
+        domain = create_domain(user=self.user)
+        scroll = create_scroll(user=self.user, domain=domain)
+        url = detail_url(scroll.id)
+        payload = {
+            "scroll_x": 100,
+            "scroll_y": 100,
+            "page_x_offset": 100,
+            "page_y_offset": 100,
+            "scroll_time": "2024-06-01 17:00:00",
+        }
+        self.client.patch(url, payload)
+        self.assertEqual(scroll.scroll_x, payload["scroll_x"])
