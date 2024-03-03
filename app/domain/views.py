@@ -47,12 +47,30 @@ class DomainViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class ClickViewSet(
+class BaseDomainAttrViewSet(
     mixins.DestroyModelMixin,
     mixins.UpdateModelMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
+    """
+    Base view set for Domain attributes.
+    """
+    authentication_classes = [
+        TokenAuthentication,
+    ]
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self) -> QuerySet:
+        """
+        Return objects for the current authenticated user only.
+        """
+        return self.queryset.filter(user=self.request.user).order_by("-id")
+
+
+class ClickViewSet(BaseDomainAttrViewSet):
     """
     Manage clicks in the database.
     """
@@ -60,26 +78,9 @@ class ClickViewSet(
     serializer_class = serializers.ClickSerializer
     # Objects available to the authenticated user.
     queryset = Click.objects.all()
-    authentication_classes = [
-        TokenAuthentication,
-    ]
-    permission_classes = [
-        IsAuthenticated,
-    ]
-
-    def get_queryset(self) -> QuerySet:
-        """
-        Return objects for the current authenticated user only.
-        """
-        return self.queryset.filter(user=self.request.user).order_by("-id")
 
 
-class ScrollViewSet(
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet,
-):
+class ScrollViewSet(BaseDomainAttrViewSet):
     """
     Manage scrolls in the database.
     """
@@ -87,15 +88,3 @@ class ScrollViewSet(
     serializer_class = serializers.ScrollSerializer
     # Objects available to the authenticated user.
     queryset = Scroll.objects.all()
-    authentication_classes = [
-        TokenAuthentication,
-    ]
-    permission_classes = [
-        IsAuthenticated,
-    ]
-
-    def get_queryset(self) -> QuerySet:
-        """
-        Return objects for the current authenticated user only.
-        """
-        return self.queryset.filter(user=self.request.user).order_by("-id")
