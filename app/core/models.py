@@ -214,6 +214,7 @@ class Domain(models.Model):
     domain_status = models.CharField(blank=False)
     start_time = models.DateTimeField(blank=True, default=timezone.now)
     closing_time = models.DateTimeField(blank=True, default=timezone.now)
+    snapshot_html = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
 
     def __str__(self) -> str:
