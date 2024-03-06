@@ -12,6 +12,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -211,6 +212,8 @@ class Domain(models.Model):
     domain_url = models.CharField(blank=False)
     domain_fav_icon = models.CharField(blank=False)
     domain_status = models.CharField(blank=False)
+    start_time = models.DateTimeField(blank=True, default=timezone.now)
+    closing_time = models.DateTimeField(blank=True, default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
 
     def __str__(self) -> str:
