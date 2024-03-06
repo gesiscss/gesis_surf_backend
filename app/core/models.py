@@ -6,9 +6,11 @@ import uuid
 from typing import Any
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.models import BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
 
 
@@ -205,10 +207,10 @@ class Domain(models.Model):
         on_delete=models.CASCADE,
         related_name="domains",
     )
-    domain_title = models.CharField(max_length=32, blank=False)
-    domain_url = models.CharField(max_length=32, blank=False)
-    domain_fav_icon = models.CharField(max_length=32, blank=False)
-    domain_status = models.CharField(max_length=32, blank=False)
+    domain_title = models.CharField(blank=False)
+    domain_url = models.CharField(blank=False)
+    domain_fav_icon = models.CharField(blank=False)
+    domain_status = models.CharField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
 
     def __str__(self) -> str:
