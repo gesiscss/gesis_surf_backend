@@ -37,7 +37,6 @@ def create_tab(user, **params) -> Tab:
     defaults = {
         "start_time": datetime.now(timezone.utc),
         "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        "snapshot_html": "Test HTML",
         "tab_num": "Test Tab ID",
         "window_num": 1,  # it isnot unique such that can close the tab
     }
@@ -136,7 +135,6 @@ class PrivateTabApiTests(TestCase):
         payload = {
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
-            "snapshot_html": "Test HTML",
             "tab_num": "Test Tab ID",
             "window_num": "1",
         }
@@ -167,7 +165,6 @@ class PrivateTabApiTests(TestCase):
         payload = {
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
-            "snapshot_html": "Test HTML",
             "tab_num": "Test Tab ID",
             "window_num": "1",
         }
@@ -175,6 +172,9 @@ class PrivateTabApiTests(TestCase):
         self.client.put(url, payload)
         tab.refresh_from_db()
         self.assertEqual(tab.start_time, payload["start_time"])
+        self.assertEqual(tab.closing_time, payload["closing_time"])
+        self.assertEqual(tab.tab_num, payload["tab_num"])
+        self.assertEqual(tab.window_num, payload["window_num"])
 
     def test_user_returns_error(self) -> None:
         """
@@ -221,7 +221,6 @@ class PrivateTabApiTests(TestCase):
         payload: dict[str, Any] = {
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
-            "snapshot_html": "Test HTML",
             "tab_num": "Test Tab ID",
             "window_num": "1",
             "domains": [
@@ -230,12 +229,26 @@ class PrivateTabApiTests(TestCase):
                     "domain_url": "Test URL",
                     "domain_fav_icon": "Test Icon",
                     "domain_status": "Test Status",
+                    "start_time": datetime.strptime(
+                        "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "closing_time": datetime.strptime(
+                        "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "snapshot_html": "<html></html>",
                 },
                 {
                     "domain_title": "Test Domain 2",
                     "domain_url": "Test URL 2",
                     "domain_fav_icon": "Test Icon 2",
                     "domain_status": "Test Status 2",
+                    "start_time": datetime.strptime(
+                        "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "closing_time": datetime.strptime(
+                        "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "snapshot_html": "<html></html>",
                 },
             ],
         }
@@ -263,6 +276,9 @@ class PrivateTabApiTests(TestCase):
             domain_url="Test URL",
             domain_fav_icon="Test Icon",
             domain_status="Test Status",
+            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            snapshot_html="<html></html>",
         )
         payload: dict[str, Any] = {
             "start_time": datetime.now(timezone.utc),
@@ -276,6 +292,9 @@ class PrivateTabApiTests(TestCase):
                     "domain_url": domain.domain_url,
                     "domain_fav_icon": domain.domain_fav_icon,
                     "domain_status": domain.domain_status,
+                    "start_time": domain.start_time,
+                    "closing_time": domain.closing_time,
+                    "snapshot_html": domain.snapshot_html,
                 }
             ],
         }
@@ -301,6 +320,9 @@ class PrivateTabApiTests(TestCase):
             domain_url="Test URL",
             domain_fav_icon="Test Icon",
             domain_status="Test Status",
+            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            snapshot_html="<html></html>",
         )
         payload: dict[str, Any] = {
             "start_time": datetime.now(timezone.utc),
@@ -314,6 +336,9 @@ class PrivateTabApiTests(TestCase):
                     "domain_url": domain_google.domain_url,
                     "domain_fav_icon": domain_google.domain_fav_icon,
                     "domain_status": domain_google.domain_status,
+                    "start_time": domain_google.start_time,
+                    "closing_time": domain_google.closing_time,
+                    "snapshot_html": domain_google.snapshot_html,
                 }
             ],
         }
@@ -328,6 +353,9 @@ class PrivateTabApiTests(TestCase):
             domain_url="Test URL",
             domain_fav_icon="Test Icon",
             domain_status="Test Status",
+            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            snapshot_html="<html></html>",
         )
         tab = create_tab(user=self.user)
         tab.domains.add(domain)
@@ -343,6 +371,9 @@ class PrivateTabApiTests(TestCase):
                     "domain_url": domain.domain_url,
                     "domain_fav_icon": domain.domain_fav_icon,
                     "domain_status": domain.domain_status,
+                    "start_time": domain.start_time,
+                    "closing_time": domain.closing_time,
+                    "snapshot_html": domain.snapshot_html,
                 }
             ],
         }
@@ -375,6 +406,9 @@ class PrivateTabApiTests(TestCase):
             domain_url="Test URL",
             domain_fav_icon="Test Icon",
             domain_status="Test Status",
+            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            snapshot_html="<html></html>",
         )
         tab.domains.add(domain)
         payload: dict[str, Any] = {
@@ -389,12 +423,18 @@ class PrivateTabApiTests(TestCase):
                     "domain_url": domain.domain_url,
                     "domain_fav_icon": domain.domain_fav_icon,
                     "domain_status": domain.domain_status,
+                    "start_time": domain.start_time,
+                    "closing_time": domain.closing_time,
+                    "snapshot_html": domain.snapshot_html,
                 },
                 {
                     "domain_title": domain.domain_title,
                     "domain_url": domain.domain_url,
                     "domain_fav_icon": domain.domain_fav_icon,
                     "domain_status": domain.domain_status,
+                    "start_time": domain.start_time,
+                    "closing_time": domain.closing_time,
+                    "snapshot_html": domain.snapshot_html,
                 },
             ],
         }
@@ -427,23 +467,18 @@ class PrivateTabApiTests(TestCase):
             domain_url="Test URL",
             domain_fav_icon="Test Icon",
             domain_status="Test Status",
+            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            snapshot_html="<html></html>",
         )
         tab = create_tab(user=self.user)
         tab.domains.add(domain)
 
-        domain_two = Domain.objects.create(
-            user=self.user,
-            domain_title="Test Domain 2",
-            domain_url="Test URL 2",
-            domain_fav_icon="Test Icon 2",
-            domain_status="Test Status 2",
-        )
         payload = {"domains": [{"domain_title": "Test Domain 2"}]}
         url = detail_url(tab.id)
         res = self.client.patch(url, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        # self.assertIn(domain_two, tab.domains.all())
         self.assertNotIn(domain, tab.domains.all())
 
     def test_clear_tab_domains(self) -> None:
@@ -456,6 +491,9 @@ class PrivateTabApiTests(TestCase):
             domain_url="Test URL",
             domain_fav_icon="Test Icon",
             domain_status="Test Status",
+            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            snapshot_html="<html></html>",
         )
         tab = create_tab(user=self.user)
         tab.domains.add(domain)

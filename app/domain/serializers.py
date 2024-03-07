@@ -68,6 +68,9 @@ class DomainSingleSerializer(serializers.ModelSerializer):
             "domain_url",
             "domain_fav_icon",
             "domain_status",
+            "start_time",
+            "closing_time",
+            "snapshot_html",
             "clicks",
             "scrolls",
         ]

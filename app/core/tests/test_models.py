@@ -2,14 +2,12 @@
 Tests for the models.
 """
 
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 from typing import Any
 
+from core import models
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-
-from core import models
 
 
 def create_user(user_id="test", password="test123") -> Any:
@@ -126,7 +124,6 @@ class ModelTests(TestCase):
             start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
             closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
             created_at=datetime.now(timezone.utc),
-            snapshot_html="<html><body><h1>Test</h1></body></html>",
             tab_num="test",
         )
         self.assertEqual(
@@ -142,7 +139,6 @@ class ModelTests(TestCase):
             self.round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(tab.user, user)
-        self.assertEqual(tab.snapshot_html, "<html><body><h1>Test</h1></body></html>")
         self.assertEqual(tab.tab_num, "test")
 
     def test_create_domain(self) -> None:
@@ -156,6 +152,9 @@ class ModelTests(TestCase):
             domain_url="https://www.test.com",
             domain_fav_icon="test.ico",
             domain_status="active",
+            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            snapshot_html="test",
             created_at=datetime.now(timezone.utc),
         )
         self.assertEqual(domain.domain_title, "Test")
@@ -167,6 +166,15 @@ class ModelTests(TestCase):
             self.round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(domain.user, user)
+        self.assertEqual(
+            domain.start_time,
+            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(
+            domain.closing_time,
+            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(domain.snapshot_html, "test")
 
     def test_create_click(self) -> None:
         """

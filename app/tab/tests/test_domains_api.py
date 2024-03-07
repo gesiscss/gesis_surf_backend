@@ -2,15 +2,15 @@
 Tests for the domains API.
 """
 
+from datetime import datetime
 from typing import Any
 
+from core.models import Domain
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-
-from core.models import Domain
 from tab.serializers import DomainSerializer
 
 DOMAIN_URL = reverse("tab:domain-list")
@@ -39,6 +39,9 @@ def create_domain(user, **params) -> Domain:
         "domain_url": "https://test.com",
         "domain_fav_icon": "https://test.com/favicon.ico",
         "domain_status": "active",
+        "start_time": datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        "closing_time": datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        "snapshot_html": "<html>Test</html>",
     }
     defaults.update(params)
     return Domain.objects.create(user=user, **defaults)

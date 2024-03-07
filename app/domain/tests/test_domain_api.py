@@ -2,6 +2,8 @@
 Test for Domain APIs.
 """
 
+from datetime import datetime, timezone
+
 from core.models import Click, Domain, Scroll
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -44,6 +46,9 @@ def create_domain(user, **params) -> Domain:
         "domain_url": "https://test.com",
         "domain_fav_icon": "https://test.com/favicon.ico",
         "domain_status": "active",
+        "start_time": datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        "closing_time": datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        "snapshot_html": "<html>Test</html>",
     }
     defaults.update(params)
     return Domain.objects.create(user=user, **defaults)
@@ -160,6 +165,9 @@ class PrivateDomainApiTests(TestCase):
             "domain_url": "https://test.com",
             "domain_fav_icon": "https://test.com/favicon.ico",
             "domain_status": "active",
+            "start_time": datetime.now(timezone.utc),
+            "closing_time": datetime.now(timezone.utc),
+            "snapshot_html": "<html>Test</html>",
         }
         res = self.client.post(DOMAIN_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -189,6 +197,11 @@ class PrivateDomainApiTests(TestCase):
             "domain_url": "https://test.com",
             "domain_fav_icon": "https://test.com/favicon.ico",
             "domain_status": "inactive",
+            "start_time": datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            "closing_time": datetime.strptime(
+                "2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ),
+            "snapshot_html": "<html>Test</html>",
         }
         url = detail_url(domain.id)
         self.client.put(url, payload)

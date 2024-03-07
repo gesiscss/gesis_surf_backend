@@ -2,6 +2,8 @@
 Test for the scroll API
 """
 
+from datetime import datetime
+
 from core.models import Domain, Scroll, User
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -37,6 +39,9 @@ def create_domain(user: User, **params: dict) -> Domain:
         "domain_url": "https://test.com",
         "domain_fav_icon": "https://test.com/favicon.ico",
         "domain_status": "active",
+        "start_time": datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        "closing_time": datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        "snapshot_html": "<html>Test</html>",
     }
     defaults.update(params)
     return Domain.objects.create(user=user, **defaults)
