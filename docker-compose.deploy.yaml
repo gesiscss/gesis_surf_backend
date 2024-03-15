@@ -2,13 +2,35 @@ version: "3.9"
 
 services:
   app:
+    container_name: api_GESIS
     build:
       context: .
     restart: always
+    volumes:
+      - static-data:/vol/web
     environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_ALLOWED_HOSTS=${DOMAIN}
+    depends_on:
+      - db
+
+  db:
+    container_name: db_GESIS
+    image: postgres:13.3-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
   proxy:
+    container_name: proxy_GESIS
     build:
       context: ./docker/proxy
     restart: always
@@ -23,6 +45,7 @@ services:
       - certbot-certs:/etc/letsencrypt
     environment:
       - DOMAIN=${DOMAIN}
+
   certbot:
     build:
       context: ./docker/certbot
@@ -37,6 +60,8 @@ services:
       - proxy
 
 volumes:
+  static-data:
+  postgres-data:
   certbot-web:
   proxy-dhparams:
   certbot-certs:
