@@ -301,6 +301,7 @@ class Host(models.Model):
     )
     hostname = models.URLField(max_length=200, blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    categories = models.ManyToManyField("Category", related_name="hosts")
 
 
 class Category(models.Model):
@@ -316,6 +317,12 @@ class Category(models.Model):
     category_label = models.CharField(max_length=32, blank=False)
     category_confidence = models.FloatField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    criteria = models.ForeignKey(
+        "Criteria",
+        on_delete=models.CASCADE,
+        related_name="categories",
+        default=None,
+    )
 
 
 class Criteria(models.Model):
