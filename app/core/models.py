@@ -289,3 +289,46 @@ class Scroll(models.Model):
         on_delete=models.CASCADE,
         related_name="scrolls",
     )
+
+
+class Url(models.Model):
+    """
+    Create the url model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    hostname = models.URLField(max_length=200, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+
+
+class Category(models.Model):
+    """
+    Create the category model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    category_score = models.FloatField(blank=False)
+    category_parent = models.CharField(max_length=32, blank=False)
+    category_label = models.CharField(max_length=32, blank=False)
+    category_confidence = models.FloatField(blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+
+
+class Criteria(models.Model):
+    """
+    Create the criteria model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    criteria_classification = models.CharField(max_length=32, blank=False)
+    criteria_window = models.BooleanField(blank=False)
+    criteria_tab = models.BooleanField(blank=False)
+    criteria_domain = models.BooleanField(blank=False)
+    criteria_click = models.BooleanField(blank=False)
+    criteria_scroll = models.BooleanField(blank=False)
