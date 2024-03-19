@@ -31,4 +31,5 @@ urlpatterns = [
     path("api/window/", include("window.urls")),
     path("api/tab/", include("tab.urls")),
     path("api/domain/", include("domain.urls")),
+    path("api/host/", include("host.urls")),
 ]
