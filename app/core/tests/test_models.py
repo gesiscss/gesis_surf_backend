@@ -244,3 +244,56 @@ class ModelTests(TestCase):
             self.round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(scroll.user, user)
+
+    def test_create_url(self) -> None:
+        """
+        Test creating a new url instance.
+        """
+        url = models.Url.objects.create(
+            url_hostname="https://www.test.com",
+            created_at=datetime.now(timezone.utc),
+        )
+        self.assertEqual(url.url_hostname, "https://www.test.com")
+        self.assertEqual(
+            self.round_datetime(url.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
+
+    def test_create_category(self) -> None:
+        """
+        Test creating a new category instance.
+        """
+        category = models.Category.objects.create(
+            category_score=0.0,
+            category_parent="test",
+            category_label="test",
+            category_confidence=0.0,
+            created_at=datetime.now(timezone.utc),
+        )
+        self.assertEqual(category.category_score, 0.0)
+        self.assertEqual(category.category_parent, "test")
+        self.assertEqual(category.category_label, "test")
+        self.assertEqual(category.category_confidence, 0.0)
+        self.assertEqual(
+            self.round_datetime(category.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
+
+    def test_create_criteria(self) -> None:
+        """
+        Test creating a new criteria instance.
+        """
+        criteria = models.Criteria.objects.create(
+            criteria_classification="test",
+            criteria_window=True,
+            criteria_tab=True,
+            criteria_domain=True,
+            criteria_click=True,
+            criteria_scroll=True,
+        )
+        self.assertEqual(criteria.criteria_classification, "test")
+        self.assertEqual(criteria.criteria_window, True)
+        self.assertEqual(criteria.criteria_tab, True)
+        self.assertEqual(criteria.criteria_domain, True)
+        self.assertEqual(criteria.criteria_click, True)
+        self.assertEqual(criteria.criteria_scroll, True)

@@ -299,7 +299,7 @@ class Url(models.Model):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, blank=False
     )
-    hostname = models.URLField(max_length=200, blank=False)
+    url_hostname = models.URLField(max_length=200, blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
 
 
