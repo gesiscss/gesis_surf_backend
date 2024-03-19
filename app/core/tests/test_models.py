@@ -245,17 +245,17 @@ class ModelTests(TestCase):
         )
         self.assertEqual(scroll.user, user)
 
-    def test_create_url(self) -> None:
+    def test_create_host(self) -> None:
         """
         Test creating a new url instance.
         """
-        url = models.Url.objects.create(
-            url_hostname="https://www.test.com",
+        host = models.Host.objects.create(
+            hostname="https://www.test.com",
             created_at=datetime.now(timezone.utc),
         )
-        self.assertEqual(url.url_hostname, "https://www.test.com")
+        self.assertEqual(host.hostname, "https://www.test.com")
         self.assertEqual(
-            self.round_datetime(url.created_at),
+            self.round_datetime(host.created_at),
             self.round_datetime(datetime.now(timezone.utc)),
         )
 
