@@ -1,4 +1,4 @@
-# Web Tracker Backend
+# GESIS Surf Backend
 
 ![GESIS](https://upload.wikimedia.org/wikipedia/commons/4/42/GESIS-Logo.svg)
 
