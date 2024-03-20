@@ -67,19 +67,27 @@ class HostSerializer(serializers.ModelSerializer):
         """
 
         model = Host
-        fields = ["id", "hostname", "created_at", "categories"]
+        fields = [
+            "id",
+            "hostname",
+            "created_at",
+            "categories",
+        ]
         read_only_fields = ["id"]
+
+    def _create_criteria(self, categories_data: list) -> None:
+        """
+        Create criteria for the host.
+        """
+        for category_data in categories_data:
+            criteria_data = category_data.pop("criteria")
+            criteria = Criteria.objects.create(**criteria_data)
+            Category.objects.create(criteria=criteria, **category_data)
 
     def create(self, validated_data):
         """
-        Create a new host.
+        Create a new host and return it.
         """
-        hostname = validated_data.pop("host")["hostname"]
-        host, _ = Host.objects.get_or_create(hostname=hostname)
-        categories_data = validated_data.pop("categories", [])
-        for category_data in categories_data:
-            criteria_data = category_data.pop("criteria")
-            category, _ = Category.objects.get_or_create(host=host, **category_data)
-            category.criteria = criteria_data
-            category.save()
-        return host
+        categories_data = validated_data.pop("categories")
+        self._create_criteria(categories_data)
+        return Host.objects.create(**validated_data)

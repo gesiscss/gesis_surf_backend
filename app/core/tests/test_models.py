@@ -305,3 +305,32 @@ class ModelTests(TestCase):
         self.assertEqual(criteria.criteria_domain, True)
         self.assertEqual(criteria.criteria_click, True)
         self.assertEqual(criteria.criteria_scroll, True)
+
+    def test_create_category_with_instance_criteria(self) -> None:
+        """
+        Test creating a new category instance with an instance of criteria.
+        """
+        criteria = models.Criteria.objects.create(
+            criteria_classification="test",
+            criteria_window=True,
+            criteria_tab=True,
+            criteria_domain=True,
+            criteria_click=True,
+            criteria_scroll=True,
+        )
+        category = models.Category.objects.create(
+            category_score=0.0,
+            category_parent="test",
+            category_label="test",
+            category_confidence=0.0,
+            created_at=datetime.now(timezone.utc),
+            criteria=criteria,
+        )
+        self.assertEqual(category.category_score, 0.0)
+        self.assertEqual(category.category_parent, "test")
+        self.assertEqual(category.category_label, "test")
+        self.assertEqual(category.category_confidence, 0.0)
+        self.assertEqual(
+            self.round_datetime(category.created_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )

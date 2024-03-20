@@ -3,6 +3,7 @@ Views for the host app.
 """
 
 from core.models import Host
+from django.http import Http404
 from host import serializers
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
@@ -23,24 +24,10 @@ class HostViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
+    lookup_field = "hostname"
 
     def get_queryset(self):
         """
         Return objects for the current authenticated user only.
         """
-        return self.queryset.filter(user=self.request.user).order_by("-id")
-
-    # def get_serializer_class(self):
-    #     """
-    #     Return appropriate serializer class.
-    #     """
-    #     if self.action == "list":
-    #         return serializers.HostSerializer
-
-    #     return self.serializer_class
-
-    # def perform_create(self, serializer):
-    #     """
-    #     Create a new host that belongs to the authenticated user.
-    #     """
-    #     serializer.save(user=self.request.user)
+        return self.queryset.filter().order_by("-id")
