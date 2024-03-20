@@ -299,7 +299,7 @@ class Host(models.Model):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, blank=False
     )
-    hostname = models.URLField(max_length=200, blank=False)
+    hostname = models.CharField(max_length=32, blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     categories = models.ManyToManyField("Category", related_name="hosts")
 

@@ -269,6 +269,14 @@ class ModelTests(TestCase):
             category_label="test",
             category_confidence=0.0,
             created_at=datetime.now(timezone.utc),
+            criteria=models.Criteria.objects.create(
+                criteria_classification="test",
+                criteria_window=True,
+                criteria_tab=True,
+                criteria_domain=True,
+                criteria_click=True,
+                criteria_scroll=True,
+            ),
         )
         self.assertEqual(category.category_score, 0.0)
         self.assertEqual(category.category_parent, "test")
