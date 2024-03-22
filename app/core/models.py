@@ -321,7 +321,7 @@ class Category(models.Model):
         "Criteria",
         on_delete=models.CASCADE,
         related_name="categories",
-        default=None,
+        null=True,
     )
 
 

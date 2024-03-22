@@ -385,4 +385,3 @@ class ModelTests(TestCase):
             self.round_datetime(category.created_at),
             self.round_datetime(datetime.now(timezone.utc)),
         )
-        
