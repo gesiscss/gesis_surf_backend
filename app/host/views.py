@@ -3,7 +3,6 @@ Views for the host app.
 """
 
 from core.models import Host
-from django.http import Http404
 from host import serializers
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
@@ -24,7 +23,6 @@ class HostViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    lookup_field = "hostname"
 
     def get_queryset(self):
         """

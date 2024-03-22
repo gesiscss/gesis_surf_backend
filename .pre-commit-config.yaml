@@ -85,6 +85,7 @@ repos:
             "--load-plugins=pylint_django",
             "--disable=django-not-configured",
             "--output-format=colorized",
+            "--disable=too-many-ancestors",
             "--jobs=4",
           ]
         files: \.(py|html|js)$

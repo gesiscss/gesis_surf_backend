@@ -34,7 +34,7 @@ class CategorySerializer(serializers.ModelSerializer):
     Serializer for the category object.
     """
 
-    criteria = CriteriaSerializer()
+    criteria = CriteriaSerializer(allow_null=True, required=False)
 
     class Meta:
         """
@@ -75,19 +75,28 @@ class HostSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id"]
 
-    def _create_criteria(self, categories_data: list) -> None:
+    def _create_criteria(self, criteria_data: dict) -> None:
         """
         Create criteria for the host.
         """
-        for category_data in categories_data:
-            criteria_data = category_data.pop("criteria")
-            criteria = Criteria.objects.create(**criteria_data)
-            Category.objects.create(criteria=criteria, **category_data)
+        criteria = Criteria.objects.create(**criteria_data)
+        return criteria
+
+    def _create_category(self, categories_data: list, host: Host) -> None:
+        """
+        Create categories for the host.
+        """
+        criteria_data = categories_data.pop("criteria", None)
+        criteria = self._create_criteria(criteria_data) if criteria_data else None
+        category = Category.objects.create(criteria=criteria, **categories_data)
+        host.categories.add(category)
 
     def create(self, validated_data):
         """
         Create a new host and return it.
         """
-        categories_data = validated_data.pop("categories")
-        self._create_criteria(categories_data)
-        return Host.objects.create(**validated_data)
+        categories_data = validated_data.pop("categories", [])
+        host = Host.objects.create(**validated_data)
+        for category_data in categories_data:
+            self._create_category(category_data, host)
+        return host
