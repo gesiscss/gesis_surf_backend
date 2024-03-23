@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: api_GESIS_staging
+    build:
+      context: .
+    restart: always
+    volumes:
+      - static-data:/vol/web
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+    depends_on:
+      - db
+
+  db:
+    container_name: db_GESIS_staging
+    image: postgres:13.3-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # Simplified proxy service, assuming no SSL or using self-signed certs
+  proxy:
+    container_name: proxy_GESIS_staging
+    build:
+      context: ./docker/proxy
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - 80:80
+    volumes:
+      - static-data:/vol/web
+
+  # The certbot service could be omitted or left in a skipped state as in production
+  certbot:
+    command: echo "Certbot not used in staging"
+
+volumes:
+  static-data:
+  postgres-data:
