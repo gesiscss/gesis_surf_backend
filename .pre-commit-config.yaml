@@ -6,7 +6,6 @@ default_language_version:
 repos:
   - hooks:
       - id: check-added-large-files
-      - id: check-shebang-scripts-are-executable
       - id: check-merge-conflict
       - id: check-toml
       - id: check-yaml
@@ -51,7 +50,7 @@ repos:
     rev: 1.16.0
     hooks:
       - id: django-upgrade
-        args: [--target-version, "4.1"] # Replace with Django version
+        args: [--target-version, "4.2"]
   - hooks:
       - additional_dependencies:
           - prettier@2.5.1
