@@ -24,7 +24,11 @@ class CommandTest(SimpleTestCase):
         patched_check.asset_called_once_with(databases=["default"])
 
     @patch("time.sleep")
-    def test_wait_for_db_delay(self: "CommandTest", patched_check: Any) -> None:
+    def test_wait_for_db_delay(
+        self: "CommandTest",
+        patched_sleep: Any,  # pylint: disable=unused-argument
+        patched_check: Any,
+    ) -> None:
         """Test waiting for database when getting OperationalError."""
         patched_check.side_effect = (
             [Psycopg2Error] * 2 + [OperationalError] * 3 + [True]
