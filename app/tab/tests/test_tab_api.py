@@ -479,11 +479,25 @@ class PrivateTabApiTests(TestCase):
         res = self.client.patch(url, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertNotIn(domain, tab.domains.all())
+        self.assertIn(domain, tab.domains.all())
 
-    def test_clear_tab_domains(self) -> None:
+    def test_create_new_domain_on_update(self) -> None:
         """
-        Test clearing tab domains
+        Test creating a new domain on update
+        """
+        tab = create_tab(user=self.user)
+
+        payload = {"domains": [{"domain_title": "Test Domain"}]}
+        url = detail_url(tab.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_domain = Domain.objects.get(domain_title="Test Domain")
+        self.assertIn(new_domain, tab.domains.all())
+
+    def test_create_domain_on_update_with_existing_domain(self) -> None:
+        """
+        Test creating a domain on update with existing domain
         """
         domain = Domain.objects.create(
             user=self.user,
@@ -497,9 +511,11 @@ class PrivateTabApiTests(TestCase):
         )
         tab = create_tab(user=self.user)
         tab.domains.add(domain)
-        payload = {"domains": []}
+
+        payload = {"domains": [{"domain_title": domain.domain_title}]}
         url = detail_url(tab.id)
         res = self.client.patch(url, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(tab.domains.count(), 0)
+        self.assertIn(domain, tab.domains.all())
+        self.assertEqual(tab.domains.count(), 2)

@@ -83,7 +83,6 @@ class TabSerializer(serializers.ModelSerializer):
         domains: list = validated_data.pop("domains", None)
 
         if domains is not None:
-            instance.domains.clear()
             self._create_domains(domains, instance)
 
         for attr, value in validated_data.items():
