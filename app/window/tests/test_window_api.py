@@ -3,18 +3,15 @@ Tests for the recipe API
 """
 
 import random
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
+from core.models import Window
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-
-from core.models import Window
-from window.serializers import WindowDetailSerializer
-from window.serializers import WindowSerializer
+from window.serializers import WindowDetailSerializer, WindowSerializer
 
 WINDOW_URL = reverse("window:window-list")
 

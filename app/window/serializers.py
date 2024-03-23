@@ -2,9 +2,8 @@
 Serializers for the window APIs.
 """
 
-from rest_framework import serializers
-
 from core.models import Window
+from rest_framework import serializers
 
 
 class WindowSerializer(serializers.ModelSerializer):

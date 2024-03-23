@@ -87,6 +87,7 @@ repos:
             "--output-format=colorized",
             "--disable=too-many-ancestors",
             "--jobs=4",
+            "--disable=E0401",
           ]
         files: \.(py|html|js)$
         exclude: ^(.*/)?(migrations|static|node_modules|build|dist|\.cache|\.git|\.hg|\.svn|\.tox|\.venv|_build|buck-out|build|dist|node_modules|\.mypy_cache|\.pytest_cache|\.tox|\.venv|venv)/

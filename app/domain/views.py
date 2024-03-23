@@ -56,6 +56,7 @@ class BaseDomainAttrViewSet(
     """
     Base view set for Domain attributes.
     """
+
     authentication_classes = [
         TokenAuthentication,
     ]

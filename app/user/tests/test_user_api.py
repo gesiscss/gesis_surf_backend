@@ -136,9 +136,7 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data,
-            {
-                "user_id": self.user.user_id
-            },
+            {"user_id": self.user.user_id},
         )
 
     def test_update_user_profile(self) -> None:

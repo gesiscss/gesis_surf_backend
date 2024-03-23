@@ -2,11 +2,10 @@
 Views for the window app.
 """
 
+from core.models import Window
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
-from core.models import Window
 from window import serializers
 
 
