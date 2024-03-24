@@ -26,6 +26,9 @@ class DomainSerializer(serializers.ModelSerializer):
             "start_time",
             "closing_time",
             "snapshot_html",
+            "category_number",
+            "criteria_classification",
+            "category_label",
         ]
         read_only_fields = ["id"]
 

@@ -208,13 +208,18 @@ class Domain(models.Model):
         related_name="domains",
     )
     domain_title = models.CharField(blank=False)
-    domain_url = models.CharField(blank=False)
-    domain_fav_icon = models.CharField(blank=False)
+    snapshot_html = models.TextField(blank=True)
     domain_status = models.CharField(blank=False)
+    domain_fav_icon = models.CharField(blank=False)
     start_time = models.DateTimeField(blank=True, default=timezone.now)
     closing_time = models.DateTimeField(blank=True, default=timezone.now)
-    snapshot_html = models.TextField(blank=True)
+    domain_url = models.CharField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    category_number = models.CharField(max_length=32, blank=False, default="0")
+    criteria_classification = models.CharField(
+        max_length=32, blank=False, default="full_allow"
+    )
+    category_label = models.CharField(max_length=32, blank=False, default="0")
 
     def __str__(self) -> str:
         """
@@ -312,6 +317,7 @@ class Category(models.Model):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, blank=False
     )
+    category_number = models.CharField(max_length=32, blank=False, default="0")
     category_score = models.FloatField(blank=False)
     category_parent = models.CharField(max_length=32, blank=False)
     category_label = models.CharField(max_length=32, blank=False)
@@ -339,3 +345,4 @@ class Criteria(models.Model):
     criteria_domain = models.BooleanField(blank=False)
     criteria_click = models.BooleanField(blank=False)
     criteria_scroll = models.BooleanField(blank=False)
+    snapshot_html = models.BooleanField(blank=False, default=False)

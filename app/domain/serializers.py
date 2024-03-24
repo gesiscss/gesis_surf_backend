@@ -71,6 +71,9 @@ class DomainSingleSerializer(serializers.ModelSerializer):
             "start_time",
             "closing_time",
             "snapshot_html",
+            "category_number",
+            "criteria_classification",
+            "category_label",
             "clicks",
             "scrolls",
         ]

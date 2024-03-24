@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="6GvVnYGIM91AcuOnr-Z4" name="Page-1">
-        <mxGraphModel dx="1583" dy="2574" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2365" dy="3548" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -430,20 +430,20 @@
                 <mxCell id="213" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="198" target="212" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="198" value="categories" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="198" value="category" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="491.76" y="-730" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="200" value="id" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="661.76" y="-810" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="202" value="confident" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="202" value="category_confidence" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="661.76" y="-630" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="204" value="category_label" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="491.76" y="-580" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="206" value="category_parent" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="331.76" y="-600" width="120" height="80" as="geometry"/>
+                    <mxGeometry x="340" y="-590" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="208" value="category_score" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="340" y="-860" width="120" height="80" as="geometry"/>
@@ -499,13 +499,13 @@
                 <mxCell id="231" value="clicks" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1031.76" y="-590" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="234" value="category_id" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="234" value="category_number" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1060" y="-50" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="240" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="235" target="11" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="235" value="criteria_category" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="235" value="criteria_classification" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="720" y="150" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="236" value="category_label" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -521,17 +521,17 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="247" value="created_at" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="260" y="-690" width="120" height="80" as="geometry"/>
+                    <mxGeometry x="255" y="-680" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="257" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="249" edge="1" target="259">
+                <mxCell id="257" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="249" target="259" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="1101.76" y="-1260" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="262" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="249" target="261">
+                <mxCell id="262" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;endArrow=none;endFill=0;" parent="1" source="249" target="261" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="263" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="249" target="260">
+                <mxCell id="263" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="249" target="260" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="249" value="version" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -552,10 +552,10 @@
                 <mxCell id="261" value="id" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="891.76" y="-1450" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="265" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="264" target="198">
+                <mxCell id="265" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endArrow=none;endFill=0;" parent="1" source="264" target="198" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="264" value="category_id" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="264" value="category_number" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="240" y="-780" width="120" height="80" as="geometry"/>
                 </mxCell>
             </root>
