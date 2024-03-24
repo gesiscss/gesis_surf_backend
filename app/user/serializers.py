@@ -37,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
     Serializer for the user object GESIS.
     """
 
-    waves = WaveSerializer(many=True, read_only=True, required=False)
+    waves = WaveSerializer(many=True, required=False)
 
     class Meta:
         """
@@ -48,6 +48,15 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("user_id", "password", "waves")
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
+    def to_representation(self, instance):
+        """
+        Serialize the user object with wave when exists.
+        """
+        ret = super().to_representation(instance)
+        waves = models.Wave.objects.filter(users=instance)
+        ret["waves"] = WaveSerializer(waves, many=True).data
+        return ret
+
     def create(self, validated_data):
         """
         Create a new user with encrypted password and return it.
@@ -55,7 +64,8 @@ class UserSerializer(serializers.ModelSerializer):
         waves = validated_data.pop("waves", [])
         user = get_user_model().objects.create_user(**validated_data)
         for wave in waves:
-            user.waves.add(wave)
+            wave = models.Wave.objects.create(**wave)
+            wave.users.add(user)
         return user
 
     def update(self, instance, validated_data):

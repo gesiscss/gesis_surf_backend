@@ -2,7 +2,10 @@
 Tests for the user API.
 """
 
+from datetime import datetime, timezone
+
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -13,7 +16,7 @@ TOKEN_URL = reverse("user:token")
 ME_URL = reverse("user:me")
 
 
-def create_user(**params) -> get_user_model():
+def create_user(**params) -> models.Model:
     """
     Helper function to create a user.
     """
@@ -30,15 +33,39 @@ class PublicUserApiTests(TestCase):
         self.client = APIClient()
 
     def test_create_user_success(self) -> None:
-        """Tests creating a user with valid payload is successful."""
+        """Tests creating a user without waves payload."""
         payload = {
             "user_id": "test",
             "password": "test123",
         }
+
         response = self.client.post(CREATE_USER_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = get_user_model().objects.get(**response.data)
+        user = get_user_model().objects.get(user_id=payload["user_id"])
+        self.assertTrue(user.check_password(payload["password"]))
+        self.assertNotIn("password", response.data)
+
+    def test_create_user_with_waves_success(self) -> None:
+        """Tests creating a user with waves."""
+        payload = {
+            "user_id": "test",
+            "password": "test123",
+            "waves": [
+                {
+                    "start_date": datetime.now(timezone.utc),
+                    "end_date": datetime.now(timezone.utc),
+                    "wave_status": "open",
+                    "wave_type": "test",
+                    "wave_number": "1",
+                    "client_id": "test",
+                }
+            ],
+        }
+        response = self.client.post(CREATE_USER_URL, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = get_user_model().objects.get(user_id=payload["user_id"])
         self.assertTrue(user.check_password(payload["password"]))
         self.assertNotIn("password", response.data)
 
@@ -136,7 +163,7 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data,
-            {"user_id": self.user.user_id},
+            {"user_id": self.user.user_id, "waves": []},
         )
 
     def test_update_user_profile(self) -> None:
@@ -150,3 +177,23 @@ class PrivateUserApiTests(TestCase):
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password(payload["password"]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_user_with_wave_authenticated_fails(self) -> None:
+        """Tests creating a user with waves."""
+        payload = {
+            "user_id": "test",
+            "password": "test123",
+            "waves": [
+                {
+                    "start_date": datetime.now(timezone.utc),
+                    "end_date": datetime.now(timezone.utc),
+                    "wave_status": "open",
+                    "wave_type": "test",
+                    "wave_number": "1",
+                    "client_id": "test",
+                }
+            ],
+        }
+        response = self.client.post(CREATE_USER_URL, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
