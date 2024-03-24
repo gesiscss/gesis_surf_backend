@@ -53,8 +53,8 @@ class PublicUserApiTests(TestCase):
             "password": "test123",
             "waves": [
                 {
-                    "start_date": datetime.now(timezone.utc),
-                    "end_date": datetime.now(timezone.utc),
+                    "start_date": datetime.now(timezone.utc).isoformat(),
+                    "end_date": datetime.now(timezone.utc).isoformat(),
                     "wave_status": "open",
                     "wave_type": "test",
                     "wave_number": "1",
@@ -62,11 +62,14 @@ class PublicUserApiTests(TestCase):
                 }
             ],
         }
-        response = self.client.post(CREATE_USER_URL, payload)
+        response = self.client.post(CREATE_USER_URL, payload, format="json")
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         user = get_user_model().objects.get(user_id=payload["user_id"])
         self.assertTrue(user.check_password(payload["password"]))
         self.assertNotIn("password", response.data)
+
+        self.assertEqual(len(response.data["waves"]), 1)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         user = get_user_model().objects.get(user_id=payload["user_id"])
