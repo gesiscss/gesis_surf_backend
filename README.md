@@ -82,11 +82,17 @@ One - One
 ### Example
 
 User - Wave **(Many to Many)**
-A User must have a token.
+A User can be active.
+A User can be a staff.
+A User can be a superuser.
+A User has a staff classification.
 A Wave must have a client_id.
 A Wave must have a wave number.
 A Wave must have a start date.
 A Wave must have an end date.
+
+#### Relationship
+
 A User belongs to 1 or more Waves.
 A User belongs at to least 1 Wave.
 A Wave must have at least 1 User.
