@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "drf_spectacular",
     "user",
-    # "wave",
+    "wave",
     "window",
     "tab",
     "domain",
