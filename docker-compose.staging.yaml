@@ -7,13 +7,13 @@ services:
       context: .
     restart: always
     volumes:
-      - static-data:/vol/web
+      - static-data:/vol/static
     environment:
       - DB_HOST=db
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DB_NAME=dbname
+      - DB_USER=rootuser
+      - DB_PASSWORD=changeme
+      - DJANGO_SECRET_KEY=changeme
       - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
     depends_on:
       - db
@@ -23,9 +23,9 @@ services:
     image: postgres:13.3-alpine
     restart: always
     environment:
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=dbname
+      - POSTGRES_USER=rootuser
+      - POSTGRES_PASSWORD=changeme
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
@@ -39,13 +39,26 @@ services:
       - app
     ports:
       - 80:80
+      - 443:443
     volumes:
-      - static-data:/vol/web
+      - static-data:/vol/static
+      - certbot-web:/vol/www
+      - proxy-dhparams:/vol/proxy
+      - certbot-certs:/etc/letsencrypt
+    environment:
+      - DOMAIN=staging.example.com
 
   # The certbot service could be omitted or left in a skipped state as in production
   certbot:
+    image: certbot/certbot
     command: echo "Certbot not used in staging"
+    volumes:
+      - certbot-web:/var/www
+      - certbot-certs:/etc/letsencrypt
 
 volumes:
   static-data:
   postgres-data:
+  certbot-web:
+  certbot-certs:
+  proxy-dhparams:
