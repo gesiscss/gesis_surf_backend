@@ -385,3 +385,49 @@ class ModelTests(TestCase):
             self.round_datetime(category.created_at),
             self.round_datetime(datetime.now(timezone.utc)),
         )
+
+    def test_create_privacy(self) -> None:
+        """
+        Test creating a new privacy instance.
+        """
+        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        privacy = models.Privacy.objects.create(
+            user=user,
+            privacy_mode=True,
+            privacy_start_time=datetime.strptime(
+                "2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"
+            ),
+            privacy_end_time=datetime.strptime(
+                "2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ),
+        )
+
+        self.assertEqual(privacy.privacy_mode, True)
+        self.assertEqual(
+            privacy.privacy_start_time,
+            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(
+            privacy.privacy_end_time,
+            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(privacy.user, user)
+
+    def test_create_extension(self) -> None:
+        """
+        Test creating a new extension instance.
+        """
+        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        extension = models.Extension.objects.create(
+            user=user,
+            extension_version="1.0.0",
+            extension_installed_at=datetime.now(timezone.utc),
+            extension_browser="chrome",
+        )
+
+        self.assertEqual(extension.extension_version, "1.0.0")
+        self.assertEqual(
+            self.round_datetime(extension.extension_installed_at),
+            self.round_datetime(datetime.now(timezone.utc)),
+        )
+        self.assertEqual(extension.extension_browser, "chrome")

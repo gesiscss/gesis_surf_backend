@@ -333,6 +333,20 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-simple-history"
+version = "3.5.0"
+description = "Store model history and view/revert changes from admin site."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django-simple-history-3.5.0.tar.gz", hash = "sha256:eef2943d7c846270f11c8136f38a3ba00de2bebd7b1b89037de5d9b148ed677a"},
+    {file = "django_simple_history-3.5.0-py3-none-any.whl", hash = "sha256:0030b3bb5ed219d6453320213e75cfa00dab7a381946124df9411729101c8874"},
+]
+
+[package.dependencies]
+asgiref = ">=3.6"
+
+[[package]]
 name = "django-stubs"
 version = "4.2.6"
 description = "Mypy stubs for Django"
@@ -1478,4 +1492,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "84e242589ca82e76605ee0c035d7f20ed744289b845f5ec2c15c52e91d421754"
+content-hash = "7c8d23ae8ce0da6233dd44a3ab02a095830d285b3a7d22a5bf272a1bb1e95a20"

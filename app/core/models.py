@@ -13,6 +13,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 
 class UserManager(BaseUserManager):
@@ -91,6 +92,68 @@ class User(
     objects = UserManager()
 
     USERNAME_FIELD = "user_id"
+
+
+class Privacy(models.Model):
+    """
+    Custom privacy model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # Store the user who created the privacy
+    # Relationship one-to-one with the user model
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="privacy",
+    )
+    privacy_mode = models.BooleanField(default=False)
+    privacy_start_time = models.DateTimeField(blank=True)
+    privacy_end_time = models.DateTimeField(blank=True)
+    history = HistoricalRecords()
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the privacy.
+
+        Returns:
+            str: A formatted string with privacy information.
+        """
+        # Return information about the privacy at admin panel
+        return f"{self.privacy_mode} to {self.privacy_start_time}"
+
+
+class Extension(models.Model):
+    """
+    Custom extension model.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # Store the user who created the extension
+    # Relationship one-to-one with the user model
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="extension",
+    )
+    extension_version = models.CharField(max_length=32, blank=False)
+    extension_installed_at = models.DateTimeField(blank=False)
+    extension_browser = models.CharField(max_length=128, blank=False)
+    history = HistoricalRecords()
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the extension.
+
+        Returns:
+            str: A formatted string with extension information.
+        """
+        # Return information about the extension at admin panel
+        return f"{self.extension_version} to {self.extension_installed_at}"
 
 
 class Wave(models.Model):

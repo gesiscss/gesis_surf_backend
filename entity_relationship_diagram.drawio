@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="6GvVnYGIM91AcuOnr-Z4" name="Page-1">
-        <mxGraphModel dx="2364" dy="2079" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1426" dy="1979" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -546,7 +546,13 @@
                 <mxCell id="266" value="has" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="-125" y="410" width="80" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="267" value="extension_setting" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="291" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="267" target="290">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="293" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="267" target="292">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="267" value="Extension" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="-310" y="600" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="274" style="edgeStyle=none;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="268" target="267" edge="1">
@@ -567,7 +573,10 @@
                 <mxCell id="285" style="edgeStyle=none;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;endArrow=none;endFill=0;" parent="1" source="271" target="282" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="287" style="edgeStyle=none;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="271" target="286">
+                <mxCell id="287" style="edgeStyle=none;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="271" target="286" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="289" style="edgeStyle=none;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="271" target="288">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="271" value="privacy" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -576,17 +585,26 @@
                 <mxCell id="276" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="275" target="267" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="275" value="extension_installed_daytime" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="275" value="extension_installation" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="-510" y="650" width="150" height="90" as="geometry"/>
                 </mxCell>
                 <mxCell id="282" value="privacy_mode" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="15" y="-450" width="120" height="80" as="geometry"/>
+                    <mxGeometry x="15" y="-440" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="283" value="privacy_starting_daytime" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="283" value="privacy_start_time" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="-300" y="-450" width="130" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="286" value="privacy_end_daytime" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="286" value="privacy_end_time" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="20" y="-250" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="288" value="ID" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="-300" y="-250" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="290" value="extension_browser" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="-310" y="750" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="292" value="ID" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="-117.5" y="590" width="120" height="80" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
