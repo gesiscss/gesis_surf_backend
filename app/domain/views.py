@@ -29,7 +29,7 @@ class DomainViewSet(viewsets.ModelViewSet):
         """
         Return objects for the current authenticated user only.
         """
-        return self.queryset.filter(user=self.request.user).order_by("-id")
+        return self.queryset.filter(user=self.request.user).order_by("-created_at")
 
     def get_serializer_class(self):
         """
@@ -68,7 +68,7 @@ class BaseDomainAttrViewSet(
         """
         Return objects for the current authenticated user only.
         """
-        return self.queryset.filter(user=self.request.user).order_by("-id")
+        return self.queryset.filter(user=self.request.user).order_by("-created_at")
 
 
 class ClickViewSet(BaseDomainAttrViewSet):

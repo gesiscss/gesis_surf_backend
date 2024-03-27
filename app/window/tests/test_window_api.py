@@ -89,7 +89,7 @@ class PrivateWindowApiTests(TestCase):
 
     def test_retrive_windows(self):
         """
-        Test retrieving a list of windows
+        Test retrieving a list of windows by created_at
         """
         # Create 3 windows
         create_window(user=self.user)
@@ -99,7 +99,7 @@ class PrivateWindowApiTests(TestCase):
         res = self.client.get(WINDOW_URL)
 
         # The latest window should be the first in the list
-        windows = Window.objects.all().order_by("-id")
+        windows = Window.objects.all().order_by("-created_at")
         # Compare the response data with the serialized data
         serializer = WindowSerializer(windows, many=True)
 

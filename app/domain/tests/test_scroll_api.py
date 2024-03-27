@@ -102,7 +102,7 @@ class PrivateScrollApiTests(TestCase):
 
         res: Response = self.client.get(SCROLL_URL)
 
-        scrolls: Scroll = Scroll.objects.all().order_by("-id")
+        scrolls: Scroll = Scroll.objects.all().order_by("-created_at")
         # Serialize the scrolls
         serializer: ScrollSerializer = ScrollSerializer(scrolls, many=True)
 

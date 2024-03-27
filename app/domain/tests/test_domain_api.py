@@ -126,7 +126,7 @@ class PrivateDomainApiTests(TestCase):
         create_domain(user=self.user)
 
         res = self.client.get(DOMAIN_URL)
-        domains = Domain.objects.all().order_by("-id")
+        domains = Domain.objects.all().order_by("-created_at")
         serializer = DomainSingleSerializer(domains, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)

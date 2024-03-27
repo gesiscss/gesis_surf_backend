@@ -7,7 +7,7 @@ services:
       context: .
     restart: always
     volumes:
-      - static-data:/vol/web
+      - static-data:/vol/static
     environment:
       - DB_HOST=db
       - DB_NAME=${DB_NAME}
@@ -40,6 +40,7 @@ services:
       - 80:80
       - 443:443
     volumes:
+      - static-data:/vol/static
       - certbot-web:/vol/www
       - proxy-dhparams:/vol/proxy
       - certbot-certs:/etc/letsencrypt

@@ -97,7 +97,7 @@ class PrivateClickApiTests(TestCase):
 
         res: Response = self.client.get(CLICK_URL)
 
-        clicks: Click = Click.objects.all().order_by("-id")
+        clicks: Click = Click.objects.all().order_by("-created_at")
         # Serialize the clicks.
         serializer: ClickSerializer = ClickSerializer(clicks, many=True)
 
