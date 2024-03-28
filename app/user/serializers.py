@@ -4,8 +4,29 @@ Serializers for the user API views.
 
 from core import models
 from django.contrib.auth import authenticate, get_user_model
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+
+
+class PrivacySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the privacy object.
+    """
+
+    class Meta:
+        """
+        Meta class for the privacy serializer.
+        """
+
+        model = models.Privacy
+        fields = (
+            "id",
+            "privacy_mode",
+            "privacy_start_time",
+            "privacy_end_time",
+        )
+        read_only_fields = ("id",)
 
 
 class WaveSerializer(serializers.ModelSerializer):
@@ -38,6 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     waves = WaveSerializer(many=True, required=False)
+    privacy = PrivacySerializer(required=True)
 
     class Meta:
         """
@@ -45,7 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
         """
 
         model = get_user_model()
-        fields = ("user_id", "password", "waves")
+        fields = ("user_id", "password", "waves", "privacy")
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
     def to_representation(self, instance):
@@ -61,23 +83,39 @@ class UserSerializer(serializers.ModelSerializer):
         """
         Create a new user with encrypted password and return it.
         """
-        waves = validated_data.pop("waves", [])
-        user = get_user_model().objects.create_user(**validated_data)
-        for wave in waves:
-            wave = models.Wave.objects.create(**wave)
-            wave.users.add(user)
-        return user
+        with transaction.atomic():
+            waves = validated_data.pop("waves", [])
+            privacy = validated_data.pop("privacy")
+            user = get_user_model().objects.create_user(**validated_data)
+            privacy = models.Privacy.objects.create(user=user, **privacy)
+            for wave in waves:
+                wave = models.Wave.objects.create(**wave)
+                wave.users.add(user)
+            return user
 
     def update(self, instance, validated_data):
         """
         Update a user, setting the password correctly and return it.
         """
         password = validated_data.pop("password", None)
+        privacy = validated_data.pop("privacy", None)
         user = super().update(instance, validated_data)
 
         if password:
             user.set_password(password)
             user.save()
+
+        if privacy:
+            user.privacy.privacy_mode = privacy.get(
+                "privacy_mode", user.privacy.privacy_mode
+            )
+            user.privacy.privacy_start_time = privacy.get(
+                "privacy_start_time", user.privacy.privacy_start_time
+            )
+            user.privacy.privacy_end_time = privacy.get(
+                "privacy_end_time", user.privacy.privacy_end_time
+            )
+            user.privacy.save()
 
         return user
 

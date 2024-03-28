@@ -393,7 +393,7 @@ class ModelTests(TestCase):
         user = get_user_model().objects.create_user(user_id="test", password="test123")
         privacy = models.Privacy.objects.create(
             user=user,
-            privacy_mode=True,
+            privacy_mode=False,
             privacy_start_time=datetime.strptime(
                 "2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"
             ),
