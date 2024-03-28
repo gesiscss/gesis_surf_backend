@@ -37,9 +37,20 @@ class PublicUserApiTests(TestCase):
         payload = {
             "user_id": "test",
             "password": "test123",
+            "privacy": {
+                "privacy_mode": False,
+                "privacy_start_time": datetime.now(timezone.utc).isoformat(),
+                "privacy_end_time": datetime.now(timezone.utc).isoformat(),
+            },
+            "extension": {
+                "extension_version": "string",
+                "extension_installed_at": datetime.now(timezone.utc).isoformat(),
+                "extension_updated_at": datetime.now(timezone.utc).isoformat(),
+                "extension_browser": "string",
+            },
         }
 
-        response = self.client.post(CREATE_USER_URL, payload)
+        response = self.client.post(CREATE_USER_URL, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         user = get_user_model().objects.get(user_id=payload["user_id"])
@@ -51,6 +62,17 @@ class PublicUserApiTests(TestCase):
         payload = {
             "user_id": "test",
             "password": "test123",
+            "privacy": {
+                "privacy_mode": False,
+                "privacy_start_time": datetime.now(timezone.utc).isoformat(),
+                "privacy_end_time": datetime.now(timezone.utc).isoformat(),
+            },
+            "extension": {
+                "extension_version": "string",
+                "extension_installed_at": datetime.now(timezone.utc).isoformat(),
+                "extension_updated_at": datetime.now(timezone.utc).isoformat(),
+                "extension_browser": "string",
+            },
             "waves": [
                 {
                     "start_date": datetime.now(timezone.utc).isoformat(),
@@ -63,7 +85,7 @@ class PublicUserApiTests(TestCase):
             ],
         }
         response = self.client.post(CREATE_USER_URL, payload, format="json")
-        print(response.data)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         user = get_user_model().objects.get(user_id=payload["user_id"])
         self.assertTrue(user.check_password(payload["password"]))
@@ -170,7 +192,12 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data,
-            {"user_id": self.user.user_id, "waves": []},
+            {
+                "user_id": self.user.user_id,
+                "waves": [],
+                "privacy": None,
+                "extension": None,
+            },
         )
 
     def test_update_user_profile(self) -> None:

@@ -141,7 +141,8 @@ class Extension(models.Model):
         related_name="extension",
     )
     extension_version = models.CharField(max_length=32, blank=False)
-    extension_installed_at = models.DateTimeField(blank=False)
+    extension_installed_at = models.DateTimeField()
+    extension_updated_at = models.DateTimeField()
     extension_browser = models.CharField(max_length=128, blank=False)
     history = HistoricalRecords()
 

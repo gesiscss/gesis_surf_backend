@@ -9,6 +9,27 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 
+class ExtensionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the extension object.
+    """
+
+    class Meta:
+        """
+        Meta class for the extension serializer.
+        """
+
+        model = models.Extension
+        fields = (
+            "id",
+            "extension_version",
+            "extension_installed_at",
+            "extension_updated_at",
+            "extension_browser",
+        )
+        read_only_fields = ("id",)
+
+
 class PrivacySerializer(serializers.ModelSerializer):
     """
     Serializer for the privacy object.
@@ -60,6 +81,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     waves = WaveSerializer(many=True, required=False)
     privacy = PrivacySerializer(required=True)
+    extension = ExtensionSerializer(required=True)
 
     class Meta:
         """
@@ -67,7 +89,7 @@ class UserSerializer(serializers.ModelSerializer):
         """
 
         model = get_user_model()
-        fields = ("user_id", "password", "waves", "privacy")
+        fields = ("user_id", "password", "waves", "privacy", "extension")
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
     def to_representation(self, instance):
@@ -86,8 +108,10 @@ class UserSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             waves = validated_data.pop("waves", [])
             privacy = validated_data.pop("privacy")
+            extension = validated_data.pop("extension")
             user = get_user_model().objects.create_user(**validated_data)
             privacy = models.Privacy.objects.create(user=user, **privacy)
+            extension = models.Extension.objects.create(user=user, **extension)
             for wave in waves:
                 wave = models.Wave.objects.create(**wave)
                 wave.users.add(user)
@@ -97,25 +121,42 @@ class UserSerializer(serializers.ModelSerializer):
         """
         Update a user, setting the password correctly and return it.
         """
-        password = validated_data.pop("password", None)
-        privacy = validated_data.pop("privacy", None)
-        user = super().update(instance, validated_data)
+        with transaction.atomic():
+            password = validated_data.pop("password", None)
+            privacy = validated_data.pop("privacy", None)
+            extension = validated_data.pop("extension", None)
+            user = super().update(instance, validated_data)
 
-        if password:
-            user.set_password(password)
-            user.save()
+            if password:
+                user.set_password(password)
+                user.save()
 
-        if privacy:
-            user.privacy.privacy_mode = privacy.get(
-                "privacy_mode", user.privacy.privacy_mode
-            )
-            user.privacy.privacy_start_time = privacy.get(
-                "privacy_start_time", user.privacy.privacy_start_time
-            )
-            user.privacy.privacy_end_time = privacy.get(
-                "privacy_end_time", user.privacy.privacy_end_time
-            )
-            user.privacy.save()
+            if privacy:
+                user.privacy.privacy_mode = privacy.get(
+                    "privacy_mode", user.privacy.privacy_mode
+                )
+                user.privacy.privacy_start_time = privacy.get(
+                    "privacy_start_time", user.privacy.privacy_start_time
+                )
+                user.privacy.privacy_end_time = privacy.get(
+                    "privacy_end_time", user.privacy.privacy_end_time
+                )
+                user.privacy.save()
+
+            if extension:
+                user.extension.extension_version = extension.get(
+                    "extension_version", user.extension.extension_version
+                )
+                user.extension.extension_installed_at = extension.get(
+                    "extension_installed_at", user.extension.extension_installed_at
+                )
+                user.extension.extension_updated_at = extension.get(
+                    "extension_updated_at", user.extension.extension_updated_at
+                )
+                user.extension.extension_browser = extension.get(
+                    "extension_browser", user.extension.extension_browser
+                )
+                user.extension.save()
 
         return user
 

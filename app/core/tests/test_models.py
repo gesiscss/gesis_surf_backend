@@ -402,7 +402,7 @@ class ModelTests(TestCase):
             ),
         )
 
-        self.assertEqual(privacy.privacy_mode, True)
+        self.assertEqual(privacy.privacy_mode, False)
         self.assertEqual(
             privacy.privacy_start_time,
             datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
@@ -422,6 +422,7 @@ class ModelTests(TestCase):
             user=user,
             extension_version="1.0.0",
             extension_installed_at=datetime.now(timezone.utc),
+            extension_updated_at=datetime.now(timezone.utc),
             extension_browser="chrome",
         )
 
