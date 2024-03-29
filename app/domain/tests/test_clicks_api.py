@@ -52,9 +52,15 @@ def create_click(user: User, **params: dict) -> Click:
     Create and return a sample click
     """
     defaults: dict = {
-        "click_location": "test",
+        "click_time": "2021-06-01T08:00:00Z",
         "click_type": "click",
-        "click_time": "2024-06-01 17:00:00",
+        "click_target_element": "button",
+        "click_target_tag": "button",
+        "click_target_id": "btn-1",
+        "click_target_class": "btn",
+        "click_page_x": 100.0,
+        "click_page_y": 200.0,
+        "click_referrer": "https://test.com",
         "domain": create_domain(user=user),
     }
     defaults.update(params)
@@ -115,7 +121,8 @@ class PrivateClickApiTests(TestCase):
         res: Response = self.client.get(CLICK_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data[0]["click_location"], click.click_location)
+        self.assertEqual(res.data[0]["click_type"], click.click_type)
+        self.assertEqual(res.data[0]["click_time"], click.click_time)
 
     def test_update_cick(self) -> None:
         """
@@ -123,11 +130,11 @@ class PrivateClickApiTests(TestCase):
         """
         click: Click = create_click(user=self.user)
         url: str = detail_url(click)
-        payload: dict = {"click_location": "New Location"}
+        payload: dict = {"click_target_element": "a", "click_target_tag": "a"}
         self.client.patch(url, payload)
 
         click.refresh_from_db()
-        self.assertEqual(click.click_location, payload["click_location"])
+        self.assertEqual(click.click_target_element, payload["click_target_element"])
 
     def test_delete_click(self) -> None:
         """

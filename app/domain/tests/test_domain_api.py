@@ -79,9 +79,15 @@ def create_click(user, domain=None, **params) -> Click:
     if domain is None:
         domain = create_domain(user=user)
     defaults = {
-        "click_location": "test",
         "click_type": "click",
         "click_time": "2024-06-01 17:00:00",
+        "click_target_element": "button",
+        "click_target_tag": "button",
+        "click_target_class": "btn",
+        "click_target_id": "btn-1",
+        "click_page_x": 100,
+        "click_page_y": 200,
+        "click_referrer": "https://test.com",
         "domain": domain,
     }
     defaults.update(params)

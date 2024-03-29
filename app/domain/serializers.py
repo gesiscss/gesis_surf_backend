@@ -41,9 +41,15 @@ class ClickSerializer(serializers.ModelSerializer):
         model: Click = Click
         fields: list = [
             "id",
-            "click_location",
             "click_type",
             "click_time",
+            "click_target_element",
+            "click_target_tag",
+            "click_target_class",
+            "click_target_id",
+            "click_page_x",
+            "click_page_y",
+            "click_referrer",
         ]
         read_only_fields: list = ["id"]
 

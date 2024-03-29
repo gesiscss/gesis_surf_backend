@@ -185,7 +185,13 @@ class ModelTests(TestCase):
             user=user,
             click_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
             click_type="click",
-            click_location="test",
+            click_target_element="test",
+            click_target_tag="test",
+            click_target_id="test",
+            click_target_class="test",
+            click_page_x=0,
+            click_page_y=0,
+            click_referrer="test",
             created_at=datetime.now(timezone.utc),
             domain=models.Domain.objects.create(
                 user=user,
@@ -201,7 +207,13 @@ class ModelTests(TestCase):
             datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
         )
         self.assertEqual(click.click_type, "click")
-        self.assertEqual(click.click_location, "test")
+        self.assertEqual(click.click_target_element, "test")
+        self.assertEqual(click.click_target_tag, "test")
+        self.assertEqual(click.click_target_id, "test")
+        self.assertEqual(click.click_target_class, "test")
+        self.assertEqual(click.click_page_x, 0)
+        self.assertEqual(click.click_page_y, 0)
+        self.assertEqual(click.click_referrer, "test")
         self.assertEqual(
             self.round_datetime(click.created_at),
             self.round_datetime(datetime.now(timezone.utc)),
