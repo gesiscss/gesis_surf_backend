@@ -348,10 +348,10 @@ class Scroll(models.Model):
         related_name="scrolls",
     )
     scroll_time = models.DateTimeField(blank=True)
-    scroll_x = models.IntegerField(blank=False)
-    scroll_y = models.IntegerField(blank=False)
-    page_x_offset = models.IntegerField(blank=False)
-    page_y_offset = models.IntegerField(blank=False)
+    scroll_x = models.FloatField(blank=False)
+    scroll_y = models.FloatField(blank=False)
+    page_x_offset = models.FloatField(blank=False)
+    page_y_offset = models.FloatField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     domain = models.ForeignKey(
         Domain,
