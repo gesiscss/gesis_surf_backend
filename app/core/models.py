@@ -314,12 +314,12 @@ class Click(models.Model):
     click_time = models.DateTimeField(blank=True)
     click_type = models.CharField(max_length=32, blank=False)
     click_target_element = models.CharField(max_length=100, blank=False, default="0")
-    click_target_tag = models.CharField(max_length=100, blank=False, default="0")
-    click_target_id = models.CharField(max_length=100, blank=False, default="0")
-    click_target_class = models.CharField(max_length=100, blank=False, default="0")
+    click_target_tag = models.CharField(max_length=200, blank=False, default="0")
+    click_target_id = models.CharField(max_length=200, blank=False, default="0")
+    click_target_class = models.CharField(max_length=200, blank=False, default="0")
     click_page_x = models.FloatField(blank=False, default=0)
     click_page_y = models.FloatField(blank=False, default=0)
-    click_referrer = models.CharField(max_length=100, default="0")
+    click_referrer = models.CharField(max_length=200, default="0")
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     domain = models.ForeignKey(
         Domain,
