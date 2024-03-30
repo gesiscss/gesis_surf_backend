@@ -135,8 +135,26 @@ class DomainSingleSerializer(serializers.ModelSerializer):
                 click_id = click.get("id", None)
                 if click_id:
                     click_obj = Click.objects.get(id=click_id)
-                    click_obj.click_location = click.get(
-                        "click_location", click_obj.click_location
+                    click_obj.click_target_element = click.get(
+                        "click_target_element", click_obj.click_target_element
+                    )
+                    click_obj.click_target_tag = click.get(
+                        "click_target_tag", click_obj.click_target_tag
+                    )
+                    click_obj.click_target_class = click.get(
+                        "click_target_class", click_obj.click_target_class
+                    )
+                    click_obj.click_target_id = click.get(
+                        "click_target_id", click_obj.click_target_id
+                    )
+                    click_obj.click_page_x = click.get(
+                        "click_page_x", click_obj.click_page_x
+                    )
+                    click_obj.click_page_y = click.get(
+                        "click_page_y", click_obj.click_page_y
+                    )
+                    click_obj.click_referrer = click.get(
+                        "click_referrer", click_obj.click_referrer
                     )
                     click_obj.click_type = click.get("click_type", click_obj.click_type)
                     click_obj.click_time = click.get("click_time", click_obj.click_time)

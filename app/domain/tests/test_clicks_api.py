@@ -124,7 +124,7 @@ class PrivateClickApiTests(TestCase):
         self.assertEqual(res.data[0]["click_type"], click.click_type)
         self.assertEqual(res.data[0]["click_time"], click.click_time)
 
-    def test_update_cick(self) -> None:
+    def test_update_click(self) -> None:
         """
         Test updating a click
         """
@@ -134,6 +134,7 @@ class PrivateClickApiTests(TestCase):
         self.client.patch(url, payload)
 
         click.refresh_from_db()
+        self.assertEqual(click.click_target_tag, payload["click_target_tag"])
         self.assertEqual(click.click_target_element, payload["click_target_element"])
 
     def test_delete_click(self) -> None:
