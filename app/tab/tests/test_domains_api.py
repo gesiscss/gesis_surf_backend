@@ -83,7 +83,7 @@ class PrivateDomainApiTests(TestCase):
 
         res = self.client.get(DOMAIN_URL)
 
-        domains = Domain.objects.all().order_by("-created_at")
+        domains = Domain.objects.all().order_by("created_at")
         # Serializing the domains and getting all the objects
         serializer = DomainSerializer(domains, many=True)
 

@@ -95,7 +95,7 @@ class PrivateTabApiTests(TestCase):
         create_tab(user=self.user)
 
         res = self.client.get(TAB_URL)
-        tabs = Tab.objects.all().order_by("-created_at")
+        tabs = Tab.objects.all().order_by("created_at")
         serializer = TabSerializer(tabs, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
