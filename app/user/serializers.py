@@ -132,6 +132,12 @@ class UserSerializer(serializers.ModelSerializer):
                 user.save()
 
             if privacy:
+                try:
+                    privacy_instance = user.privacy
+                except models.Privacy.DoesNotExist:
+                    privacy_instance = models.Privacy.objects.create(user=user)
+                    privacy_instance.save()
+
                 user.privacy.privacy_mode = privacy.get(
                     "privacy_mode", user.privacy.privacy_mode
                 )
@@ -144,6 +150,11 @@ class UserSerializer(serializers.ModelSerializer):
                 user.privacy.save()
 
             if extension:
+                try:
+                    extension_instance = user.extension
+                except models.Extension.DoesNotExist:
+                    extension_instance = models.Extension.objects.create(user=user)
+                    extension_instance.save()
                 user.extension.extension_version = extension.get(
                     "extension_version", user.extension.extension_version
                 )
