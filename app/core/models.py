@@ -110,8 +110,8 @@ class Privacy(models.Model):
         related_name="privacy",
     )
     privacy_mode = models.BooleanField(default=False)
-    privacy_start_time = models.DateTimeField(blank=True)
-    privacy_end_time = models.DateTimeField(blank=True)
+    privacy_start_time = models.DateTimeField(blank=True, default=timezone.now)
+    privacy_end_time = models.DateTimeField(blank=True, default=timezone.now)
     history = HistoricalRecords()
 
     def __str__(self) -> str:
@@ -140,10 +140,10 @@ class Extension(models.Model):
         on_delete=models.CASCADE,
         related_name="extension",
     )
-    extension_version = models.CharField(max_length=32, blank=False)
-    extension_installed_at = models.DateTimeField()
-    extension_updated_at = models.DateTimeField()
-    extension_browser = models.CharField(max_length=128, blank=False)
+    extension_version = models.CharField(max_length=32, blank=True)
+    extension_installed_at = models.DateTimeField(blank=True, null=True)
+    extension_updated_at = models.DateTimeField(blank=True, null=True)
+    extension_browser = models.CharField(max_length=128, blank=True)
     history = HistoricalRecords()
 
     def __str__(self) -> str:

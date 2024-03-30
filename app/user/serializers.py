@@ -80,8 +80,8 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     waves = WaveSerializer(many=True, required=False)
-    privacy = PrivacySerializer(required=True)
-    extension = ExtensionSerializer(required=True)
+    privacy = PrivacySerializer(required=False)
+    extension = ExtensionSerializer(required=False)
 
     class Meta:
         """
@@ -107,8 +107,8 @@ class UserSerializer(serializers.ModelSerializer):
         """
         with transaction.atomic():
             waves = validated_data.pop("waves", [])
-            privacy = validated_data.pop("privacy")
-            extension = validated_data.pop("extension")
+            privacy = validated_data.pop("privacy", {})
+            extension = validated_data.pop("extension", {})
             user = get_user_model().objects.create_user(**validated_data)
             privacy = models.Privacy.objects.create(user=user, **privacy)
             extension = models.Extension.objects.create(user=user, **extension)

@@ -23,6 +23,13 @@ def create_user(**params) -> models.Model:
     return get_user_model().objects.create_user(**params)
 
 
+def round_datetime(d_t: datetime) -> datetime:
+    """
+    Round the datetime to the nearest second.
+    """
+    return d_t.replace(second=0, microsecond=0)
+
+
 class PublicUserApiTests(TestCase):
     """
     Tests the users API (public).
@@ -178,10 +185,7 @@ class PrivateUserApiTests(TestCase):
 
     def setUp(self) -> None:
         """Creates a client for the tests."""
-        self.user = create_user(
-            user_id="test",
-            password="test123",
-        )
+        self.user = create_user(user_id="test", password="test123")
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
@@ -231,3 +235,68 @@ class PrivateUserApiTests(TestCase):
         response = self.client.post(CREATE_USER_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_user_without_waves_privacy_extension_authenticated(self) -> None:
+        """Tests creating a user without privacy and extension"""
+        payload = {"user_id": "test_dos", "password": "test123"}
+        response = self.client.post(CREATE_USER_URL, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["user_id"], payload["user_id"])
+        self.assertNotIn("password", response.data)
+        self.assertIn("waves", response.data)
+        self.assertIn("privacy", response.data)
+        self.assertIn("extension", response.data)
+
+    def test_create_user_with_extension_authenticated(self) -> None:
+        """Tests creating a user with extension"""
+        payload = {
+            "user_id": "test_tres",
+            "password": "test123",
+            "extension": {
+                "extension_version": "string",
+                "extension_installed_at": datetime.now(timezone.utc),
+                "extension_updated_at": datetime.now(timezone.utc),
+                "extension_browser": "string",
+            },
+        }
+        response = self.client.post(CREATE_USER_URL, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["user_id"], payload["user_id"])
+        self.assertNotIn("password", response.data)
+        self.assertIn("waves", response.data)
+        self.assertIn("privacy", response.data)
+        self.assertIn("extension", response.data)
+
+    def test_update_privacy_authenticated(self) -> None:
+        """Tests updating the privacy for authenticated user."""
+        payload = {
+            "privacy": {
+                "privacy_mode": False,
+                "privacy_start_time": datetime.now(timezone.utc),
+                "privacy_end_time": datetime.now(timezone.utc),
+            }
+        }
+
+        response = self.client.patch(ME_URL, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["privacy"]["privacy_mode"], payload["privacy"]["privacy_mode"]
+        )
+
+    def test_update_privacy_onefield_authenticated(self) -> None:
+        """Tests updating the privacy for authenticated user."""
+        payload = {
+            "privacy": {
+                "privacy_mode": True,
+            }
+        }
+
+        response = self.client.patch(ME_URL, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["privacy"]["privacy_mode"], payload["privacy"]["privacy_mode"]
+        )
