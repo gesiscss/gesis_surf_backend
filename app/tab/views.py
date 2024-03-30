@@ -29,7 +29,7 @@ class TabViewSet(viewsets.ModelViewSet):
         """
         Return objects for the current authenticated user only.
         """
-        return self.queryset.filter(user=self.request.user).order_by("-created_at")
+        return self.queryset.filter(user=self.request.user).order_by("created_at")
 
     def get_serializer_class(self):
         """
@@ -70,4 +70,4 @@ class DomainViewSet(
         """
         Return objects for the current authenticated user only.
         """
-        return self.queryset.filter(user=self.request.user).order_by("-created_at")
+        return self.queryset.filter(user=self.request.user).order_by("created_at")
