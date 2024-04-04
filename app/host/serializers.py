@@ -25,6 +25,7 @@ class CriteriaSerializer(serializers.ModelSerializer):
             "criteria_domain",
             "criteria_click",
             "criteria_scroll",
+            "snapshot_html",
         ]
         read_only_fields = ["id"]
 
