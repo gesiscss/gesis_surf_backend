@@ -1,6 +1,10 @@
 version: "3.9"
 
 services:
+  redis:
+    container_name: redis_GESIS
+    image: redis:7.0.11-alpine
+
   app:
     container_name: app_GESIS
     build:
@@ -22,6 +26,7 @@ services:
       - DB_PASSWORD=changeme
       - DJANGO_DEBUG=1
     depends_on:
+      - redis
       - db
 
   db:
