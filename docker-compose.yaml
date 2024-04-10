@@ -29,6 +29,26 @@ services:
       - redis
       - db
 
+  celery:
+    container_name: celery_GESIS
+    build:
+      context: .
+      args:
+        - DEV=true
+    volumes:
+      - ./app:/app
+    command: >
+      sh -c "celery -A app worker --loglevel=info"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASSWORD=changeme
+      - DJANGO_DEBUG=1
+    depends_on:
+      - redis
+      - db
+
   db:
     container_name: db_GESIS
     image: postgres:13.3-alpine

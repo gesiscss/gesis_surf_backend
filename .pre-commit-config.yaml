@@ -12,7 +12,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
     repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
   - hooks:
       - additional_dependencies:
           - types-aiofiles
@@ -38,14 +38,14 @@ repos:
       - id: black
         name: format
     repo: https://github.com/psf/black
-    rev: 24.2.0
+    rev: 24.3.0
   - hooks:
       - id: commitizen
       - id: commitizen-branch
         stages:
           - push
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.18.4
+    rev: v3.21.3
   - repo: https://github.com/adamchainz/django-upgrade
     rev: 1.16.0
     hooks:
@@ -74,7 +74,7 @@ repos:
           - --fix
         id: eslint
     repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.0.0-beta.2
+    rev: v9.0.0
   - repo: https://github.com/pre-commit/mirrors-pylint
     rev: v3.0.0a5
     hooks:
@@ -112,11 +112,11 @@ repos:
           - --py310-plus
         id: pyupgrade
     repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.1
+    rev: v3.15.2
   - hooks:
       - id: black
     repo: https://github.com/psf/black
-    rev: 24.2.0
+    rev: 24.3.0
   - hooks:
       - additional_dependencies:
           - black==23.11.0
