@@ -49,6 +49,28 @@ services:
       - redis
       - db
 
+  flower:
+    container_name: flower_GESIS
+    build:
+      context: .
+      args:
+        - DEV=true
+    volumes:
+      - ./app:/app
+    command: >
+      sh -c "celery -A app flower --port=5555"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASSWORD=changeme
+      - DJANGO_DEBUG=1
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - db
+
   db:
     container_name: db_GESIS
     image: postgres:13.3-alpine
