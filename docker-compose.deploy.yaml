@@ -1,6 +1,10 @@
 version: "3.9"
 
 services:
+  redis:
+    container_name: redis_GESIS
+    image: redis:7.0.11-alpine
+
   app:
     container_name: api_GESIS
     build:
@@ -17,6 +21,42 @@ services:
       - DJANGO_ALLOWED_HOSTS=${DOMAIN}
     depends_on:
       - db
+
+  celery_worker_1:
+    container_name: celery_GESIS_worker_1
+    build:
+      context: .
+    restart: always
+    volumes:
+      - static-data:/vol/static
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=${DOMAIN}
+    depends_on:
+      - db
+      - redis
+
+  flower:
+    container_name: flower_GESIS
+    build:
+      context: .
+    restart: always
+    volumes:
+      - static-data:/vol/static
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=${DOMAIN}
+    depends_on:
+      - db
+      - redis
 
   db:
     container_name: db_GESIS

@@ -17,6 +17,9 @@ types-psycopg2 = "^2.9.21.15"
 drf-spectacular = "^0.27.1"
 uwsgi = "^2.0.24"
 django-simple-history = "^3.5.0"
+celery = "^5.3.6"
+redis = "^5.0.3"
+flower = "^2.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
