@@ -49,7 +49,5 @@ class HostViewSet(viewsets.ModelViewSet):
         """
         task_result = AsyncResult(task_id)
         if task_result.ready():
-            # Task has finished, parse the JSON result and return it
             return JsonResponse(task_result.result, safe=False, status=200)
-        # Task is still processing
         return JsonResponse({"status": "Processing"}, status=202)

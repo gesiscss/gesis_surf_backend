@@ -26,6 +26,7 @@ class ExtensionSerializer(serializers.ModelSerializer):
             "extension_installed_at",
             "extension_updated_at",
             "extension_browser",
+            "host_version",
         )
         read_only_fields = ("id",)
 
