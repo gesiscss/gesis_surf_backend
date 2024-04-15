@@ -73,6 +73,7 @@ class HostSerializer(serializers.ModelSerializer):
             "hostname",
             "created_at",
             "categories",
+            "version",
         ]
         read_only_fields = ["id"]
 

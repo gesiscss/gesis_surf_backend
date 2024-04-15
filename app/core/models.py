@@ -377,6 +377,7 @@ class Host(models.Model):
     hostname = models.CharField(max_length=32, blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     categories = models.ManyToManyField("Category", related_name="hosts")
+    version = models.CharField(max_length=32, blank=False, default="0")
 
 
 class Category(models.Model):
