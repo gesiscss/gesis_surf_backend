@@ -75,7 +75,7 @@ class PrivateHostApiTests(TestCase):
         create_host(hostname="test2")
 
         res = self.client.get(HOST_URL)
-        hosts = Host.objects.all().order_by("id")
+        hosts = Host.objects.all()
         serializer = HostSerializer(hosts, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
