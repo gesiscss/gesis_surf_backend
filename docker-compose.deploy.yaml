@@ -4,6 +4,7 @@ services:
   redis:
     container_name: redis_GESIS
     image: redis:7.0.11-alpine
+    restart: always
 
   app:
     container_name: api_GESIS
