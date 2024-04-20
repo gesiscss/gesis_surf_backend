@@ -45,7 +45,7 @@ repos:
         stages:
           - push
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.22.0
+    rev: v3.24.0
   - repo: https://github.com/adamchainz/django-upgrade
     rev: 1.16.0
     hooks:
@@ -74,7 +74,7 @@ repos:
           - --fix
         id: eslint
     repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.0.0
+    rev: v9.1.0
   - repo: https://github.com/pre-commit/mirrors-pylint
     rev: v3.0.0a5
     hooks:

@@ -24,6 +24,8 @@ server {
 
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
+    send_timeout 300s;
+
     location /static {
         alias /vol/static;
     }
