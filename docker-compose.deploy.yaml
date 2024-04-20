@@ -55,6 +55,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_ALLOWED_HOSTS=${DOMAIN}
+    ports:
+      - 5555:5555
     depends_on:
       - db
       - redis
