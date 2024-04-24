@@ -2,8 +2,8 @@
 Drop all hosts from the database
 """
 
+from core.models import Category, Criteria, Host
 from django.core.management.base import BaseCommand
-from core.models import Host, Category, Criteria
 
 
 class Command(BaseCommand):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     help = "Drop all hosts from the database"
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # pylint: disable=unused-argument
         """_summary_"""
         Host.objects.all().delete()
         Category.objects.all().delete()
