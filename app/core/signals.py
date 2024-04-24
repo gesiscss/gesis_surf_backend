@@ -24,7 +24,7 @@ def update_extension_versions(sender, instance, created, **kwargs):
         old_host = Host.objects.get(pk=instance.pk)
         old_hosts_version = old_host.hosts_version
     update_extension_versions_task.apply_async(
-        (instance.pk, created, old_hosts_version), countdown=10
+        (instance.pk, created, old_hosts_version), countdown=10800
     )
 
 
