@@ -20,6 +20,7 @@ django-simple-history = "^3.5.0"
 celery = "^5.3.6"
 redis = "^5.0.3"
 flower = "^2.0.1"
+python-logstash = "^0.4.8"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1273,6 +1273,16 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "python-logstash"
+version = "0.4.8"
+description = "Python logging handler for Logstash."
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-logstash-0.4.8.tar.gz", hash = "sha256:d04e1ce11ecc107e4a4f3b807fc57d96811e964a554081b3bbb44732f74ef5f9"},
+]
+
+[[package]]
 name = "pytz"
 version = "2023.3.post1"
 description = "World timezone definitions, modern and historical"
@@ -1784,4 +1794,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "746dac85f1ae3abaeead51cb84a926c28ec06d6a53c2b5b2a9f6f2201f088e32"
+content-hash = "b2aae6e3977a7a3c863a37ee0cabf608af54d5b6aae92e4fd56d9895d201af1a"
