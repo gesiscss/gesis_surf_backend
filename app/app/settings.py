@@ -181,41 +181,40 @@ LOGGING = {
         }
     },
     "loggers": {
-        "django": {  # Default Django logger
+        "django": {
             "handlers": ["logstash", "console"],
             "level": "INFO",
             "propagate": True,
         },
-        "app.core": {  # Logger for the 'core' app
+        "app.core": {
             "handlers": ["logstash", "console"],
             "level": "DEBUG",
             "propagate": False,
         },
-        "app.domain": {  # Logger for the 'domain' app
+        "app.domain": {
             "handlers": ["logstash", "console"],
             "level": "WARNING",
             "propagate": False,
         },
-        "app.host": {  # Logger for the 'host' app
+        "app.host": {
             "handlers": ["logstash", "console"],
             "level": "ERROR",
             "propagate": False,
         },
-        "app.tab": {  # Logger for the 'tab' app
+        "app.tab": {
             "handlers": ["logstash", "console"],
             "level": "DEBUG",
             "propagate": False,
         },
-        "app.user": {  # Logger for the 'user' app
+        "app.user": {
             "handlers": ["logstash", "console"],
             "level": "INFO",
             "propagate": False,
         },
-        "app.window": {  # Logger for the 'window' app
+        "app.window": {
             "handlers": ["logstash", "console"],
             "level": "DEBUG",
             "propagate": False,
         },
-        # Add additional loggers if there are more apps or modules
     },
 }
