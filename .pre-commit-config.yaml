@@ -28,7 +28,7 @@ repos:
         exclude: ^(.*/)?(models/)?
         name: typecheck
     repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.9.0
+    rev: v1.11.2
   - hooks:
       - id: autoflake
         name: remove unused imports
@@ -38,16 +38,16 @@ repos:
       - id: black
         name: format
     repo: https://github.com/psf/black
-    rev: 24.4.0
+    rev: 24.8.0
   - hooks:
       - id: commitizen
       - id: commitizen-branch
         stages:
           - push
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.24.0
+    rev: v3.29.0
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.16.0
+    rev: 1.20.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.2"]
@@ -74,7 +74,7 @@ repos:
           - --fix
         id: eslint
     repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.1.0
+    rev: v9.9.1
   - repo: https://github.com/pre-commit/mirrors-pylint
     rev: v3.0.0a5
     hooks:
@@ -112,17 +112,17 @@ repos:
           - --py310-plus
         id: pyupgrade
     repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.2
+    rev: v3.17.0
   - hooks:
       - id: black
     repo: https://github.com/psf/black
-    rev: 24.4.0
+    rev: 24.8.0
   - hooks:
       - additional_dependencies:
           - black==23.11.0
         id: blacken-docs
     repo: https://github.com/asottile/blacken-docs
-    rev: 1.16.0
+    rev: 1.18.0
   - hooks:
       - id: isort
     repo: https://github.com/pycqa/isort
@@ -161,4 +161,4 @@ repos:
         id: flake8
         exclude: ^(.*/)?(migrations|static|node_modules|build|dist|\.cache|\.git|\.hg|\.svn|\.tox|\.venv|_build|buck-out|build|dist|node_modules|\.mypy_cache|\.pytest_cache|\.tox|\.venv|venv)/
     repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.1.1

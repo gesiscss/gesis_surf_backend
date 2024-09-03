@@ -154,7 +154,6 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")
 
 # Logstash configuration
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -169,12 +168,54 @@ LOGGING = {
             "fqdn": False,
             "tags": ["app"],
         },
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        }
     },
     "loggers": {
-        "django": {
-            "handlers": ["logstash"],
-            "level": "DEBUG",
+        "django": {  # Default Django logger
+            "handlers": ["logstash", "console"],
+            "level": "INFO",
             "propagate": True,
         },
+        "app.core": {  # Logger for the 'core' app
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "app.domain": {  # Logger for the 'domain' app
+            "handlers": ["logstash", "console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "app.host": {  # Logger for the 'host' app
+            "handlers": ["logstash", "console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "app.tab": {  # Logger for the 'tab' app
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "app.user": {  # Logger for the 'user' app
+            "handlers": ["logstash", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "app.window": {  # Logger for the 'window' app
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        # Add additional loggers if there are more apps or modules
     },
 }
