@@ -62,6 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "app.middleware.traffic_middleware.LoggingMiddleware",
 ]
 
 ROOT_URLCONF = "app.urls"
@@ -169,7 +170,7 @@ LOGGING = {
             "tags": ["app"],
         },
         "console": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
@@ -212,6 +213,11 @@ LOGGING = {
             "propagate": False,
         },
         "app.window": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "app.middleware": {
             "handlers": ["logstash", "console"],
             "level": "DEBUG",
             "propagate": False,
