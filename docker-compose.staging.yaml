@@ -1,6 +1,48 @@
-version: "3.9"
-
 services:
+  elasticsearch:
+    container_name: elasticseach_GESIS_staging
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.11
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "xpack.security.enabled=false"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
+  kibana:
+    container_name: kibana_GESIS_staging
+    image: docker.elastic.co/kibana/kibana:7.17.11
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  logstash:
+    container_name: logstash_GESIS_staging
+    image: docker.elastic.co/logstash/logstash:7.17.11
+    restart: always
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    depends_on:
+      - elasticsearch
+
+  redis:
+    container_name: redis_GESIS_staging
+    image: redis:7.0.11-alpine
+    restart: always
+
   app:
     container_name: api_GESIS_staging
     build:
@@ -28,6 +70,27 @@ services:
       - POSTGRES_PASSWORD=changeme
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+  celery:
+    container_name: celery_GESIS_staging
+    build:
+      context: .
+      args:
+        - DEV=true
+    volumes:
+      - ./app:/app
+    command: >
+      sh -c "celery -A app worker -l info"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=dbname
+      - DB_USER=rootuser
+      - DB_PASSWORD=changeme
+      - DJANGO_SECRET_KEY=changeme
+      - DJANGO_ALLOWED_HOSTS=localhost,
+    depends_on:
+      - redis
+      - db
 
   # Simplified proxy service, assuming no SSL or using self-signed certs
   proxy:
@@ -62,3 +125,4 @@ volumes:
   certbot-web:
   certbot-certs:
   proxy-dhparams:
+  elasticsearch-data:
