@@ -5,6 +5,7 @@ App configuration for the addons app.
 from django.apps import AppConfig
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
+from elasticsearch_dsl import connections
 
 
 class AddonsConfig(AppConfig):
@@ -18,7 +19,15 @@ class AddonsConfig(AppConfig):
     name = "addons"
 
     def ready(self) -> None:
-        """_summary_"""
+        """
+        Set up the Elasticsearch connections and create the indices
+        """
+
+        connections.create_connection(
+            alias="default",
+            hosts=["http://elasticsearch:9200"],
+        )
+
         from core.indexes.chatgpt_index import (  # pylint: disable=import-outside-toplevel
             ChatGPTIndex,
         )
