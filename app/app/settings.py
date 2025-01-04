@@ -100,13 +100,6 @@ DATABASES = {
     }
 }
 
-ELASTICSEARCH_DSL = {
-    "default": {
-        "hosts": os.environ.get("ELASTICSEARCH_HOST", "localhost:9200"),
-        "use_ssl": False,
-        "verify_certs": False,
-    }
-}
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
