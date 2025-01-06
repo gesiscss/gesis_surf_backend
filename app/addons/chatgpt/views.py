@@ -2,7 +2,7 @@
 Views for the ChatGPT addon.
 """
 
-from chatgpt import serializers
+from addons.chatgpt import serializers
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -15,8 +15,12 @@ class ChatGPTDataView(APIView):
     API view for ChatGPT data.
     """
 
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [
+        TokenAuthentication,
+    ]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     serializer_class = serializers.ChatGPTDataSerializer
 
     def post(self, request) -> Response:
