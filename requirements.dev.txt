@@ -7,9 +7,9 @@ argcomplete==3.1.6 ; python_version >= "3.10" and python_version < "4.0" \
 asgiref==3.7.2 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:89b2ef2247e3b562a16eef663bc0e2e703ec6468e2fa8a5cd61cd449786d4f6e \
     --hash=sha256:9e0ce3aa93a819ba5b45120216b23878cf6e8525eb3848653452b4192b92afed
-astroid==3.0.3 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:4148645659b08b70d72460ed1921158027a9e53ae8b7234149b1400eddacbb93 \
-    --hash=sha256:92fcf218b89f449cdf9f7b39a269f8d5d617b27be68434912e11e79203963a17
+astroid==3.3.8 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:187ccc0c248bfbba564826c26f070494f7bc964fd286b6d9fff4420e55de828c \
+    --hash=sha256:a88c7994f914a4ea8572fac479459f4955eeccc877be3f2d959a33273b0cf40b
 async-timeout==4.0.3 ; python_version >= "3.10" and python_full_version < "3.11.3" \
     --hash=sha256:4640d96be84d82d02ed59ea2b7105a0f7b33abe8703703cd0ab0bf87c427522f \
     --hash=sha256:7405140ff1230c310e51dc27b3145b9092d659ce68ff733fb0cefe3ee42be028
@@ -394,9 +394,9 @@ pylint-django==2.5.5 ; python_version >= "3.10" and python_version < "4.0" \
 pylint-plugin-utils==0.8.2 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:ae11664737aa2effbf26f973a9e0b6779ab7106ec0adc5fe104b0907ca04e507 \
     --hash=sha256:d3cebf68a38ba3fba23a873809155562571386d4c1b03e5b4c4cc26c3eee93e4
-pylint==3.0.3 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:58c2398b0301e049609a8429789ec6edf3aabe9b6c5fec916acd18639c16de8b \
-    --hash=sha256:7a1585285aefc5165db81083c3e06363a27448f6b467b3b0f30dbd0ac1f73810
+pylint==3.3.3 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:07c607523b17e6d16e2ae0d7ef59602e332caa762af64203c24b41c27139f36a \
+    --hash=sha256:26e271a2bc8bce0fc23833805a9076dd9b4d5194e2a02164942cb3cdc37b4183
 pytest==7.4.3 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:0d009c083ea859a71b76adf7c1d502e4bc170b80a8ef002da5806527b9591fac \
     --hash=sha256:d989d136982de4e3b29dabcc838ad581c64e8ed52c11fbe86ddebd9da0818cd5
