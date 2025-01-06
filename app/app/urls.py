@@ -32,4 +32,6 @@ urlpatterns = [
     path("api/tab/", include("tab.urls")),
     path("api/domain/", include("domain.urls")),
     path("api/host/", include("host.urls")),
+    path("api/twitter/", include("addons.twitter.urls")),
+    path("api/chatgpt/", include("addons.chatgpt.urls")),
 ]
