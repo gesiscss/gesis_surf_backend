@@ -21,9 +21,14 @@ class CustomPagination(PageNumberPagination):
         """
         return Response(
             {
-                "next": self.get_next_link(),
-                "previous": self.get_previous_link(),
+                "links": {
+                    "next": self.get_next_link(),
+                    "previous": self.get_previous_link(),
+                },
                 "count": self.page.paginator.count,
+                "page_size": self.page_size,
+                "total_pages": self.page.paginator.num_pages,
+                "current_page": self.page.number,
                 "results": data,
             }
         )
