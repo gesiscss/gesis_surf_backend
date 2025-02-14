@@ -128,7 +128,9 @@ class PrivatePaginationTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data["results"]), 10)
         self.assertEqual(res.data["links"]["next"], None)
-        self.assertEqual(res.data["links"]["previous"], "http://testserver/api/domain/domains/")
+        self.assertEqual(
+            res.data["links"]["previous"], "http://testserver/api/domain/domains/"
+        )
 
     def test_invalid_page(self) -> None:
         """
