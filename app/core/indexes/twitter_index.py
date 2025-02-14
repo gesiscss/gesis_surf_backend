@@ -2,7 +2,8 @@
 Document for twitter index
 """
 
-from elasticsearch_dsl import Text, Keyword, Date
+from elasticsearch_dsl import Date, Keyword, Text
+
 from .base_index import BaseIndex
 
 

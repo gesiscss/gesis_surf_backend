@@ -1,3 +1,15 @@
-from django.test import TestCase
+"""
+This file is used to write tests for the ChatGPT addon.
+"""
 
-# Create your tests here.
+# from django.test import TestCase
+
+
+class ChatGPTTests:
+    """_summary_
+
+    Args:
+        TestCase (_type_): _description_
+    """
+
+    pass
