@@ -3,6 +3,7 @@ Middleware that logs all requests and responses to the application.
 """
 
 import logging
+import time
 
 from core.models import User
 from django.http import HttpRequest, HttpResponse
@@ -13,25 +14,45 @@ logger: logging.Logger = logging.getLogger("app.middleware")
 
 class LoggingMiddleware(MiddlewareMixin):
     """
-    Middleware that logs all requests and responses to the application.
+    Middleware that logs all requests and responses to the application with:
+    - 2xx/3xx status codes are logged as info
+    - 4xx status codes are logged as warning
+    - 5xx status codes are logged as error
     """
+
+    def _get_user_detail_from_request(self, request: HttpRequest) -> str:
+        """
+        Extracts the user detail from the request object.
+
+        Args:
+            request (HttpRequest): The request object.
+
+        Returns:
+            str: The user detail.
+        """
+        authorization: str | None = request.headers.get("Authorization")
+
+        if not authorization:
+            return "Anonymous"
+
+        try:
+            token = authorization.split(" ")[1]
+            user = User.objects.get(auth_token=token)
+            return f"UUID: {user.id}"
+        except (User.DoesNotExist, IndexError, ValueError):
+            logger.warning("Auth Error: %s", authorization)
+            return "Anonymous (Invalid Token)"
 
     def process_request(self, request: HttpRequest) -> None:
         """
         Logs all requests to the application and the user that made the request.
         """
-        method: str = request.method
-        authorization: str = request.headers.get("Authorization")
-        referer: str = request.headers.get("Referer")
-        user_agent: str = request.headers.get("User-Agent")
+        request._start_time = time.time()  # pylint: disable=protected-access
 
-        # Extract uuid from incoming request
-        if authorization:
-            token = authorization.split(" ")[1]
-            user = User.objects.get(auth_token=token)
-            user_detail = f"UUID: {user.id}"
-        else:
-            user_detail = "Anonymous"
+        method: str = request.method
+        referer: str = request.headers.get("Referer", "")
+        user_agent: str = request.headers.get("User-Agent", "")
+        user_detail = self._get_user_detail_from_request(request)
 
         logger.info(
             "Request by User_detail: %s, Method: %s, Path: %s, Referer: %s, User_Agent: %s",
@@ -40,6 +61,23 @@ class LoggingMiddleware(MiddlewareMixin):
             request.path,
             referer,
             user_agent,
+        )
+
+    def _get_user_detail_from_response(self, request: HttpRequest) -> str:
+        """
+        Extracts the user detail from the response object.
+
+        Args:
+            request (HttpRequest): The request object.
+
+        Returns:
+            str: The user detail.
+        """
+        user: str = getattr(request, "user", None)
+        return (
+            f"{user.user_id} (ID: {user.id})"
+            if user and user.is_authenticated
+            else "Anonymous"
         )
 
     def process_response(
@@ -54,26 +92,42 @@ class LoggingMiddleware(MiddlewareMixin):
         Returns:
             HttpResponse: The response object.
         """
-        user: str = getattr(request, "user", None)
+        duration: float = (
+            time.time() - request._start_time  # pylint: disable=protected-access
+        )
+
+        user: str = self._get_user_detail_from_response(request)
         user_detail: str = (
             f"(ID: {user.id})" if user and user.is_authenticated else "Anonymous"
         )
+
         path: str = request.path
 
         logger.info(
-            "Response User: %s, status: %s, Request_path: %s",
+            "Response User: %s, status: %s, Request_path: %s, Duration: %s",
             user_detail,
             response.status_code,
             path,
+            duration,
         )
 
-        if response.status_code >= 400:
-            logger.error(
-                "Response Error User: %s, status: %s, Request_path: %s",
+        if 400 <= response.status_code < 500:
+            logger.warning(
+                "Response User: %s, status: %s, Request_path: %s, Duration: %s",
                 user_detail,
                 response.status_code,
                 path,
+                duration,
             )
+        elif 500 <= response.status_code:
+            logger.error(
+                "Response User: %s, status: %s, Request_path: %s, Duration: %s",
+                user_detail,
+                response.status_code,
+                path,
+                duration,
+            )
+
         return response
 
     def process_exception(self, request: HttpRequest, exception: Exception) -> None:
