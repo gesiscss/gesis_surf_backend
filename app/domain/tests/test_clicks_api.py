@@ -108,7 +108,7 @@ class PrivateClickApiTests(TestCase):
         serializer: ClickSerializer = ClickSerializer(clicks, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data["results"], serializer.data)
 
     def test_clicks_limited_to_user(self) -> None:
         """
@@ -120,9 +120,9 @@ class PrivateClickApiTests(TestCase):
 
         res: Response = self.client.get(CLICK_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data[0]["click_type"], click.click_type)
-        self.assertEqual(res.data[0]["click_time"], click.click_time)
+        self.assertEqual(len(res.data["results"]), 1)
+        self.assertEqual(res.data["results"][0]["click_type"], click.click_type)
+        self.assertEqual(res.data["results"][0]["click_time"], click.click_time)
 
     def test_update_click(self) -> None:
         """

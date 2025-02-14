@@ -135,7 +135,7 @@ class PrivateDomainApiTests(TestCase):
         domains = Domain.objects.all().order_by("-created_at")
         serializer = DomainSingleSerializer(domains, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data["results"], serializer.data)
 
     def test_domains_limited_to_user(self) -> None:
         """
@@ -149,8 +149,8 @@ class PrivateDomainApiTests(TestCase):
 
         res = self.client.get(DOMAIN_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data[0]["domain_title"], domain.domain_title)
+        self.assertEqual(len(res.data["results"]), 1)
+        self.assertEqual(res.data["results"][0]["domain_title"], domain.domain_title)
 
     def test_get_domain_detail(self) -> None:
         """
