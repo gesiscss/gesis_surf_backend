@@ -7,6 +7,7 @@ from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from window import serializers
+from core.pagination import CustomPagination
 
 
 class WindowViewSet(viewsets.ModelViewSet):
@@ -23,6 +24,7 @@ class WindowViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         """
