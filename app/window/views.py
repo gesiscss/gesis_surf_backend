@@ -3,11 +3,11 @@ Views for the window app.
 """
 
 from core.models import Window
+from core.pagination import CustomPagination
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from window import serializers
-from core.pagination import CustomPagination
 
 
 class WindowViewSet(viewsets.ModelViewSet):
