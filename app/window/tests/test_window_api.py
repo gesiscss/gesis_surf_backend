@@ -104,7 +104,7 @@ class PrivateWindowApiTests(TestCase):
         serializer = WindowSerializer(windows, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data["results"], serializer.data)
 
     def test_windows_limited_to_user(self):
         """
@@ -121,7 +121,7 @@ class PrivateWindowApiTests(TestCase):
         serializer = WindowSerializer(windows, many=True)
 
         # Compare the response data with the serialized data
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data["results"], serializer.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_get_window_detail(self):
