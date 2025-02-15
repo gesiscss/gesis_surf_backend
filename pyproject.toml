@@ -21,6 +21,7 @@ celery = "^5.3.6"
 redis = "^5.0.3"
 flower = "^2.0.1"
 python-logstash = "^0.4.8"
+cryptography = "^44.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
