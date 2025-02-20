@@ -51,4 +51,9 @@ class SecurePatternLoader:
                 "pattern": r"(?i)(select|union|drop|exec)\s+",
                 "severity": 3,
             },
+            {
+                "name": "Null_Byte_Injection",
+                "pattern": r"(?:%00|\\?x00|\\?u0000|\x00|\u0000)",
+                "severity": 3,
+            },
         ]
