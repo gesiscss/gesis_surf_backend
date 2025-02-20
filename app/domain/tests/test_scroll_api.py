@@ -107,7 +107,7 @@ class PrivateScrollApiTests(TestCase):
         serializer: ScrollSerializer = ScrollSerializer(scrolls, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data["results"], serializer.data)
 
     def test_scroll_limited_user(self) -> None:
         """
@@ -119,8 +119,8 @@ class PrivateScrollApiTests(TestCase):
 
         res: Response = self.client.get(SCROLL_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data[0]["scroll_x"], scroll.scroll_x)
+        self.assertEqual(len(res.data["results"]), 1)
+        self.assertEqual(res.data["results"][0]["scroll_x"], scroll.scroll_x)
 
     def test_update_scroll(self) -> None:
         """
