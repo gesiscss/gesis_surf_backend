@@ -66,13 +66,18 @@ class SecurityMiddleware(MiddlewareMixin):
         Returns:
             list[str]: _description_
         """
-        return [
+        data = [
             request.path,
             request.GET.urlencode(),
-            request.POST.urlencode(),
             str(request.headers),
-            request.body.decode("utf-8", errors="ignore"),
         ]
+
+        if request.method == "POST":
+            try:
+                data.append(request.POST.copy().urlencode())
+            except Exception as error:  # pylint: disable=broad-except
+                logger.error("Error getting POST data: %s", error)
+        return data
 
     def _check_patterns(self, data: str) -> tuple | None:
         """_summary_

@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 # pylint: disable=R0903
 class SecurePatternLoader:
-    """LOads encrypted security patterns from secure storage"""
+    """Loads encrypted security patterns from secure storage"""
 
     def __init__(self) -> None:
         """Initializes the SecurePatternLoader"""
