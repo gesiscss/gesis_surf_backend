@@ -62,12 +62,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-<<<<<<< HEAD
     "app.middleware.security_middleware.SecurityMiddleware",
     "app.middleware.traffic_middleware.LoggingMiddleware",
-=======
-    # "app.middleware.traffic_middleware.LoggingMiddleware",
->>>>>>> bfb03e7 (refactor: middleware before testing)
 ]
 
 ROOT_URLCONF = "app.urls"
