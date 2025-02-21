@@ -14,6 +14,7 @@ class CreateUserView(generics.CreateAPIView):
     """
 
     serializer_class = UserSerializer
+    permissions_classes = (permissions.IsAdminUser,)
 
 
 class CreateTokenView(ObtainAuthToken):
