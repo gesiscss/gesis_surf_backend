@@ -30,6 +30,8 @@ ALLOWED_HOSTS: list[str] = (
     [] if DEBUG else os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
 )
 
+# Maintenance mode
+MAINTENANCE_MODE = bool(int(os.environ.get("MAINTENANCE_MODE", 0)))
 
 # Application definition
 
