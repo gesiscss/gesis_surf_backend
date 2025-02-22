@@ -1,12 +1,15 @@
+"""
+Test the maintenance mode mixin
+"""
+
 from datetime import datetime, timezone
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from django.conf import settings
-
 
 DOMAIN_URL = reverse("domain:domain-list")
 CREATE_USER_URL = reverse("user:create")
@@ -32,11 +35,17 @@ class PrivateDomainApiTestsMaintenance(TestCase):
         self.client = APIClient()
         self.user = create_user()
         self.client.force_authenticate(self.user)
+        settings.MAINTENANCE_MODE = False
 
+    def tearDown(self) -> None:  # pylint: disable=invalid-name
+        """
+        Clean up the test
+        """
+        settings.MAINTENANCE_MODE = False
+
+    @override_settings(MAINTENANCE_MODE=True)
     def test_maintenance_mode_does_not_block_user(self) -> None:
         """Test that maintenance mode blocks all CRUD operations."""
-
-        settings.MAINTENANCE_MODE = True
 
         user_id = "testuser"
         payload = {
@@ -69,14 +78,11 @@ class PrivateDomainApiTestsMaintenance(TestCase):
         update_response = self.client.patch(reverse("user:me"), {"password": "newpass"})
         self.assertEqual(update_response.status_code, status.HTTP_200_OK)
 
-        #  Reset maintenance mode to False
-        settings.MAINTENANCE_MODE = False
-
+    @override_settings(MAINTENANCE_MODE=True)
     def test_create_basic_domain_under_maintenance(self) -> None:
         """
         Test creating domain under maintenance mode
         """
-        settings.MAINTENANCE_MODE = True
 
         payload = {
             "domain_title": "test.com",
@@ -88,17 +94,17 @@ class PrivateDomainApiTestsMaintenance(TestCase):
             "snapshot_html": "<html>Test</html>",
         }
         res = self.client.post(DOMAIN_URL, payload)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
         self.assertEqual(
             res.data["detail"],
             "Service temporarily unavailable, please try again later.",
         )
 
+    @override_settings(MAINTENANCE_MODE=True)
     def test_update_domain_under_maintenance(self) -> None:
         """
         Test updating domain under maintenance mode
         """
-        settings.MAINTENANCE_MODE = True
 
         payload = {
             "domain_title": "test.com",
@@ -110,12 +116,13 @@ class PrivateDomainApiTestsMaintenance(TestCase):
             "snapshot_html": "<html>Test</html>",
         }
         res = self.client.patch(DOMAIN_URL, payload)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
         self.assertEqual(
             res.data["detail"],
             "Service temporarily unavailable, please try again later.",
         )
 
+    @override_settings(MAINTENANCE_MODE=True)
     def test_create_tab_under_maintenance(self) -> None:
         """
         Test creating a tab under maintenance mode

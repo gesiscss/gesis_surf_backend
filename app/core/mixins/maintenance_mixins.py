@@ -1,7 +1,11 @@
+"""
+Description: Mixin for maintenance mode.
+"""
+
 from django.conf import settings
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
 
 
 class MaintenanceModeMixin:
@@ -17,10 +21,14 @@ class MaintenanceModeMixin:
         """
         Dispatch method for maintenance mode.
         """
+        maintenance_mode = self.is_maintenance_mode()
+        print(f"Maintenance mode: {maintenance_mode}")
+        print(f"Request: {request}")
+
         if self.is_maintenance_mode():
             response = Response(
                 self.maintenance_message,
-                status=status.HTTP_200_OK,
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
             response.accepted_renderer = JSONRenderer()
             response.accepted_media_type = "application/json"
@@ -32,4 +40,5 @@ class MaintenanceModeMixin:
         """
         Check if maintenance mode is enabled.
         """
+        print(f"Settings: {settings}")
         return getattr(settings, "MAINTENANCE_MODE", False)
