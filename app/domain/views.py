@@ -2,6 +2,7 @@
 Views for the domain app
 """
 
+from core.mixins.maintenance_mixins import MaintenanceModeMixin
 from core.models import Click, Domain, Scroll
 from core.pagination import CustomPagination
 from django.db.models.query import QuerySet
@@ -11,7 +12,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
-class DomainViewSet(viewsets.ModelViewSet):
+class DomainViewSet(MaintenanceModeMixin, viewsets.ModelViewSet):
     """
     Manage domains in the database.
     """
