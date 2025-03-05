@@ -20,7 +20,7 @@ def create_user(**params) -> models.Model:
     """
     Helper function to create a user.
     """
-    return get_user_model().objects.create_user(**params)
+    return get_user_model().objects.create_superuser(**params)
 
 
 def round_datetime(d_t: datetime) -> datetime:
@@ -39,8 +39,42 @@ class PublicUserApiTests(TestCase):
         """Creates a client for the tests."""
         self.client = APIClient()
 
+    def test_create_user_success_with_token_superuser(self) -> None:
+        """Tests creating a user using a superuser token (similar to production)."""
+
+        superuser_credentials = {"user_id": "admin_user", "password": "adminpass123"}
+        superuser = create_user(**superuser_credentials)
+        self.client.force_authenticate(user=superuser)
+
+        payload = {
+            "user_id": "test",
+            "password": "test123",
+            "privacy": {
+                "privacy_mode": False,
+                "privacy_start_time": datetime.now(timezone.utc).isoformat(),
+                "privacy_end_time": datetime.now(timezone.utc).isoformat(),
+            },
+            "extension": {
+                "extension_version": "string",
+                "extension_installed_at": datetime.now(timezone.utc).isoformat(),
+                "extension_updated_at": datetime.now(timezone.utc).isoformat(),
+                "extension_browser": "string",
+            },
+        }
+
+        response = self.client.post(CREATE_USER_URL, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = get_user_model().objects.get(user_id=payload["user_id"])
+        self.assertTrue(user.check_password(payload["password"]))
+        self.assertNotIn("password", response.data)
+
     def test_create_user_success(self) -> None:
         """Tests creating a user without waves payload."""
+
+        superuser_credentials = {"user_id": "admin_user", "password": "adminpass123"}
+        superuser = create_user(**superuser_credentials)
+        self.client.force_authenticate(user=superuser)
+
         payload = {
             "user_id": "test",
             "password": "test123",
@@ -66,6 +100,11 @@ class PublicUserApiTests(TestCase):
 
     def test_create_user_with_waves_success(self) -> None:
         """Tests creating a user with waves."""
+
+        superuser_credentials = {"user_id": "admin_user", "password": "adminpass123"}
+        superuser = create_user(**superuser_credentials)
+        self.client.force_authenticate(user=superuser)
+
         payload = {
             "user_id": "test",
             "password": "test123",
@@ -107,6 +146,11 @@ class PublicUserApiTests(TestCase):
 
     def test_user_with_email_exists_error(self) -> None:
         """Tests creating a user that already exists fails."""
+
+        superuser_credentials = {"user_id": "admin_user", "password": "adminpass123"}
+        superuser = create_user(**superuser_credentials)
+        self.client.force_authenticate(user=superuser)
+
         payload = {
             "user_id": "test",
             "password": "test123",
@@ -119,6 +163,11 @@ class PublicUserApiTests(TestCase):
 
     def test_password_too_short_error(self) -> None:
         """Tests that the password must be more than 5 characters."""
+
+        superuser_credentials = {"user_id": "admin_user", "password": "adminpass123"}
+        superuser = create_user(**superuser_credentials)
+        self.client.force_authenticate(user=superuser)
+
         payload = {
             "user_id": "test",
             "password": "pw",
@@ -134,6 +183,7 @@ class PublicUserApiTests(TestCase):
 
     def test_create_token_for_user(self) -> None:
         """Tests that a token is created for the user with valid credentials."""
+
         payload = {
             "user_id": "test",
             "password": "test123",
@@ -149,6 +199,7 @@ class PublicUserApiTests(TestCase):
 
     def test_create_token_bad_credentials(self) -> None:
         """Tests that a token is not created for the user with invalid credentials."""
+
         create_user(user_id="test", password="test123")
         payload = {
             "user_id": "test",
@@ -185,8 +236,8 @@ class PrivateUserApiTests(TestCase):
 
     def setUp(self) -> None:
         """Creates a client for the tests."""
-        self.user = create_user(user_id="test", password="test123")
         self.client = APIClient()
+        self.user = create_user(user_id="test", password="test123")
         self.client.force_authenticate(user=self.user)
 
     def test_retrieve_profile_success(self) -> None:

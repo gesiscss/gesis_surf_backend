@@ -20,7 +20,7 @@ def create_user(user_id: str = "test", password: str = "testpass"):
     """
     Create and return a sample user
     """
-    return get_user_model().objects.create_user(user_id, password)
+    return get_user_model().objects.create_superuser(user_id, password)
 
 
 class PrivateDomainApiTestsMaintenance(TestCase):
@@ -33,8 +33,11 @@ class PrivateDomainApiTestsMaintenance(TestCase):
         Set up the test
         """
         self.client = APIClient()
-        self.user = create_user()
-        self.client.force_authenticate(self.user)
+        self.super_user = create_user(
+            user_id="testuser",
+            password="testpass",
+        )
+        self.client.force_authenticate(user=self.super_user)
         settings.MAINTENANCE_MODE = False
 
     def tearDown(self) -> None:  # pylint: disable=invalid-name
@@ -45,9 +48,9 @@ class PrivateDomainApiTestsMaintenance(TestCase):
 
     @override_settings(MAINTENANCE_MODE=True)
     def test_maintenance_mode_does_not_block_user(self) -> None:
-        """Test that maintenance mode blocks all CRUD operations."""
+        """Test that maintenance mode blocks all CRUD operations but user operations"""
 
-        user_id = "testuser"
+        user_id = "testuser_dos"
         payload = {
             "user_id": user_id,
             "password": "testpass",
@@ -66,7 +69,6 @@ class PrivateDomainApiTestsMaintenance(TestCase):
 
         # Test CREATE user
         create_response = self.client.post(CREATE_USER_URL, payload, format="json")
-        print(create_response.json())
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(create_response.data["user_id"], user_id)
 
