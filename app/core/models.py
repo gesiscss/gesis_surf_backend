@@ -144,6 +144,7 @@ class Extension(models.Model):
     extension_installed_at = models.DateTimeField(blank=True, null=True)
     extension_updated_at = models.DateTimeField(blank=True, null=True)
     extension_browser = models.CharField(max_length=128, blank=True)
+    extension_data_collection = models.BooleanField(default=True)
     history = HistoricalRecords()
     host_version = models.CharField(max_length=32, blank=False, default="0")
 
