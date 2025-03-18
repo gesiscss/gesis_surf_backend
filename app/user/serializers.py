@@ -170,7 +170,8 @@ class UserSerializer(serializers.ModelSerializer):
                     "extension_browser", user.extension.extension_browser
                 )
                 user.extension.extension_data_collection = extension.get(
-                    "extension_data_collection", user.extension.extension_data_collection
+                    "extension_data_collection",
+                    user.extension.extension_data_collection,
                 )
                 user.extension.save()
 
