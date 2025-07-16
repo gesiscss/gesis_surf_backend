@@ -8,6 +8,14 @@ from typing import Any
 from core import models
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+import uuid
+
+
+def generate_global_session_id() -> str:
+    """
+    Generates a unique global session ID.
+    """
+    return f"global-session-{uuid.uuid4()}"
 
 
 def create_user(user_id="test", password="test123") -> Any:
@@ -444,3 +452,18 @@ class ModelTests(TestCase):
             self.round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(extension.extension_browser, "chrome")
+
+    def test_create_global_session(self) -> None:
+        """
+        Test creating a new global session instance.
+        """
+        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        global_session = models.GlobalSession.objects.create(
+            user=user,
+            global_session_id=generate_global_session_id(),
+            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        self.assertEqual(
+            global_session.global_session_id, global_session.global_session_id
+        )

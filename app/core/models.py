@@ -188,6 +188,41 @@ class Wave(models.Model):
         return f"{self.start_date} to {self.end_date}"
 
 
+class GlobalSession(models.Model):
+    """
+    Global session model to track user sessions.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # Store the user who created the global session
+    # Relationship with the user model
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="global_sessions",
+    )
+    global_session_id: models.CharField = models.CharField(
+        max_length=255, unique=True, blank=False
+    )
+    start_time: models.DateTimeField = models.DateTimeField()
+    closing_time: models.DateTimeField = models.DateTimeField(blank=True, null=True)
+    created_at: models.DateTimeField = models.DateTimeField(
+        auto_now_add=True, blank=False
+    )
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the global session.
+
+        Returns:
+            str: A formatted string with global session information.
+        """
+        # Return information about the global session at admin panel
+        return f"Global Session {self.global_session_id} started at {self.start_time}"
+
+
 class Window(models.Model):
     """
     Custom window model.
