@@ -305,6 +305,18 @@ class Tab(models.Model):
 
     domains = models.ManyToManyField("Domain")
 
+    class Meta:
+        """
+        Meta class to define the constraints for the Tab model.
+        """
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["tab_num", "tab_session_id", "start_time"],
+                name="unique_tab_in_window",
+            )
+        ]
+
     def __str__(self) -> str:
         """
         Returns the string representation of the tab.
@@ -335,6 +347,7 @@ class Domain(models.Model):
     snapshot_html = models.TextField(blank=True)
     domain_status = models.CharField(blank=False)
     domain_fav_icon = models.CharField(blank=False)
+    domain_session_id: models.CharField = models.CharField(blank=True)
     start_time = models.DateTimeField(blank=True, default=timezone.now)
     closing_time = models.DateTimeField(blank=True, default=timezone.now)
     domain_url = models.CharField(blank=False)
@@ -344,6 +357,18 @@ class Domain(models.Model):
         max_length=32, blank=False, default="full_allow"
     )
     category_label = models.CharField(max_length=32, blank=False, default="0")
+
+    class Meta:
+        """
+        Meta class to define the constraints for the Domain model.
+        """
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["domain_title", "domain_url", "start_time"],
+                name="unique_domain_in_tab",
+            )
+        ]
 
     def __str__(self) -> str:
         """
