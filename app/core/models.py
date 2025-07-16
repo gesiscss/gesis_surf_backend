@@ -238,10 +238,30 @@ class Window(models.Model):
         on_delete=models.CASCADE,
         # related_name="windows",
     )
+    # Store the global session that the window belongs to
+    # Relationship with the global session model
+    global_session: models.ForeignKey = models.ForeignKey(
+        GlobalSession,
+        on_delete=models.CASCADE,
+        related_name="windows",
+    )
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     window_num = models.CharField(max_length=32, blank=False)
+    window_session_id: models.CharField = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        """
+        Meta class to define the constraints for the Window model.
+        """
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["window_num", "window_session_id", "start_time"],
+                name="unique_window_in_global_session",
+            )
+        ]
 
     def __str__(self) -> str:
         """
@@ -272,14 +292,17 @@ class Tab(models.Model):
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-    tab_num = models.CharField(max_length=32, blank=False)
     window_num = models.CharField(max_length=32, blank=False)
+    tab_num = models.CharField(max_length=32, blank=False)
+    tab_session_id: models.CharField = models.CharField(max_length=255, blank=True)
+
     # Create a relationship with the window model
-    # window = models.ForeignKey(
-    #     Window,
-    #     on_delete=models.CASCADE,
-    #     related_name="tabs",
-    # )
+    window = models.ForeignKey(
+        Window,
+        on_delete=models.CASCADE,
+        related_name="tabs",
+    )
+
     domains = models.ManyToManyField("Domain")
 
     def __str__(self) -> str:
