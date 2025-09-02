@@ -25,7 +25,7 @@ class GlobalSessionViewSet(viewsets.ModelViewSet):
         Returns:
             QuerySet: A queryset of global sessions.
         """
-        return super().get_queryset().filter(user=self.request.user)
+        return self.queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
         """Get the serializer class for the viewset.
