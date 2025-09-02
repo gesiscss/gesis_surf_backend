@@ -734,3 +734,6 @@ wcwidth==0.2.12 ; python_version >= "3.10" and python_version < "4.0" \
 zipp==3.17.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:0e923e726174922dce09c53c59ad483ff7bbb8e572e00c7f7c46b88556409f31 \
     --hash=sha256:84e64a1c28cf7e91ed2078bb8cc8c259cb19b76942096c8d7b84947690cabaf0
+django-cors-headers==4.6.0 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:14d76b4b4c8d39375baeddd89e4f08899051eeaf177cb02a29bd6eae8cf63aa8 \
+    --hash=sha256:8edbc0497e611c24d5150e0055d3b178c6534b8ed826fb6f53b21c63f5d48ba3
