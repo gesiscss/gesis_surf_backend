@@ -19,18 +19,21 @@ class DomainSerializer(serializers.ModelSerializer):
         model = Domain
         fields = [
             "id",
+            "user",
+            "start_time",
+            "closing_time",
             "domain_title",
             "domain_url",
             "domain_fav_icon",
-            "domain_status",
-            "start_time",
-            "closing_time",
+            "domain_last_accessed",
             "snapshot_html",
             "category_number",
             "criteria_classification",
             "category_label",
+            "domain_session_id"
         ]
         read_only_fields = ["id"]
+        extra_kwargs = {"user": {"read_only": True}}
 
 
 class TabSerializer(serializers.ModelSerializer):
@@ -48,11 +51,13 @@ class TabSerializer(serializers.ModelSerializer):
         model = Tab
         fields = [
             "id",
+            "user",
+            "window",
             "start_time",
             "closing_time",
-            "created_at",
-            "tab_num",
             "window_num",
+            "tab_num",
+            "tab_session_id",
             "domains",
         ]
 
