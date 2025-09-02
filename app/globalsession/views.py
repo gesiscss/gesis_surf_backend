@@ -5,7 +5,7 @@ Views for the global session app
 from core.models import GlobalSession
 from globalsession import serializers
 from rest_framework import viewsets
-from rest_framewokr.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -14,8 +14,8 @@ class GlobalSessionViewSet(viewsets.ModelViewSet):
     ViewSet for the GlobalSession model
     """
     
-    authentication_classes = [TokenAuthentication, ]
-    permission_classes = [IsAuthenticated, ]
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAuthenticated, )
     queryset = GlobalSession.objects.all()
     serializer_class = serializers.GlobalSessionSerializer
 
@@ -25,7 +25,7 @@ class GlobalSessionViewSet(viewsets.ModelViewSet):
         Returns:
             QuerySet: A queryset of global sessions.
         """
-        return super().get_queryset().filter(user=self.request.user).order_by("-start_time")
+        return super().get_queryset().filter(user=self.request.user)
 
     def get_serializer_class(self):
         """Get the serializer class for the viewset.
@@ -33,8 +33,7 @@ class GlobalSessionViewSet(viewsets.ModelViewSet):
         Returns:
             Type[serializers.BaseSerializer]: The serializer class to use.
         """
-        if self.action == "list":
-            return serializers.GlobalSessionSerializer
+        return serializers.GlobalSessionSerializer
 
     def perform_create(self, serializer):
         """Create a new global session for the authenticated user.
