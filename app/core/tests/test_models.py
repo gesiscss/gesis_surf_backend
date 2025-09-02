@@ -11,6 +11,15 @@ from django.test import TestCase
 import uuid
 
 
+def generate_window_session_id(
+    global_session_id: str = "0", window_num: str = "0"
+) -> str:
+    """
+    Generates a unique window session ID.
+    """
+    return f"{global_session_id}-windowId-{window_num}"
+
+
 def generate_global_session_id() -> str:
     """
     Generates a unique global session ID.
@@ -99,12 +108,24 @@ class ModelTests(TestCase):
         Tests creating a new window.
         """
         user = get_user_model().objects.create_user(user_id="test", password="test123")
+        global_session = models.GlobalSession.objects.create(
+            user=user,
+            global_session_id=generate_global_session_id(),
+            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+        )
+        window_num = "1"
+        window_session_id = generate_window_session_id(
+            global_session_id=global_session.global_session_id,
+            window_num=window_num,
+        )
+
         window = models.Window.objects.create(
             user=user,
+            global_session=global_session,
             start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
             closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-            created_at=datetime.now(timezone.utc),
-            window_num=1,
+            window_num=window_num,
+            window_session_id=window_session_id,
         )
 
         self.assertEqual(

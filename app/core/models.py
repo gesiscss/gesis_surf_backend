@@ -248,7 +248,7 @@ class Window(models.Model):
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-    window_num = models.CharField(max_length=32, blank=False)
+    window_num = models.IntegerField(blank=False)
     window_session_id: models.CharField = models.CharField(max_length=255, blank=True)
 
     class Meta:
@@ -345,7 +345,7 @@ class Domain(models.Model):
     )
     domain_title = models.CharField(blank=False)
     snapshot_html = models.TextField(blank=True)
-    domain_status = models.CharField(blank=False)
+    domain_last_accessed = models.CharField(blank=False)
     domain_fav_icon = models.CharField(blank=False)
     domain_session_id: models.CharField = models.CharField(blank=True)
     start_time = models.DateTimeField(blank=True, default=timezone.now)
