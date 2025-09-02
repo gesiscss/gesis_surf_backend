@@ -70,12 +70,13 @@ class DomainSingleSerializer(serializers.ModelSerializer):
         model: list = Domain
         fields: list = [
             "id",
+            "start_time",
+            "closing_time",
             "domain_title",
             "domain_url",
             "domain_fav_icon",
-            "domain_status",
-            "start_time",
-            "closing_time",
+            "domain_last_accessed",
+            "domain_session_id",
             "snapshot_html",
             "category_number",
             "criteria_classification",
