@@ -13,9 +13,9 @@ class GlobalSessionViewSet(viewsets.ModelViewSet):
     """
     ViewSet for the GlobalSession model
     """
-    
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated, )
+
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
     queryset = GlobalSession.objects.all()
     serializer_class = serializers.GlobalSessionSerializer
 

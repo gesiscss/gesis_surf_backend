@@ -2,13 +2,13 @@
 Tests for the models.
 """
 
+import uuid
 from datetime import datetime, timezone
 from typing import Any
 
 from core import models
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-import uuid
 
 
 def generate_window_session_id(

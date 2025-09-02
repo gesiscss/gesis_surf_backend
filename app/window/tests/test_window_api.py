@@ -5,7 +5,7 @@ Tests for the recipe API
 import random
 from datetime import datetime, timezone
 
-from core.models import Window, GlobalSession
+from core.models import GlobalSession, Window
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -17,6 +17,7 @@ WINDOW_URL = reverse("window:window-list")
 
 
 # Functions outside class do not need logic.
+
 
 def create_user(**params):
     """
@@ -38,17 +39,19 @@ def detail_url(window_id) -> str:
     """
     return reverse("window:window-detail", args=[window_id])
 
+
 def create_global_session(user, **params):
     """
     Create and return a sample global session
     """
     defaults = {
         "start_time": datetime.now(timezone.utc),
-        "global_session_id": "session_{}".format(random.randint(10000, 99999))
+        "global_session_id": f"session_{random.randint(10000, 99999)}",
     }
     defaults.update(params)
 
     return GlobalSession.objects.create(user=user, **defaults)
+
 
 def create_window(user, **params):
     """
@@ -59,9 +62,9 @@ def create_window(user, **params):
         "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
         "window_num": random.randint(1, 100),
         # Window session ID unique
-        "window_session_id": "session_{}".format(random.randint(10000, 99999)),
+        "window_session_id": f"session_{random.randint(10000, 99999)}",
         # Global session ID relation
-        "global_session": None
+        "global_session": None,
     }
     # Update the defaults with the params provided in the function.
     defaults.update(params)
@@ -109,7 +112,7 @@ class PrivateWindowApiTests(APITestCase):
         """
         # Create 3 windows & global session
         global_session = create_global_session(user=self.user)
-        
+
         # Attach global session to window
         create_window(user=self.user, global_session=global_session)
         create_window(user=self.user, global_session=global_session)
@@ -131,7 +134,7 @@ class PrivateWindowApiTests(APITestCase):
         """
         user2 = create_user(user_id="test2", password="testpass")
         global_session = create_global_session(user=user2)
-        
+
         create_window(user=user2, global_session=global_session)
         create_window(user=self.user, global_session=global_session)
 
@@ -151,7 +154,7 @@ class PrivateWindowApiTests(APITestCase):
         # Create Global Session
         global_session = create_global_session(user=self.user)
         window = create_window(user=self.user, global_session=global_session)
-        
+
         # The URL to the detail of the window
         url = detail_url(window.id)
         res = self.client.get(url)
@@ -165,7 +168,7 @@ class PrivateWindowApiTests(APITestCase):
         """
         # Create Global Session
         global_session = create_global_session(user=self.user)
-        
+
         payload = {
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
@@ -193,12 +196,12 @@ class PrivateWindowApiTests(APITestCase):
         # Create Global Session
         global_session = create_global_session(user=self.user)
         window = create_window(user=self.user, global_session=global_session)
-        
+
         payload = {"start_time": datetime.now(timezone.utc)}
         url = detail_url(window.id)
-        
+
         self.client.patch(url, payload)
-        
+
         window.refresh_from_db()
         self.assertEqual(window.start_time, payload["start_time"])
 
@@ -210,7 +213,7 @@ class PrivateWindowApiTests(APITestCase):
         # Create Global Session
         global_session = create_global_session(user=self.user)
         window = create_window(user=self.user, global_session=global_session)
-        
+
         payload = {
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
@@ -220,7 +223,7 @@ class PrivateWindowApiTests(APITestCase):
         }
         url = detail_url(window.id)
         self.client.put(url, payload)
-        
+
         window.refresh_from_db()
         self.assertEqual(window.start_time, payload["start_time"])
 

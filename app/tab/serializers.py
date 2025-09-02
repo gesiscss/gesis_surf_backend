@@ -30,7 +30,7 @@ class DomainSerializer(serializers.ModelSerializer):
             "category_number",
             "criteria_classification",
             "category_label",
-            "domain_session_id"
+            "domain_session_id",
         ]
         read_only_fields = ["id"]
         extra_kwargs = {"user": {"read_only": True}}
