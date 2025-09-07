@@ -2,73 +2,21 @@
 Tests for the recipe API
 """
 
-import random
 from datetime import datetime, timezone
 
-from core.models import GlobalSession, Window
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+from core.models import Window
+from core.tests.helpers import (
+    create_global_session,
+    create_user,
+    create_window,
+    detail_url,
+)
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 from window.serializers import WindowDetailSerializer, WindowSerializer
 
 WINDOW_URL = reverse("window:window-list")
-
-
-# Functions outside class do not need logic.
-
-
-def create_user(**params):
-    """
-    Create and return a sample user
-    """
-    return get_user_model().objects.create_user(**params)
-
-
-def round_datetime(d_t: datetime) -> datetime:
-    """
-    Round the datetime to the nearest second.
-    """
-    return d_t.replace(second=0, microsecond=0)
-
-
-def detail_url(window_id) -> str:
-    """
-    Create and return a window detail URL
-    """
-    return reverse("window:window-detail", args=[window_id])
-
-
-def create_global_session(user, **params):
-    """
-    Create and return a sample global session
-    """
-    defaults = {
-        "start_time": datetime.now(timezone.utc),
-        "global_session_id": f"session_{random.randint(10000, 99999)}",
-    }
-    defaults.update(params)
-
-    return GlobalSession.objects.create(user=user, **defaults)
-
-
-def create_window(user, **params):
-    """
-    Create and return a sample window
-    """
-    defaults = {
-        "start_time": datetime.now(timezone.utc),
-        "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        "window_num": random.randint(1, 100),
-        # Window session ID unique
-        "window_session_id": f"session_{random.randint(10000, 99999)}",
-        # Global session ID relation
-        "global_session": None,
-    }
-    # Update the defaults with the params provided in the function.
-    defaults.update(params)
-    return Window.objects.create(user=user, **defaults)
 
 
 class PublicWindowApiTests(APITestCase):
@@ -156,7 +104,7 @@ class PrivateWindowApiTests(APITestCase):
         window = create_window(user=self.user, global_session=global_session)
 
         # The URL to the detail of the window
-        url = detail_url(window.id)
+        url = detail_url("window", window.id)
         res = self.client.get(url)
 
         serializer = WindowDetailSerializer(window)
@@ -198,7 +146,7 @@ class PrivateWindowApiTests(APITestCase):
         window = create_window(user=self.user, global_session=global_session)
 
         payload = {"start_time": datetime.now(timezone.utc)}
-        url = detail_url(window.id)
+        url = detail_url("window", window.id)
 
         self.client.patch(url, payload)
 
@@ -221,7 +169,7 @@ class PrivateWindowApiTests(APITestCase):
             "window_session_id": "session_12345",
             "global_session": str(global_session.id),
         }
-        url = detail_url(window.id)
+        url = detail_url("window", window.id)
         self.client.put(url, payload)
 
         window.refresh_from_db()
@@ -236,7 +184,7 @@ class PrivateWindowApiTests(APITestCase):
         window = create_window(user=self.user, global_session=global_session)
 
         payload = {"user": new_user}
-        url = detail_url(window.id)
+        url = detail_url("window", window.id)
         self.client.patch(url, payload)
 
         window.refresh_from_db()
@@ -248,7 +196,7 @@ class PrivateWindowApiTests(APITestCase):
         """
         global_session = create_global_session(user=self.user)
         window = create_window(user=self.user, global_session=global_session)
-        url = detail_url(window.id)
+        url = detail_url("window", window.id)
         res = self.client.delete(url)
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Window.objects.filter(id=window.id).exists(), False)
@@ -262,7 +210,7 @@ class PrivateWindowApiTests(APITestCase):
         global_session = create_global_session(user=user2)
         window = create_window(user=user2, global_session=global_session)
 
-        url = detail_url(window.id)
+        url = detail_url("window", window.id)
         res = self.client.delete(url)
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
