@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
-from core.models import Domain, GlobalSession, Tab, Window
+from core.models import Domain, GlobalSession, Tab, Window, Click
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
@@ -103,6 +103,27 @@ def create_domain(user, **params) -> Domain:
     return domain
 
 
+def create_click(user, **params) -> Click:
+    """
+    Create and return a sample click
+    """
+    
+    defaults = {
+        "click_type": "click",
+        "click_time": "2024-06-01 17:00:00",
+        "click_target_element": "button",
+        "click_target_tag": "button",
+        "click_target_class": "btn",
+        "click_target_id": "btn-1",
+        "click_page_x": 100,
+        "click_page_y": 200,
+        "click_referrer": "https://test.com",
+        "domain": create_domain(user=user),
+    }
+    defaults.update(params)
+    return Click.objects.create(user=user, **defaults)
+
+
 # def create_scroll(user, domain=None, **params) -> Scroll:
 #     """
 #     Create and return a sample scroll
@@ -120,24 +141,3 @@ def create_domain(user, **params) -> Domain:
 #     defaults.update(params)
 #     return Scroll.objects.create(user=user, **defaults)
 
-
-# def create_click(user, domain=None, **params) -> Click:
-#     """
-#     Create and return a sample click
-#     """
-#     if domain is None:
-#         domain = create_domain(user=user)
-#     defaults = {
-#         "click_type": "click",
-#         "click_time": "2024-06-01 17:00:00",
-#         "click_target_element": "button",
-#         "click_target_tag": "button",
-#         "click_target_class": "btn",
-#         "click_target_id": "btn-1",
-#         "click_page_x": 100,
-#         "click_page_y": 200,
-#         "click_referrer": "https://test.com",
-#         "domain": domain,
-#     }
-#     defaults.update(params)
-#     return Click.objects.create(user=user, **defaults)

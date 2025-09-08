@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "tab",
     "domain",
     "host",
+    "globalsession",
+    "clicks",
 ]
 
 MIDDLEWARE = [
