@@ -6,11 +6,11 @@ from datetime import datetime, timezone
 
 from core.models import Click, Domain, Scroll
 from core.tests.helpers import (
-    create_user,
-    create_global_session,
-    create_window,
-    create_tab,
     create_domain,
+    create_global_session,
+    create_tab,
+    create_user,
+    create_window,
     detail_url,
 )
 from django.contrib.auth import get_user_model
@@ -72,7 +72,7 @@ class PrivateDomainApiTests(APITestCase):
         Test that domains for the authenticated user are returned
         """
         user2 = create_user(user_id="other", password="test123")
-        
+
         create_domain(user=user2)
         domain = create_domain(user=self.user)
 
@@ -167,12 +167,14 @@ class PrivateDomainApiTests(APITestCase):
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Domain.objects.count(), 0)
-        
+
     def test_retrieve_html_snapshot(self) -> None:
         """
         Test retrieving the HTML snapshot for a domain
         """
-        domain = create_domain(user=self.user, snapshot_html="<html>Test Snapshot</html>")
+        domain = create_domain(
+            user=self.user, snapshot_html="<html>Test Snapshot</html>"
+        )
         url = detail_url("domain", domain.id)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)

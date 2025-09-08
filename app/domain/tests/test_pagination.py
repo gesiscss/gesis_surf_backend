@@ -2,19 +2,15 @@
 Django Rest Framework Pagination Test
 """
 
-from datetime import datetime
-
 from core.models import Domain, User
-from core.tests.helpers import (
-    create_user,
-    create_domain,
-)
+from core.tests.helpers import create_domain, create_user
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 DOMAIN_URL = reverse("domain:domain-list")
+
 
 class PublicPaginationTestCase(TestCase):
     """

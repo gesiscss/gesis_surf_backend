@@ -5,13 +5,15 @@ Serializer for the Click model.
 from core.models import Click, Domain
 from rest_framework import serializers
 
+
 class ClickSerializer(serializers.ModelSerializer):
     """
     Serializer for the Click model.
     """
+
     domain_id = serializers.UUIDField(write_only=True, required=True)
 
-    class Meta: # type: ignore
+    class Meta:  # type: ignore
         model = Click
         fields = [
             "id",
@@ -30,17 +32,14 @@ class ClickSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "user", "domain", "created_at"]
-        
+
     def create(self, validated_data: dict) -> Click:
         """
         Create and return a new Click instance.
         """
         domain_id = validated_data.pop("domain_id")
         domain = Domain.objects.get(id=domain_id, user=self.context["request"].user)
-        
-        
+
         return Click.objects.create(
-            user=self.context["request"].user,
-            domain=domain,
-            **validated_data
+            user=self.context["request"].user, domain=domain, **validated_data
         )

@@ -2,19 +2,23 @@
 Tests for the clicks API
 """
 
-from django.db.models import QuerySet
 from core.models import Click, Domain, User
+from core.tests.helpers import (
+    create_click,
+    create_domain,
+    create_user,
+    detail_url,
+)
 from django.contrib.auth.models import AbstractUser
+from django.db.models import QuerySet
 from django.urls import reverse
 from domain.serializers import ClickSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
-from core.tests.helpers import (
-    create_domain, create_user, detail_url, create_click
-)
 
 CLICK_URL: str = reverse("click:click-list")
+
 
 class PublicClickApiTests(APITestCase):
     """
@@ -59,7 +63,7 @@ class PrivateClickApiTests(APITestCase):
         serializer: ClickSerializer = ClickSerializer(clicks, many=True)
 
         self.assertEqual(len(res.data["results"]), len(clicks))
-        
+
         response_ids = [item["id"] for item in res.data["results"]]
         serializer_ids = [item["id"] for item in serializer.data]
         self.assertEqual(response_ids, serializer_ids)
@@ -70,7 +74,7 @@ class PrivateClickApiTests(APITestCase):
         """
         user2: AbstractUser = create_user(user_id="other", password="testpass")
         create_click(user=user2)
-        
+
         click: Click = create_click(user=self.user)
 
         res: Response = self.client.get(CLICK_URL)
@@ -84,12 +88,9 @@ class PrivateClickApiTests(APITestCase):
         """
         click: Click = create_click(user=self.user)
         url: str = detail_url("click", click.id)
-        
-        payload: dict = {
-            "click_target_element": "a",
-            "click_target_tag": "a"
-        }
-        
+
+        payload: dict = {"click_target_element": "a", "click_target_tag": "a"}
+
         self.client.patch(url, payload)
         click.refresh_from_db()
         self.assertEqual(click.click_target_tag, payload["click_target_tag"])

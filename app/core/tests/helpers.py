@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
-from core.models import Domain, GlobalSession, Tab, Window, Click
+from core.models import Click, Domain, GlobalSession, Scroll, Tab, Window
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
@@ -107,7 +107,7 @@ def create_click(user, **params) -> Click:
     """
     Create and return a sample click
     """
-    
+
     defaults = {
         "click_type": "click",
         "click_time": "2024-06-01 17:00:00",
@@ -124,20 +124,18 @@ def create_click(user, **params) -> Click:
     return Click.objects.create(user=user, **defaults)
 
 
-# def create_scroll(user, domain=None, **params) -> Scroll:
-#     """
-#     Create and return a sample scroll
-#     """
-#     if domain is None:
-#         domain = create_domain(user=user)
-#     defaults = {
-#         "scroll_x": 0,
-#         "scroll_y": 0,
-#         "page_x_offset": 0,
-#         "page_y_offset": 0,
-#         "scroll_time": "2024-06-01 17:00:00",
-#         "domain": domain,
-#     }
-#     defaults.update(params)
-#     return Scroll.objects.create(user=user, **defaults)
+def create_scroll(user, **params) -> Scroll:
+    """
+    Create and return a sample scroll
+    """
 
+    defaults = {
+        "scroll_x": 0,
+        "scroll_y": 0,
+        "page_x_offset": 0,
+        "page_y_offset": 0,
+        "scroll_time": "2024-06-01 17:00:00",
+        "domain": create_domain(user=user),
+    }
+    defaults.update(params)
+    return Scroll.objects.create(user=user, **defaults)

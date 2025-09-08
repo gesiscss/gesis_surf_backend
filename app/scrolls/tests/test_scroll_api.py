@@ -2,68 +2,19 @@
 Test for the scroll API
 """
 
-from datetime import datetime
-
 from core.models import Domain, Scroll, User
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+from core.tests.helpers import create_scroll, create_user, detail_url
+from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
 from domain.serializers import ScrollSerializer
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
-SCROLL_URL: str = reverse("domain:scroll-list")
-
-
-def detail_url(scroll: Scroll) -> str:
-    """
-    Return the scroll detail URL
-    """
-    return reverse("domain:scroll-detail", args=[scroll.id])
+SCROLL_URL: str = reverse("scroll:scroll-list")
 
 
-def create_user(username: str = "test", password: str = "testpass") -> User:
-    """
-    Create and return a sample user.
-    """
-    return get_user_model().objects.create_user(username, password)
-
-
-def create_domain(user: User, **params: dict) -> Domain:
-    """
-    Create and return a sample domain.
-    """
-    defaults: dict = {
-        "domain_title": "test.com",
-        "domain_url": "https://test.com",
-        "domain_fav_icon": "https://test.com/favicon.ico",
-        "domain_status": "active",
-        "start_time": datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        "closing_time": datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        "snapshot_html": "<html>Test</html>",
-    }
-    defaults.update(params)
-    return Domain.objects.create(user=user, **defaults)
-
-
-def create_scroll(user: User, **params: dict) -> Scroll:
-    """
-    Create and return a sample scroll.
-    """
-    defaults: dict = {
-        "scroll_x": 0,
-        "scroll_y": 0,
-        "page_x_offset": 0,
-        "page_y_offset": 0,
-        "scroll_time": "2024-06-01 17:00:00",
-        "domain": create_domain(user=user),
-    }
-    defaults.update(params)
-    return Scroll.objects.create(user=user, **defaults)
-
-
-class PublicScrollApiTests(TestCase):
+class PublicScrollApiTests(APITestCase):
     """
     Test the publicly available scroll API.
     """
@@ -83,14 +34,14 @@ class PublicScrollApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class PrivateScrollApiTests(TestCase):
+class PrivateScrollApiTests(APITestCase):
     """
     Test the private scroll API.
     """
 
     def setUp(self):
         self.client: APIClient = APIClient()
-        self.user: User = get_user_model().objects.create_user("test", "testpass")
+        self.user: AbstractUser = create_user(user_id="test", password="testpass")
         self.client.force_authenticate(self.user)
 
     def test_retrieve_scrolls(self) -> None:

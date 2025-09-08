@@ -11,7 +11,7 @@ class ScrollSerializer(serializers.ModelSerializer):
     Serializer for the scroll object.
     """
 
-    class Meta: # type: ignore
+    class Meta:  # type: ignore
         """
         Meta class for the scroll
         """
@@ -33,7 +33,7 @@ class ClickSerializer(serializers.ModelSerializer):
     Serializer for the click object.
     """
 
-    class Meta: # type: ignore
+    class Meta:  # type: ignore
         """
         Meta class for the click
         """
@@ -58,11 +58,12 @@ class DomainSingleSerializer(serializers.ModelSerializer):
     """
     Serializer for the domain object.
     """
+
     # Relationships
     clicks: ClickSerializer = ClickSerializer(many=True, read_only=True)
     scrolls: ScrollSerializer = ScrollSerializer(many=True, read_only=True)
 
-    class Meta: # type: ignore
+    class Meta:  # type: ignore
         """
         Meta class for the domain
         """

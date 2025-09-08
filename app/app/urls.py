@@ -34,4 +34,5 @@ urlpatterns = [
     path("api/host/", include("host.urls")),
     path("api/globalsession/", include("globalsession.urls")),
     path("api/clicks/", include("clicks.urls")),
+    path("api/scrolls/", include("scrolls.urls")),
 ]

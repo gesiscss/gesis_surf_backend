@@ -2,12 +2,12 @@
 Views for the clicks app.
 """
 
-from core.models import Click
-from rest_framework import viewsets
 from clicks.serializers import ClickSerializer
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
+from core.models import Click
 from core.pagination import CustomPagination
+from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class ClickViewSet(viewsets.ModelViewSet):
@@ -32,12 +32,12 @@ class ClickViewSet(viewsets.ModelViewSet):
         queryset = Click.objects.filter(user=self.request.user)
 
         domain_id = self.request.query_params.get("domain_id")
-        
+
         if domain_id is not None:
             queryset = queryset.filter(domain__id=domain_id)
-        
+
         return queryset.order_by("-click_time")
-    
+
     def perform_create(self, serializer):
         """
         Create a new click that belongs to the authenticated user.
