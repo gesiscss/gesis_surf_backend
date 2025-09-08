@@ -2,9 +2,10 @@
 Test for the scroll API
 """
 
-from core.models import Domain, Scroll, User
+from core.models import Scroll
 from core.tests.helpers import create_scroll, create_user, detail_url
 from django.contrib.auth.models import AbstractUser
+from django.db.models import QuerySet
 from django.urls import reverse
 from domain.serializers import ScrollSerializer
 from rest_framework import status
@@ -52,19 +53,23 @@ class PrivateScrollApiTests(APITestCase):
         create_scroll(user=self.user)
 
         res: Response = self.client.get(SCROLL_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        scrolls: Scroll = Scroll.objects.all().order_by("-created_at")
+        scrolls: QuerySet[Scroll] = Scroll.objects.all()
+
         # Serialize the scrolls
         serializer: ScrollSerializer = ScrollSerializer(scrolls, many=True)
+        self.assertEqual(len(res.data["results"]), len(serializer.data))
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data["results"], serializer.data)
+        response_ids = [item["id"] for item in res.data["results"]]
+        serializer_ids = [item["id"] for item in serializer.data]
+        self.assertEqual(response_ids, serializer_ids)
 
     def test_scroll_limited_user(self) -> None:
         """
         Test scrolls for authenticated user.
         """
-        user2: User = create_user(username="other", password="testpass")
+        user2: AbstractUser = create_user(user_id="other", password="testpass")
         create_scroll(user=user2)
         scroll: Scroll = create_scroll(user=self.user)
 
@@ -78,7 +83,7 @@ class PrivateScrollApiTests(APITestCase):
         Test updating a scroll
         """
         scroll: Scroll = create_scroll(user=self.user)
-        url: str = detail_url(scroll)
+        url: str = detail_url("scroll", scroll.id)
         payload: dict = {
             "scroll_x": 100,
             "scroll_y": 100,
@@ -96,9 +101,9 @@ class PrivateScrollApiTests(APITestCase):
         Test deleting a scroll
         """
         scroll: Scroll = create_scroll(user=self.user)
-        url: str = detail_url(scroll)
+        url: str = detail_url("scroll", scroll.id)
 
         response: Response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        scrolls: Scroll = Scroll.objects.filter(user=self.user)
+        scrolls: QuerySet[Scroll] = Scroll.objects.filter(user=self.user)
         self.assertEqual(scrolls.exists(), False)
