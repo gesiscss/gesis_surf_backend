@@ -101,3 +101,43 @@ def create_domain(user, **params) -> Domain:
     defaults.update(params)
     domain = Domain.objects.create(user=user, **defaults)
     return domain
+
+
+# def create_scroll(user, domain=None, **params) -> Scroll:
+#     """
+#     Create and return a sample scroll
+#     """
+#     if domain is None:
+#         domain = create_domain(user=user)
+#     defaults = {
+#         "scroll_x": 0,
+#         "scroll_y": 0,
+#         "page_x_offset": 0,
+#         "page_y_offset": 0,
+#         "scroll_time": "2024-06-01 17:00:00",
+#         "domain": domain,
+#     }
+#     defaults.update(params)
+#     return Scroll.objects.create(user=user, **defaults)
+
+
+# def create_click(user, domain=None, **params) -> Click:
+#     """
+#     Create and return a sample click
+#     """
+#     if domain is None:
+#         domain = create_domain(user=user)
+#     defaults = {
+#         "click_type": "click",
+#         "click_time": "2024-06-01 17:00:00",
+#         "click_target_element": "button",
+#         "click_target_tag": "button",
+#         "click_target_class": "btn",
+#         "click_target_id": "btn-1",
+#         "click_page_x": 100,
+#         "click_page_y": 200,
+#         "click_referrer": "https://test.com",
+#         "domain": domain,
+#     }
+#     defaults.update(params)
+#     return Click.objects.create(user=user, **defaults)
