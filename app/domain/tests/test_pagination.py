@@ -2,40 +2,13 @@
 Django Rest Framework Pagination Test
 """
 
-from datetime import datetime
-
-from core.models import Domain, User
-from django.contrib.auth import get_user_model
+from core.tests.helpers import create_domain, create_user
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 DOMAIN_URL = reverse("domain:domain-list")
-
-
-def create_user(user_id: str = "test_user", password: str = "test_password") -> User:
-    """
-    Create a user helper function
-    """
-    return get_user_model().objects.create_user(user_id, password)
-
-
-def create_domain(user, **params) -> Domain:
-    """
-    Create and return a sample domain
-    """
-    defaults = {
-        "domain_title": "test.com",
-        "domain_url": "https://test.com",
-        "domain_fav_icon": "https://test.com/favicon.ico",
-        "domain_status": "active",
-        "start_time": datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        "closing_time": datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        "snapshot_html": "<html>Test</html>",
-    }
-    defaults.update(params)
-    return Domain.objects.create(user=user, **defaults)
 
 
 class PublicPaginationTestCase(TestCase):
@@ -57,7 +30,7 @@ class PublicPaginationTestCase(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class PrivatePaginationTest(TestCase):
+class PrivatePaginationTest(APITestCase):
     """
     Test authenticated Domain API access
     """

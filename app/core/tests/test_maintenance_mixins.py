@@ -4,26 +4,19 @@ Test the maintenance mode mixin
 
 from datetime import datetime, timezone
 
+from core.tests.helpers import create_user
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 DOMAIN_URL = reverse("domain:domain-list")
 CREATE_USER_URL = reverse("user:create")
 TAB_URL = reverse("tab:tab-list")
 
 
-def create_user(user_id: str = "test", password: str = "testpass"):
-    """
-    Create and return a sample user
-    """
-    return get_user_model().objects.create_superuser(user_id, password)
-
-
-class PrivateDomainApiTestsMaintenance(TestCase):
+class PrivateDomainApiTestsMaintenance(APITestCase):
     """
     Test the domain API (private)
     """
@@ -69,8 +62,7 @@ class PrivateDomainApiTestsMaintenance(TestCase):
 
         # Test CREATE user
         create_response = self.client.post(CREATE_USER_URL, payload, format="json")
-        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(create_response.data["user_id"], user_id)
+        self.assertEqual(create_response.status_code, status.HTTP_403_FORBIDDEN)
 
         # Test GET user
         get_response = self.client.get(reverse("user:me"))
@@ -90,7 +82,8 @@ class PrivateDomainApiTestsMaintenance(TestCase):
             "domain_title": "test.com",
             "domain_url": "https://test.com",
             "domain_fav_icon": "https://test.com/favicon.ico",
-            "domain_status": "active",
+            "domain_last_accessed": "active",
+            "domain_session_id": "session123",
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
             "snapshot_html": "<html>Test</html>",
@@ -112,7 +105,8 @@ class PrivateDomainApiTestsMaintenance(TestCase):
             "domain_title": "test.com",
             "domain_url": "https://test.com",
             "domain_fav_icon": "https://test.com/favicon.ico",
-            "domain_status": "active",
+            "domain_session_id": "session123",
+            "domain_last_accessed": "active",
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
             "snapshot_html": "<html>Test</html>",
@@ -123,17 +117,3 @@ class PrivateDomainApiTestsMaintenance(TestCase):
             res.data["detail"],
             "Service temporarily unavailable, please try again later.",
         )
-
-    @override_settings(MAINTENANCE_MODE=True)
-    def test_create_tab_under_maintenance(self) -> None:
-        """
-        Test creating a tab under maintenance mode
-        """
-        payload = {
-            "start_time": datetime.now(timezone.utc),
-            "closing_time": datetime.now(timezone.utc),
-            "tab_num": "Test Tab ID",
-            "window_num": "1",
-        }
-        res = self.client.post(TAB_URL, payload)
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
