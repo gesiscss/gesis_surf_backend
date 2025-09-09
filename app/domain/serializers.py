@@ -2,7 +2,7 @@
 Serializers for the Domain APIs.
 """
 
-from core.models import Click, Domain, Scroll, User
+from core.models import Click, Domain, Scroll
 from rest_framework import serializers
 
 

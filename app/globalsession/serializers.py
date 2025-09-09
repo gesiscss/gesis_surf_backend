@@ -9,7 +9,15 @@ from rest_framework import serializers
 
 
 class GlobalSessionSerializer(serializers.ModelSerializer):
-    class Meta:
+    """Serializer for the GlobalSession model.
+
+    Args:
+        serializers (_type_): The serializer class from DRF.
+    """
+
+    class Meta:  # type: ignore
+        """Meta class for the GlobalSession serializer."""
+
         model: type[GlobalSession] = GlobalSession
         fields: list[str] = [
             "id",

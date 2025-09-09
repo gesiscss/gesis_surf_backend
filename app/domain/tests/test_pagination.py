@@ -2,7 +2,6 @@
 Django Rest Framework Pagination Test
 """
 
-from core.models import Domain, User
 from core.tests.helpers import create_domain, create_user
 from django.test import TestCase
 from django.urls import reverse

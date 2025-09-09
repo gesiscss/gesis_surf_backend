@@ -2,13 +2,8 @@
 Tests for the clicks API
 """
 
-from core.models import Click, Domain, User
-from core.tests.helpers import (
-    create_click,
-    create_domain,
-    create_user,
-    detail_url,
-)
+from core.models import Click
+from core.tests.helpers import create_click, create_user, detail_url
 from django.contrib.auth.models import AbstractUser
 from django.db.models import QuerySet
 from django.urls import reverse
