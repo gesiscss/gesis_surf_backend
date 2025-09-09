@@ -144,6 +144,7 @@ class Extension(models.Model):
     extension_installed_at = models.DateTimeField(blank=True, null=True)
     extension_updated_at = models.DateTimeField(blank=True, null=True)
     extension_browser = models.CharField(max_length=128, blank=True)
+    extension_data_collection = models.BooleanField(default=True)
     history = HistoricalRecords()
     host_version = models.CharField(max_length=32, blank=False, default="0")
 
@@ -187,6 +188,41 @@ class Wave(models.Model):
         return f"{self.start_date} to {self.end_date}"
 
 
+class GlobalSession(models.Model):
+    """
+    Global session model to track user sessions.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    # Store the user who created the global session
+    # Relationship with the user model
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="global_sessions",
+    )
+    global_session_id: models.CharField = models.CharField(
+        max_length=255, unique=True, blank=False
+    )
+    start_time: models.DateTimeField = models.DateTimeField()
+    closing_time: models.DateTimeField = models.DateTimeField(blank=True, null=True)
+    created_at: models.DateTimeField = models.DateTimeField(
+        auto_now_add=True, blank=False
+    )
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the global session.
+
+        Returns:
+            str: A formatted string with global session information.
+        """
+        # Return information about the global session at admin panel
+        return f"Global Session {self.global_session_id} started at {self.start_time}"
+
+
 class Window(models.Model):
     """
     Custom window model.
@@ -202,10 +238,30 @@ class Window(models.Model):
         on_delete=models.CASCADE,
         # related_name="windows",
     )
+    # Store the global session that the window belongs to
+    # Relationship with the global session model
+    global_session: models.ForeignKey = models.ForeignKey(
+        GlobalSession,
+        on_delete=models.CASCADE,
+        related_name="windows",
+    )
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-    window_num = models.CharField(max_length=32, blank=False)
+    window_num = models.IntegerField(blank=False)
+    window_session_id: models.CharField = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        """
+        Meta class to define the constraints for the Window model.
+        """
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["window_num", "window_session_id", "start_time"],
+                name="unique_window_in_global_session",
+            )
+        ]
 
     def __str__(self) -> str:
         """
@@ -236,15 +292,30 @@ class Tab(models.Model):
     start_time = models.DateTimeField(blank=True)
     closing_time = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-    tab_num = models.CharField(max_length=32, blank=False)
     window_num = models.CharField(max_length=32, blank=False)
+    tab_num = models.CharField(max_length=32, blank=False)
+    tab_session_id: models.CharField = models.CharField(max_length=255, blank=True)
+
     # Create a relationship with the window model
-    # window = models.ForeignKey(
-    #     Window,
-    #     on_delete=models.CASCADE,
-    #     related_name="tabs",
-    # )
+    window = models.ForeignKey(
+        Window,
+        on_delete=models.CASCADE,
+        related_name="tabs",
+    )
+
     domains = models.ManyToManyField("Domain")
+
+    class Meta:
+        """
+        Meta class to define the constraints for the Tab model.
+        """
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["tab_num", "tab_session_id", "start_time"],
+                name="unique_tab_in_window",
+            )
+        ]
 
     def __str__(self) -> str:
         """
@@ -274,8 +345,9 @@ class Domain(models.Model):
     )
     domain_title = models.CharField(blank=False)
     snapshot_html = models.TextField(blank=True)
-    domain_status = models.CharField(blank=False)
+    domain_last_accessed = models.CharField(blank=False)
     domain_fav_icon = models.CharField(blank=False)
+    domain_session_id: models.CharField = models.CharField(blank=True)
     start_time = models.DateTimeField(blank=True, default=timezone.now)
     closing_time = models.DateTimeField(blank=True, default=timezone.now)
     domain_url = models.CharField(blank=False)
@@ -285,6 +357,18 @@ class Domain(models.Model):
         max_length=32, blank=False, default="full_allow"
     )
     category_label = models.CharField(max_length=32, blank=False, default="0")
+
+    class Meta:
+        """
+        Meta class to define the constraints for the Domain model.
+        """
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["domain_title", "domain_url", "start_time"],
+                name="unique_domain_in_tab",
+            )
+        ]
 
     def __str__(self) -> str:
         """

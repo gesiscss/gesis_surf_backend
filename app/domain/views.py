@@ -2,7 +2,9 @@
 Views for the domain app
 """
 
+from core.mixins.maintenance_mixins import MaintenanceModeMixin
 from core.models import Click, Domain, Scroll
+from core.pagination import CustomPagination
 from django.db.models.query import QuerySet
 from domain import serializers
 from rest_framework import mixins, viewsets
@@ -10,7 +12,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
-class DomainViewSet(viewsets.ModelViewSet):
+class DomainViewSet(MaintenanceModeMixin, viewsets.ModelViewSet):
     """
     Manage domains in the database.
     """
@@ -24,6 +26,7 @@ class DomainViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
+    pagination_class = CustomPagination
 
     def get_queryset(self) -> QuerySet:
         """
@@ -63,6 +66,7 @@ class BaseDomainAttrViewSet(
     permission_classes = [
         IsAuthenticated,
     ]
+    pagination_class = CustomPagination
 
     def get_queryset(self) -> QuerySet:
         """
@@ -79,6 +83,7 @@ class ClickViewSet(BaseDomainAttrViewSet):
     serializer_class = serializers.ClickSerializer
     # Objects available to the authenticated user.
     queryset = Click.objects.all()
+    pagination_class = CustomPagination
 
 
 class ScrollViewSet(BaseDomainAttrViewSet):
@@ -89,3 +94,4 @@ class ScrollViewSet(BaseDomainAttrViewSet):
     serializer_class = serializers.ScrollSerializer
     # Objects available to the authenticated user.
     queryset = Scroll.objects.all()
+    pagination_class = CustomPagination
