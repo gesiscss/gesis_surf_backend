@@ -94,3 +94,5 @@ db.sqlite3
 # vscode ignore
 .vscode/
 /infra/
+**/.terraform/*
+**/.terraform.lock.hcl
