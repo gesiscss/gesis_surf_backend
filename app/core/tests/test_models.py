@@ -2,23 +2,21 @@
 Tests for the models.
 """
 
-import uuid
 from datetime import datetime, timezone
-from typing import Any
 
 from core import models
 from core.tests.helpers import (
-    create_user,
-    round_datetime,
-    create_global_session,
-    create_window,
-    create_tab,
-    create_domain,
     create_click,
+    create_domain,
+    create_global_session,
     create_scroll,
+    create_tab,
+    create_user,
+    create_window,
+    round_datetime,
 )
+from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
-from django.contrib.auth import get_user_model 
 
 
 class ModelTests(APITestCase):
@@ -32,7 +30,7 @@ class ModelTests(APITestCase):
         """
         user = create_user(user_id="test", password="test123")
         self.assertIsInstance(user, models.User)
-        self.assertEqual(user.user_id, "test") # type: ignore - user_id is a custom field
+        self.assertEqual(user.user_id, "test")  # type: ignore - user_id is a custom field
         self.assertTrue(user.check_password("test123"))
         self.assertFalse(user.is_staff)
 
@@ -49,7 +47,7 @@ class ModelTests(APITestCase):
         """
         user = get_user_model().objects.create_superuser(
             user_id="test", password="test123"
-        ) # type: ignore -We have overridden the create_superuser method
+        )  # type: ignore -We have overridden the create_superuser method
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
 
@@ -83,12 +81,14 @@ class ModelTests(APITestCase):
         """
         Tests creating a new window.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
-        
+        user = get_user_model().objects.create_user(
+            user_id="test", password="test123"
+        )  # type: ignore -We have overridden the create_user method
+
         # Relationship with global session
         global_session = create_global_session(user=user)
         window = create_window(user=user, global_session=global_session)
-        
+
         self.assertEqual(window.start_time, window.start_time)
         self.assertEqual(window.closing_time, window.closing_time)
         self.assertEqual(window.user, user)
@@ -111,7 +111,9 @@ class ModelTests(APITestCase):
         """
         Tests creating a new domain instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        user = get_user_model().objects.create_user(
+            user_id="test", password="test123"
+        )  # type: ignore -We have overridden the create_user method
         domain = create_domain(user=user, domain_url="https://www.test.com")
         self.assertEqual(domain.user, user)
         self.assertEqual(domain.domain_title, "example.com")
@@ -121,17 +123,21 @@ class ModelTests(APITestCase):
         """
         Test creating a new click instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        user = get_user_model().objects.create_user(
+            user_id="test", password="test123"
+        )  # type: ignore -We have overridden the create_user method
         click = create_click(user=user)
         self.assertEqual(click.user, user)
         self.assertEqual(click.click_type, "click")
         self.assertEqual(click.click_target_element, "button")
-        
+
     def test_create_scroll(self):
         """
         Test creating a new scroll instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        user = get_user_model().objects.create_user(
+            user_id="test", password="test123"
+        )  # type: ignore -We have overridden the create_user method
         scroll = create_scroll(user=user)
         self.assertEqual(scroll.user, user)
         self.assertEqual(scroll.scroll_x, 0)
@@ -282,7 +288,9 @@ class ModelTests(APITestCase):
         """
         Test creating a new privacy instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        user = get_user_model().objects.create_user(
+            user_id="test", password="test123"
+        )  # type: ignore -We have overridden the create_user method
         privacy = models.Privacy.objects.create(
             user=user,
             privacy_mode=False,
@@ -309,7 +317,9 @@ class ModelTests(APITestCase):
         """
         Test creating a new extension instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        user = get_user_model().objects.create_user(
+            user_id="test", password="test123"
+        )  # type: ignore -We have overridden the create_user method
         extension = models.Extension.objects.create(
             user=user,
             extension_version="1.0.0",
@@ -329,7 +339,9 @@ class ModelTests(APITestCase):
         """
         Test creating a new global session instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        user = get_user_model().objects.create_user(
+            user_id="test", password="test123"
+        )  # type: ignore -We have overridden the create_user method
         global_session = create_global_session(user=user)
         self.assertEqual(
             global_session.global_session_id, global_session.global_session_id

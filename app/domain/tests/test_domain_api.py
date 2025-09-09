@@ -4,16 +4,8 @@ Test for Domain APIs.
 
 from datetime import datetime, timezone
 
-from core.models import Click, Domain, Scroll
-from core.tests.helpers import (
-    create_domain,
-    create_global_session,
-    create_tab,
-    create_user,
-    create_window,
-    detail_url,
-)
-from django.contrib.auth import get_user_model
+from core.models import Domain
+from core.tests.helpers import create_domain, create_user, detail_url
 from django.test import TestCase
 from django.urls import reverse
 from domain.serializers import DomainSingleSerializer
@@ -21,12 +13,11 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 DOMAIN_URL = reverse("domain:domain-list")
-SCROLL_URL: str = reverse("domain:scroll-list")
 
 
 class PublicDomainApiTests(TestCase):
     """
-    Test the publicly available domian API
+    Test the publicly available domain API
     """
 
     def setUp(self):
