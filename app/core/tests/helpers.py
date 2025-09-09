@@ -13,10 +13,12 @@ from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
 
 
-def round_datetime(d_t: datetime) -> datetime:
+def round_datetime(d_t: datetime | None) -> datetime | None:
     """
     Round the datetime to the nearest second.
     """
+    if d_t is None:
+        return None
     return d_t.replace(second=0, microsecond=0)
 
 

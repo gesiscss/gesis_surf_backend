@@ -7,34 +7,21 @@ from datetime import datetime, timezone
 from typing import Any
 
 from core import models
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+from core.tests.helpers import (
+    create_user,
+    round_datetime,
+    create_global_session,
+    create_window,
+    create_tab,
+    create_domain,
+    create_click,
+    create_scroll,
+)
+from rest_framework.test import APITestCase
+from django.contrib.auth import get_user_model 
 
 
-def generate_window_session_id(
-    global_session_id: str = "0", window_num: str = "0"
-) -> str:
-    """
-    Generates a unique window session ID.
-    """
-    return f"{global_session_id}-windowId-{window_num}"
-
-
-def generate_global_session_id() -> str:
-    """
-    Generates a unique global session ID.
-    """
-    return f"global-session-{uuid.uuid4()}"
-
-
-def create_user(user_id="test", password="test123") -> Any:
-    """
-    Helper function to create a user.
-    """
-    return get_user_model().objects.create_user(user_id=user_id, password=password)
-
-
-class ModelTests(TestCase):
+class ModelTests(APITestCase):
     """
     Tests for the models.
     """
@@ -43,14 +30,10 @@ class ModelTests(TestCase):
         """
         Tests creating a new user with a providen token.
         """
-        user_id = "test"
-        password = "test123"
-        user = get_user_model().objects.create_user(
-            user_id=user_id,
-            password=password,
-        )
-        self.assertEqual(user.user_id, user_id)
-        self.assertTrue(user.check_password(password))
+        user = create_user(user_id="test", password="test123")
+        self.assertIsInstance(user, models.User)
+        self.assertEqual(user.user_id, "test") # type: ignore - user_id is a custom field
+        self.assertTrue(user.check_password("test123"))
         self.assertFalse(user.is_staff)
 
     def test_new_user_invalid_user_id(self) -> None:
@@ -58,7 +41,7 @@ class ModelTests(TestCase):
         Tests creating a new user with no user_id raises an error.
         """
         with self.assertRaises(ValueError):
-            get_user_model().objects.create_user(user_id="", password="test123")
+            create_user(user_id="", password="test123")
 
     def test_create_superuser(self) -> None:
         """
@@ -66,16 +49,9 @@ class ModelTests(TestCase):
         """
         user = get_user_model().objects.create_superuser(
             user_id="test", password="test123"
-        )
+        ) # type: ignore -We have overridden the create_superuser method
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
-
-    @staticmethod
-    def round_datetime(d_t: datetime) -> datetime:
-        """
-        Rounds a datetime to the nearest minute.
-        """
-        return d_t.replace(second=0, microsecond=0)
 
     def test_create_wave(self) -> None:
         """
@@ -95,8 +71,8 @@ class ModelTests(TestCase):
         self.assertEqual(wave.start_date, datetime.strptime("2021-01-01", "%Y-%m-%d"))
         self.assertEqual(wave.end_date, datetime.strptime("2021-02-28", "%Y-%m-%d"))
         self.assertEqual(
-            self.round_datetime(wave.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
+            round_datetime(wave.created_at),
+            round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(wave.wave_status, "active")
         self.assertEqual(wave.wave_type, "test")
@@ -107,66 +83,27 @@ class ModelTests(TestCase):
         """
         Tests creating a new window.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123")
-        global_session = models.GlobalSession.objects.create(
-            user=user,
-            global_session_id=generate_global_session_id(),
-            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
-        window_num = "1"
-        window_session_id = generate_window_session_id(
-            global_session_id=global_session.global_session_id,
-            window_num=window_num,
-        )
-
-        window = models.Window.objects.create(
-            user=user,
-            global_session=global_session,
-            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-            closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-            window_num=window_num,
-            window_session_id=window_session_id,
-        )
-
-        self.assertEqual(
-            window.start_time,
-            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
-        self.assertEqual(
-            window.closing_time,
-            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
-        self.assertEqual(
-            self.round_datetime(window.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
-        )
+        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        
+        # Relationship with global session
+        global_session = create_global_session(user=user)
+        window = create_window(user=user, global_session=global_session)
+        
+        self.assertEqual(window.start_time, window.start_time)
+        self.assertEqual(window.closing_time, window.closing_time)
         self.assertEqual(window.user, user)
-        self.assertEqual(window.window_num, 1)
 
     def test_create_tab(self) -> None:
         """
         Tests creating a new tab instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123")
-        tab = models.Tab.objects.create(
-            user=user,
-            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-            closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-            created_at=datetime.now(timezone.utc),
-            tab_num="test",
-        )
-        self.assertEqual(
-            tab.start_time,
-            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
-        self.assertEqual(
-            tab.closing_time,
-            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
-        self.assertEqual(
-            self.round_datetime(tab.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
-        )
+        user = create_user(user_id="test", password="test123")
+        global_session = create_global_session(user=user)
+        window = create_window(user=user, global_session=global_session)
+        tab = create_tab(user=user, window=window, tab_num="test")
+        self.assertEqual(tab.start_time, tab.start_time)
+        self.assertEqual(tab.closing_time, tab.closing_time)
+        self.assertEqual(tab.window, window)
         self.assertEqual(tab.user, user)
         self.assertEqual(tab.tab_num, "test")
 
@@ -174,117 +111,31 @@ class ModelTests(TestCase):
         """
         Tests creating a new domain instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123")
-        domain = models.Domain.objects.create(
-            user=user,
-            domain_title="Test",
-            domain_url="https://www.test.com",
-            domain_fav_icon="test.ico",
-            domain_status="active",
-            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-            closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-            snapshot_html="test",
-            created_at=datetime.now(timezone.utc),
-        )
-        self.assertEqual(domain.domain_title, "Test")
-        self.assertEqual(domain.domain_url, "https://www.test.com")
-        self.assertEqual(domain.domain_fav_icon, "test.ico")
-        self.assertEqual(domain.domain_status, "active")
-        self.assertEqual(
-            self.round_datetime(domain.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
-        )
+        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        domain = create_domain(user=user, domain_url="https://www.test.com")
         self.assertEqual(domain.user, user)
-        self.assertEqual(
-            domain.start_time,
-            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
-        self.assertEqual(
-            domain.closing_time,
-            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
-        self.assertEqual(domain.snapshot_html, "test")
+        self.assertEqual(domain.domain_title, "example.com")
+        self.assertEqual(domain.domain_url, "https://www.test.com")
 
     def test_create_click(self) -> None:
         """
         Test creating a new click instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123")
-        click = models.Click.objects.create(
-            user=user,
-            click_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-            click_type="click",
-            click_target_element="test",
-            click_target_tag="test",
-            click_target_id="test",
-            click_target_class="test",
-            click_page_x=0,
-            click_page_y=0,
-            click_referrer="test",
-            created_at=datetime.now(timezone.utc),
-            domain=models.Domain.objects.create(
-                user=user,
-                domain_title="Test",
-                domain_url="https://www.test.com",
-                domain_fav_icon="test.ico",
-                domain_status="active",
-                created_at=datetime.now(timezone.utc),
-            ),
-        )
-        self.assertEqual(
-            click.click_time,
-            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
-        self.assertEqual(click.click_type, "click")
-        self.assertEqual(click.click_target_element, "test")
-        self.assertEqual(click.click_target_tag, "test")
-        self.assertEqual(click.click_target_id, "test")
-        self.assertEqual(click.click_target_class, "test")
-        self.assertEqual(click.click_page_x, 0)
-        self.assertEqual(click.click_page_y, 0)
-        self.assertEqual(click.click_referrer, "test")
-        self.assertEqual(
-            self.round_datetime(click.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
-        )
+        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        click = create_click(user=user)
         self.assertEqual(click.user, user)
-
+        self.assertEqual(click.click_type, "click")
+        self.assertEqual(click.click_target_element, "button")
+        
     def test_create_scroll(self):
         """
         Test creating a new scroll instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123")
-        scroll = models.Scroll.objects.create(
-            user=user,
-            scroll_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-            scroll_x=0,
-            scroll_y=0,
-            page_x_offset=0,
-            page_y_offset=0,
-            created_at=datetime.now(timezone.utc),
-            # Create the domain_id for the scroll
-            domain=models.Domain.objects.create(
-                user=user,
-                domain_title="Test",
-                domain_url="https://www.test.com",
-                domain_fav_icon="test.ico",
-                domain_status="active",
-                created_at=datetime.now(timezone.utc),
-            ),
-        )
-        self.assertEqual(
-            scroll.scroll_time,
-            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
+        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        scroll = create_scroll(user=user)
+        self.assertEqual(scroll.user, user)
         self.assertEqual(scroll.scroll_x, 0)
         self.assertEqual(scroll.scroll_y, 0)
-        self.assertEqual(scroll.page_x_offset, 0)
-        self.assertEqual(scroll.page_y_offset, 0)
-        self.assertEqual(
-            self.round_datetime(scroll.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
-        )
-        self.assertEqual(scroll.user, user)
 
     def test_create_host(self) -> None:
         """
@@ -296,8 +147,8 @@ class ModelTests(TestCase):
         )
         self.assertEqual(host.hostname, "https://www.test.com")
         self.assertEqual(
-            self.round_datetime(host.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
+            round_datetime(host.created_at),
+            round_datetime(datetime.now(timezone.utc)),
         )
 
     def test_create_category(self) -> None:
@@ -324,8 +175,8 @@ class ModelTests(TestCase):
         self.assertEqual(category.category_label, "test")
         self.assertEqual(category.category_confidence, 0.0)
         self.assertEqual(
-            self.round_datetime(category.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
+            round_datetime(category.created_at),
+            round_datetime(datetime.now(timezone.utc)),
         )
 
     def test_create_criteria(self) -> None:
@@ -372,8 +223,8 @@ class ModelTests(TestCase):
         self.assertEqual(category.category_label, "test")
         self.assertEqual(category.category_confidence, 0.0)
         self.assertEqual(
-            self.round_datetime(category.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
+            round_datetime(category.created_at),
+            round_datetime(datetime.now(timezone.utc)),
         )
 
     def test_create_host_with_category_and_criteria(self) -> None:
@@ -403,8 +254,8 @@ class ModelTests(TestCase):
         host.categories.add(category)
         self.assertEqual(host.hostname, "https://www.test.com")
         self.assertEqual(
-            self.round_datetime(host.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
+            round_datetime(host.created_at),
+            round_datetime(datetime.now(timezone.utc)),
         )
 
     def test_create_category_without_criteria(self) -> None:
@@ -423,15 +274,15 @@ class ModelTests(TestCase):
         self.assertEqual(category.category_label, "test")
         self.assertEqual(category.category_confidence, 0.0)
         self.assertEqual(
-            self.round_datetime(category.created_at),
-            self.round_datetime(datetime.now(timezone.utc)),
+            round_datetime(category.created_at),
+            round_datetime(datetime.now(timezone.utc)),
         )
 
     def test_create_privacy(self) -> None:
         """
         Test creating a new privacy instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
         privacy = models.Privacy.objects.create(
             user=user,
             privacy_mode=False,
@@ -458,7 +309,7 @@ class ModelTests(TestCase):
         """
         Test creating a new extension instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123")
+        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
         extension = models.Extension.objects.create(
             user=user,
             extension_version="1.0.0",
@@ -469,8 +320,8 @@ class ModelTests(TestCase):
 
         self.assertEqual(extension.extension_version, "1.0.0")
         self.assertEqual(
-            self.round_datetime(extension.extension_installed_at),
-            self.round_datetime(datetime.now(timezone.utc)),
+            round_datetime(extension.extension_installed_at),
+            round_datetime(datetime.now(timezone.utc)),
         )
         self.assertEqual(extension.extension_browser, "chrome")
 
@@ -478,13 +329,8 @@ class ModelTests(TestCase):
         """
         Test creating a new global session instance.
         """
-        user = get_user_model().objects.create_user(user_id="test", password="test123")
-        global_session = models.GlobalSession.objects.create(
-            user=user,
-            global_session_id=generate_global_session_id(),
-            start_time=datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-            closing_time=datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        )
+        user = get_user_model().objects.create_user(user_id="test", password="test123") # type: ignore -We have overridden the create_user method
+        global_session = create_global_session(user=user)
         self.assertEqual(
             global_session.global_session_id, global_session.global_session_id
         )

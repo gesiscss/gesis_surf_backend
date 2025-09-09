@@ -96,3 +96,7 @@ db.sqlite3
 /infra/
 **/.terraform/*
 **/.terraform.lock.hcl
+**/.terraform/*
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
