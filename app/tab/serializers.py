@@ -141,7 +141,7 @@ class TabSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
 
         if domains is not None:
-            instance.domains.clear()
+            # instance.domains.clear()
             self._handle_domains(domains, instance)
 
         if domain_updates is not None:

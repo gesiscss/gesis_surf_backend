@@ -346,7 +346,7 @@ class Domain(models.Model):
     domain_title = models.CharField(blank=False)
     snapshot_html = models.TextField(blank=True)
     domain_last_accessed = models.CharField(blank=False)
-    domain_fav_icon = models.CharField(blank=False)
+    domain_fav_icon = models.CharField(blank=True)
     domain_session_id: models.CharField = models.CharField(blank=True)
     start_time = models.DateTimeField(blank=True, default=timezone.now)
     closing_time = models.DateTimeField(blank=True, default=timezone.now)

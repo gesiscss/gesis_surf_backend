@@ -28,7 +28,7 @@ repos:
         exclude: ^(.*/)?(models/)?
         name: typecheck
     repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+    rev: v1.18.2
   - hooks:
       - id: autoflake
         name: remove unused imports
@@ -38,16 +38,16 @@ repos:
       - id: black
         name: format
     repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 25.9.0
   - hooks:
       - id: commitizen
       - id: commitizen-branch
         stages:
           - push
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.8.3
+    rev: v4.9.1
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.27.0
+    rev: 1.28.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.2"]
@@ -74,7 +74,7 @@ repos:
           - --fix
         id: eslint
     repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.34.0
+    rev: v9.36.0
   - repo: https://github.com/pre-commit/mirrors-pylint
     rev: v3.0.0a5
     hooks:
@@ -116,13 +116,13 @@ repos:
   - hooks:
       - id: black
     repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 25.9.0
   - hooks:
       - additional_dependencies:
           - black==23.11.0
         id: blacken-docs
     repo: https://github.com/asottile/blacken-docs
-    rev: 1.19.1
+    rev: 1.20.0
   - hooks:
       - id: isort
     repo: https://github.com/pycqa/isort
