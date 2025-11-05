@@ -44,11 +44,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     # Third party apps
+    "django_extensions",
     "simple_history",
-    "core",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
+    # Local apps
+    "core",
     "user",
     "wave",
     "window",

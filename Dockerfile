@@ -16,6 +16,8 @@ RUN python -m venv /py && \
     apk add --update --no-cache postgresql-client && \
     apk add --update --no-cache --virtual .tmp-build-dev \
     build-base postgresql-dev musl-dev linux-headers && \
+    apk add --update --no-cache graphviz && \
+    apk add --update --no-cache graphviz-dev && \
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ "$DEV" = "true" ] ; then /py/bin/pip install -r /tmp/requirements.dev.txt ; fi && \
     rm -rf /tmp && \
