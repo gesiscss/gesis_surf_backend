@@ -196,6 +196,16 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "core.signals": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "core.tasks": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
         "app.core": {
             "handlers": ["logstash", "console"],
             "level": "DEBUG",
