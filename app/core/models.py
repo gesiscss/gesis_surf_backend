@@ -443,6 +443,7 @@ class Scroll(models.Model):
     scroll_y = models.FloatField(blank=False)
     page_x_offset = models.FloatField(blank=False)
     page_y_offset = models.FloatField(blank=False)
+    scroll_metrics = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     domain = models.ForeignKey(
         Domain,
