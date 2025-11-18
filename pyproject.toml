@@ -25,6 +25,7 @@ cryptography = "^44.0.1"
 pygraphviz = "^1.11"
 elasticsearch = "^8.17.0"
 elasticsearch-dsl = "^8.17.0"
+django-cors-headers = "^4.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -57,6 +58,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+mypy_path = "app"
 
 [tool.django-stubs]
 django_settings_module = "app.settings"
