@@ -11,5 +11,3 @@ class ChatGPTTests:
     Args:
         TestCase (_type_): _description_
     """
-
-    pass

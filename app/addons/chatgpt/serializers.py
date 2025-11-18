@@ -12,10 +12,10 @@ class ChatGPTDataSerializer(serializers.Serializer):
     Serializer for the ChatGPT data object.
     """
 
-    user_id: str = serializers.CharField()
-    conversation_id: str = serializers.CharField()
-    conversation: str = serializers.CharField()
-    timestamp: str = serializers.DateTimeField()
+    user_id: serializers.CharField = serializers.CharField()
+    conversation_id: serializers.CharField = serializers.CharField()
+    conversation: serializers.CharField = serializers.CharField()
+    timestamp: serializers.DateTimeField = serializers.DateTimeField()
 
     def create(self, validated_data: dict) -> object:
         """
@@ -24,7 +24,12 @@ class ChatGPTDataSerializer(serializers.Serializer):
         try:
             doc = ChatGPTIndex(**validated_data)
             doc.save()
-            return doc
+            return {
+                **validated_data,
+                "index_name": doc.get_current_index(),
+                "document_id": doc.meta.id,
+            }
+
         except TransportError as error:
             raise serializers.ValidationError({"ChatGPT error": str(error)}) from error
 
