@@ -3,6 +3,7 @@ Views for the tab app
 """
 
 from core.models import Domain, Tab
+from core.pagination import CustomPagination
 from django.db.models.query import QuerySet
 from rest_framework import mixins, viewsets
 from rest_framework.authentication import TokenAuthentication
@@ -24,6 +25,7 @@ class TabViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
+    pagination_class = CustomPagination
 
     def get_queryset(self) -> QuerySet:
         """
@@ -65,6 +67,7 @@ class DomainViewSet(
     permission_classes = [
         IsAuthenticated,
     ]
+    pagination_class = CustomPagination
 
     def get_queryset(self) -> "QuerySet":
         """

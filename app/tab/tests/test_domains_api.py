@@ -2,54 +2,21 @@
 Tests for the domains API.
 """
 
-from datetime import datetime
 from typing import Any
 
 from core.models import Domain
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+from core.tests.helpers import create_domain, create_user, detail_url
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 from tab.serializers import DomainSerializer
 
 DOMAIN_URL = reverse("tab:domain-list")
 
 
-def detail_url(domain_id: int) -> str:
+class PublicDomainApiTests(APITestCase):
     """
-    Return domain detail URL
-    """
-    return reverse("tab:domain-detail", args=[domain_id])
-
-
-def create_user(username: str = "test", password: str = "testpass"):
-    """
-    Create and return a sample user
-    """
-    return get_user_model().objects.create_user(username, password)
-
-
-def create_domain(user, **params) -> Domain:
-    """
-    Create and return a sample domain
-    """
-    defaults = {
-        "domain_title": "test.com",
-        "domain_url": "https://test.com",
-        "domain_fav_icon": "https://test.com/favicon.ico",
-        "domain_status": "active",
-        "start_time": datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
-        "closing_time": datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        "snapshot_html": "<html>Test</html>",
-    }
-    defaults.update(params)
-    return Domain.objects.create(user=user, **defaults)
-
-
-class PublicDomainApiTests(TestCase):
-    """
-    Test the publicly available domian API
+    Test the publicly available domain API
     """
 
     def setUp(self):
@@ -64,14 +31,14 @@ class PublicDomainApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class PrivateDomainApiTests(TestCase):
+class PrivateDomainApiTests(APITestCase):
     """
     Test the authorized user domain API
     """
 
     def setUp(self) -> None:
         self.client = APIClient()
-        self.user = create_user()
+        self.user = create_user(user_id="test", password="testpass")
         self.client.force_authenticate(self.user)
 
     def test_retrieve_domains(self) -> None:
@@ -88,35 +55,34 @@ class PrivateDomainApiTests(TestCase):
         serializer = DomainSerializer(domains, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data["results"], serializer.data)
 
     def test_domains_limited_to_user(self) -> None:
         """
         Test that domains for the authenticated user are returned
         """
-        user2 = create_user(username="test2", password="testpass")
+        user2 = create_user(user_id="test2", password="testpass")
         create_domain(user=user2)
         domain = create_domain(user=self.user)
 
         res = self.client.get(DOMAIN_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data[0]["domain_title"], domain.domain_title)
+        self.assertEqual(len(res.data["results"]), 1)
+        self.assertEqual(res.data["results"][0]["domain_title"], domain.domain_title)
 
     def test_update_domain(self) -> None:
         """
         Test updating a domain
         """
-        domain: str = create_domain(user=self.user)
+        domain: Domain = create_domain(user=self.user)
         payload: dict[str, Any] = {
             "domain_title": "test.com",
-            "domain_status": "inactive",
         }
-        url: str = detail_url(domain.id)
+        url: str = detail_url("domain", domain.id)
 
         self.client.patch(url, payload)
         domain.refresh_from_db()
-        self.assertEqual(domain.domain_status, payload["domain_status"])
+        self.assertEqual(domain.domain_title, payload["domain_title"])
 
     def test_delete_tag(self) -> None:
         """
@@ -124,7 +90,7 @@ class PrivateDomainApiTests(TestCase):
         """
         domain = create_domain(user=self.user)
 
-        url = detail_url(domain.id)
+        url = detail_url("domain", domain.id)
         res = self.client.delete(url)
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)

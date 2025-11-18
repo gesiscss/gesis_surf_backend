@@ -26,6 +26,7 @@ class ExtensionSerializer(serializers.ModelSerializer):
             "extension_installed_at",
             "extension_updated_at",
             "extension_browser",
+            "extension_data_collection",
             "host_version",
         )
         read_only_fields = ("id",)
@@ -167,6 +168,10 @@ class UserSerializer(serializers.ModelSerializer):
                 )
                 user.extension.extension_browser = extension.get(
                     "extension_browser", user.extension.extension_browser
+                )
+                user.extension.extension_data_collection = extension.get(
+                    "extension_data_collection",
+                    user.extension.extension_data_collection,
                 )
                 user.extension.save()
 

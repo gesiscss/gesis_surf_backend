@@ -1,0 +1,12 @@
+name: CI - Staging (Main)
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  staging-checks:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Advanced Testing
+        run: |
+          docker compose run --rm app sh -c "python manage.py wait_for_db && python manage.py test && flake8"

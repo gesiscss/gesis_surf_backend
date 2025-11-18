@@ -21,7 +21,7 @@ class HostViewSet(viewsets.ModelViewSet):
 
     serializer_class = serializers.HostSerializer
     # Objects available to the authenticated user.
-    queryset = Host.objects.all()
+    queryset = Host.objects.all()  # pylint: disable=no-member
     authentication_classes = [
         TokenAuthentication,
     ]
@@ -36,14 +36,14 @@ class HostViewSet(viewsets.ModelViewSet):
         return self.queryset.filter()
 
     @action(detail=False, methods=["get"])
-    def async_hosts(self, request):
+    def async_hosts(self, _request):
         """
         Trigger an asynchronous task to fetch hosts and return the task ID.
         """
         task = get_hosts_async.delay()
         return Response({"task_id": task.id})
 
-    def get_async_task_result(self, request, task_id):
+    def get_async_task_result(self, _request, task_id):
         """
         Endpoint to get the result of an asynchronous task by its task ID.
         """

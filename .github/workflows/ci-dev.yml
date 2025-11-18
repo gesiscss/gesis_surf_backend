@@ -1,0 +1,15 @@
+name: CI - Dev
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+jobs:
+  test-lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Tests & Lint
+        run: |
+          docker compose run --rm app sh -c "python manage.py wait_for_db && python manage.py test"
+          docker compose run --rm app sh -c "flake8"

@@ -19,10 +19,12 @@ class WindowSerializer(serializers.ModelSerializer):
         model = Window
         fields = [
             "id",
+            "user",
             "start_time",
             "closing_time",
-            "created_at",
             "window_num",
+            "window_session_id",
+            "global_session",
         ]
 
         # Able to change the fields, but not the id.

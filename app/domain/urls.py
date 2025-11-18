@@ -8,8 +8,8 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register("domains", views.DomainViewSet)
-router.register("clicks", views.ClickViewSet)
-router.register("scrolls", views.ScrollViewSet)
+# router.register("clicks", views.ClickViewSet)
+# router.register("scrolls", views.ScrollViewSet)
 
 app_name = "domain"
 

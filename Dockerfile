@@ -16,6 +16,8 @@ RUN python -m venv /py && \
     apk add --update --no-cache postgresql-client && \
     apk add --update --no-cache --virtual .tmp-build-dev \
     build-base postgresql-dev musl-dev linux-headers && \
+    apk add --update --no-cache graphviz && \
+    apk add --update --no-cache graphviz-dev && \
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ "$DEV" = "true" ] ; then /py/bin/pip install -r /tmp/requirements.dev.txt ; fi && \
     rm -rf /tmp && \
@@ -26,9 +28,15 @@ RUN python -m venv /py && \
     django-user && \
     mkdir -p /vol/media && \
     mkdir -p /vol/static && \
+    mkdir -p /opt/web_tracker/security_scripts && \
     chown -R django-user:django-user /vol && \
     chmod -R 755 /vol && \
-    chmod -R +x /scripts
+    chmod -R +x /scripts && \
+    chown -R django-user:django-user /opt/web_tracker/security_scripts
+
+
+COPY ./security_scripts /opt/web_tracker/security_scripts
+RUN chmod -R 755 /opt/web_tracker/security_scripts/manage_patterns.py
 
 ENV PATH="/scripts:/py/bin:$PATH"
 

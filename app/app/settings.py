@@ -30,6 +30,8 @@ ALLOWED_HOSTS: list[str] = (
     [] if DEBUG else os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
 )
 
+# Maintenance mode
+MAINTENANCE_MODE = bool(int(os.environ.get("MAINTENANCE_MODE", 0)))
 
 # Application definition
 
@@ -40,22 +42,28 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     # Third party apps
+    "django_extensions",
     "simple_history",
-    "core",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
+    # Local apps
+    "core",
     "user",
     "wave",
     "window",
     "tab",
     "domain",
     "host",
+    "globalsession",
+    "clicks",
     "addons",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -63,6 +71,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "app.middleware.security_middleware.SecurityMiddleware",
     "app.middleware.traffic_middleware.LoggingMiddleware",
 ]
 
@@ -187,6 +196,16 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "core.signals": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "core.tasks": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
         "app.core": {
             "handlers": ["logstash", "console"],
             "level": "DEBUG",
@@ -224,3 +243,32 @@ LOGGING = {
         },
     },
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "chrome-extension://ocmaegpehmnegplnlcjnpphlpbdmdjnc",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]

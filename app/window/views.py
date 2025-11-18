@@ -3,6 +3,7 @@ Views for the window app.
 """
 
 from core.models import Window
+from core.pagination import CustomPagination
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -23,6 +24,7 @@ class WindowViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         """
