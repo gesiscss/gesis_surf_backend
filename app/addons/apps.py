@@ -42,6 +42,13 @@ class AddonsConfig(AppConfig):
                 sender (_type_): _description_
             """
 
+            if hasattr(create_elasticsearch_indices, "_executed"):
+                print("Elasticsearch indices setup already executed. Skipping.")
+                return
+
+            # pylint: disable=protected-access
+            create_elasticsearch_indices._executed = True  # type: ignore
+
             index_classes = [
                 ChatGPTIndex,
                 TwitterIndex,
