@@ -7,9 +7,9 @@ from rest_framework.routers import DefaultRouter
 from scrolls import views
 
 router = DefaultRouter()
-router.register("", views.ScrollViewSet, basename="scroll")
+router.register("scrolls", views.ScrollViewSet, basename="scroll")
 
-app_name = "scroll"
+app_name = "scrolls"
 
 urlpatterns = [
     path("", include(router.urls)),

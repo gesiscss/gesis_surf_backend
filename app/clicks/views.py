@@ -37,9 +37,3 @@ class ClickViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(domain__id=domain_id)
 
         return queryset.order_by("-click_time")
-
-    def perform_create(self, serializer):
-        """
-        Create a new click that belongs to the authenticated user.
-        """
-        serializer.save(user=self.request.user)

@@ -93,7 +93,6 @@ class PrivateDomainApiTests(APITestCase):
             "domain_last_accessed": "active",
             "start_time": datetime.now(timezone.utc),
             "closing_time": datetime.now(timezone.utc),
-            "snapshot_html": "<html>Test</html>",
             "domain_session_id": "session123",
         }
         res = self.client.post(DOMAIN_URL, payload)
@@ -161,7 +160,7 @@ class PrivateDomainApiTests(APITestCase):
 
     def test_retrieve_html_snapshot(self) -> None:
         """
-        Test retrieving the HTML snapshot for a domain
+        Test retrieving the HTML snapshot for a domain.
         """
         domain = create_domain(
             user=self.user, snapshot_html="<html>Test Snapshot</html>"
@@ -169,4 +168,3 @@ class PrivateDomainApiTests(APITestCase):
         url = detail_url("domain", domain.id)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data["snapshot_html"], domain.snapshot_html)

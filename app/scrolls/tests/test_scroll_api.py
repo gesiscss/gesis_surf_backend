@@ -3,7 +3,7 @@ Test for the scroll API
 """
 
 from core.models import Scroll
-from core.tests.helpers import create_scroll, create_user, detail_url
+from core.tests.helpers import create_scroll, create_user
 from django.contrib.auth.models import AbstractUser
 from django.db.models import QuerySet
 from django.urls import reverse
@@ -12,7 +12,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 
-SCROLL_URL: str = reverse("scroll:scroll-list")
+SCROLL_URL: str = reverse("scrolls:scroll-list")
 
 
 class PublicScrollApiTests(APITestCase):
@@ -83,7 +83,7 @@ class PrivateScrollApiTests(APITestCase):
         Test updating a scroll
         """
         scroll: Scroll = create_scroll(user=self.user)
-        url: str = detail_url("scroll", scroll.id)
+        url: str = reverse("scrolls:scroll-detail", args=[scroll.id])
         payload: dict = {
             "scroll_x": 100,
             "scroll_y": 100,
@@ -101,7 +101,8 @@ class PrivateScrollApiTests(APITestCase):
         Test deleting a scroll
         """
         scroll: Scroll = create_scroll(user=self.user)
-        url: str = detail_url("scroll", scroll.id)
+        # url: str = detail_url("scroll", scroll.id)
+        url: str = reverse("scrolls:scroll-detail", args=[scroll.id])
 
         response: Response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

@@ -7,9 +7,9 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register("", views.ClickViewSet, basename="click")
+router.register("clicks", views.ClickViewSet, basename="click")
 
-app_name = "click"
+app_name = "clicks"
 
 urlpatterns = [
     path("", include(router.urls)),
