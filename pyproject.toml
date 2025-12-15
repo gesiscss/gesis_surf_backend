@@ -15,13 +15,18 @@ django-stubs = "^4.2.6"
 psycopg2 = "^2.9.9"
 types-psycopg2 = "^2.9.21.15"
 drf-spectacular = "^0.27.1"
-uwsgi = "^2.0.24"
+uwsgi = "^2.0.25"
 django-simple-history = "^3.5.0"
 celery = "^5.3.6"
 redis = "^5.0.3"
 flower = "^2.0.1"
 python-logstash = "^0.4.8"
 cryptography = "^44.0.1"
+pygraphviz = "^1.11"
+elasticsearch = "^8.17.0"
+elasticsearch-dsl = "^8.17.0"
+django-cors-headers = "^4.9.0"
+celery-stubs = "^0.1.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -37,6 +42,7 @@ pre-commit = "^3.5.0"
 djangorestframework-stubs = "^3.14.4"
 django-stubs = "^4.2.6"
 pylint-django = "^2.5.5"
+pylint = "^3.3.3"
 
 
 [tool.commitizen]
@@ -53,6 +59,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+mypy_path = "app"
 
 [tool.django-stubs]
 django_settings_module = "app.settings"
