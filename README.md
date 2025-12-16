@@ -253,6 +253,25 @@ We welcome contributions! Please see our **[Contributing Guide](CONTRIBUTING.md)
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 📝 Citing
+
+If you use this software in your research, please cite:
+
+```bibtex
+@article{ramirez2025gesis,
+  title = {GESIS Surf },
+  author = {Ramirez, Mario and },
+  journal = {SoftwareX},
+  volume = {XX},
+  pages = {XXXXXX},
+  year = {2026},
+  publisher = {Elsevier},
+  doi = {10.1016/j.softx.2025.xxxxxx}
+}
+```
+
+See [CITATION.cff](CITATION.cff) for more citation formats.
+
 ## 👥 Authors
 
 - **Mario Ramirez** - *Lead Research Software Engineer* - [@geomario](https://github.com/geomario) [@MarioGesis](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
