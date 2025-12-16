@@ -1,0 +1,56 @@
+cff-version: 1.2.0
+title: GESIS Surf Backend
+message: >-
+  If you use this software in your research, please cite it
+  using the metadata from this file.
+type: software
+authors:
+  - given-names: Mario
+    family-names: Ramirez
+    email: mario.ramirez@gesis.org
+    affiliation: GESIS - Leibniz Institute for the Social Sciences
+    orcid: 'https://orcid.org/0009-0005-0960-4745'
+repository-code: 'https://github.com/geomario/gesis_surf_backend'
+url: 'https://www.gesis.org/'
+abstract: >-
+  A Django-based backend for web tracking research services,
+  designed to collect and manage browsing behavior data for
+  social science research. Built with Django REST Framework,
+  it provides a robust API for browser extension integration.
+keywords:
+  - web-tracking
+  - research-software
+  - django
+  - social-science
+  - browsing-behavior
+  - data-collection
+  - browser-extension
+license: MIT
+version: 2.0.0 
+date-released: '2026-15-01'  
+# doi: '10.1016/j.softx.2025.xxxxxx' 
+# identifiers:
+#   - type: doi
+#     value: '10.1016/j.softx.2025.xxxxxx'
+#     description: SoftwareX journal article
+#   - type: doi
+#     value: '10.5281/zenodo.xxxxxxx'
+#     description: Zenodo code archive
+# preferred-citation:
+#   type: article
+#   authors:
+#     - given-names: Mario
+#       family-names: Ramirez
+#       orcid: 'https://orcid.org/0000-0000-0000-0000'
+#   title: 'GESIS Surf Backend: A Django-based Platform for Web Tracking Research'
+#   journal: SoftwareX
+#   year: 2025
+#   volume: XX
+#   issue: X
+#   doi: '10.1016/j.softx.2025.xxxxxx'
+institution:
+  name: GESIS - Leibniz Institute for the Social Sciences
+  address: Unter Sachsenhausen 6-8
+  city: Cologne
+  country: DE
+  post-code: '50667'
