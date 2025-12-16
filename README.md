@@ -13,12 +13,12 @@
 [![Docker](https://img.shields.io/badge/docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
 
-[Features](#features) •
-[Installation](#installation) •
-[Usage](#usage) •
-[API Documentation](#api-documentation) •
-[Contributing](#contributing) •
-[License](#license)
+[Features](#-features) •
+[Installation](#-installation) •
+[Usage](#-usage) •
+[API Documentation](#-api-documentation) •
+[Contributing](#-contributing) •
+[License](#-license)
 
 </div>
 
