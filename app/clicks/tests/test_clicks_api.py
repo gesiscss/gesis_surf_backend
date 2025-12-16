@@ -3,7 +3,7 @@ Tests for the clicks API
 """
 
 from core.models import Click
-from core.tests.helpers import create_click, create_user, detail_url
+from core.tests.helpers import create_click, create_user
 from django.contrib.auth.models import AbstractUser
 from django.db.models import QuerySet
 from django.urls import reverse
@@ -12,7 +12,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 
-CLICK_URL: str = reverse("click:click-list")
+CLICK_URL: str = reverse("clicks:click-list")
 
 
 class PublicClickApiTests(APITestCase):
@@ -82,7 +82,7 @@ class PrivateClickApiTests(APITestCase):
         Test updating a click
         """
         click: Click = create_click(user=self.user)
-        url: str = detail_url("click", click.id)
+        url = reverse("clicks:click-detail", args=[click.id])
 
         payload: dict = {"click_target_element": "a", "click_target_tag": "a"}
 
@@ -96,7 +96,7 @@ class PrivateClickApiTests(APITestCase):
         Test deleting a click
         """
         click: Click = create_click(user=self.user)
-        url: str = detail_url("click", click.id)
+        url = reverse("clicks:click-detail", args=[click.id])
         self.client.delete(url)
 
         clicks: QuerySet[Click] = Click.objects.all()

@@ -44,11 +44,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     # Third party apps
+    "django_extensions",
     "simple_history",
-    "core",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
+    # Local apps
+    "core",
     "user",
     "wave",
     "window",
@@ -105,7 +107,6 @@ DATABASES = {
         "PASSWORD": os.environ.get("DB_PASSWORD"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -193,6 +194,16 @@ LOGGING = {
             "handlers": ["logstash", "console"],
             "level": "INFO",
             "propagate": True,
+        },
+        "core.signals": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "core.tasks": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
         },
         "app.core": {
             "handlers": ["logstash", "console"],

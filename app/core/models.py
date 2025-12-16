@@ -346,7 +346,7 @@ class Domain(models.Model):
     domain_title = models.CharField(blank=False)
     snapshot_html = models.TextField(blank=True)
     domain_last_accessed = models.CharField(blank=False)
-    domain_fav_icon = models.CharField(blank=False)
+    domain_fav_icon = models.CharField(blank=True)
     domain_session_id: models.CharField = models.CharField(blank=True)
     start_time = models.DateTimeField(blank=True, default=timezone.now)
     closing_time = models.DateTimeField(blank=True, default=timezone.now)
@@ -443,6 +443,7 @@ class Scroll(models.Model):
     scroll_y = models.FloatField(blank=False)
     page_x_offset = models.FloatField(blank=False)
     page_y_offset = models.FloatField(blank=False)
+    scroll_metrics = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     domain = models.ForeignKey(
         Domain,

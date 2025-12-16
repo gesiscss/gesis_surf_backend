@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    """_summary_
+    """Drop all hosts from the database
 
     Args:
         BaseCommand (_type_): _description_

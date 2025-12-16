@@ -27,6 +27,7 @@ elasticsearch = "^8.17.0"
 elasticsearch-dsl = "^8.17.0"
 django-cors-headers = "^4.9.0"
 celery-stubs = "^0.1.3"
+django-extensions = "^4.1"
 
 
 [tool.poetry.group.dev.dependencies]

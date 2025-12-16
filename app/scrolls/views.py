@@ -37,9 +37,3 @@ class ScrollViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(domain__id=domain_id)
 
         return queryset.order_by("-scroll_time")
-
-    def perform_create(self, serializer):
-        """
-        Create a new scroll that belongs to the authenticated user.
-        """
-        serializer.save(user=self.request.user)
