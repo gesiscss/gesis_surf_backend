@@ -1,6 +1,6 @@
 <div align="center">
 <table><tr><td bgcolor="white" style="padding: 20px;">
-  <img src="https://www.gesis.org/_assets/bcde6f0ba1afa2bc3a2a4125374d424a/webpack/dist/img/logo_gesis_en.svg" alt="GESIS" height="60">
+<img src="images/gesis_logo.svg" alt="GESIS" height="60">
 </td></tr></table>
 
 # GESIS Surf Backend
