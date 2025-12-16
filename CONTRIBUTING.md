@@ -46,15 +46,15 @@ We follow a **Git Flow** inspired workflow with continuous integration:
 
 ### Branch Hierarchy
 
-| Branch | Purpose | Deployed To | Merge Access |
-|--------|---------|-------------|--------------|
-| `prod` | Production-ready code | Production server | Admin only |
-| `main` | Staging/Testing | Staging server | Maintainers |
-| `dev` | Development integration | Development server | Contributors |
-| `feature/*` | New features | Local/PR preview | - |
-| `bugfix/*` | Non-critical bug fixes | Local/PR preview | - |
-| `hotfix/*` | Critical production fixes | Direct to prod | Admin only |
-| `refactor/*` | Code improvements | Local/PR preview | - |
+| Branch       | Purpose                   | Deployed To        | Merge Access |
+| ------------ | ------------------------- | ------------------ | ------------ |
+| `prod`       | Production-ready code     | Production server  | Admin only   |
+| `main`       | Staging/Testing           | Staging server     | Maintainers  |
+| `dev`        | Development integration   | Development server | Contributors |
+| `feature/*`  | New features              | Local/PR preview   | -            |
+| `bugfix/*`   | Non-critical bug fixes    | Local/PR preview   | -            |
+| `hotfix/*`   | Critical production fixes | Direct to prod     | Admin only   |
+| `refactor/*` | Code improvements         | Local/PR preview   | -            |
 
 ---
 
@@ -75,14 +75,14 @@ git checkout -b feature/your-feature-name
 
 Use the following prefixes:
 
-| Prefix | Use Case | Example |
-|--------|----------|---------|
-| `feature/` | New functionality | `feature/add-user-analytics` |
-| `bugfix/` | Bug fixes | `bugfix/fix-scroll-tracking` |
-| `hotfix/` | Urgent production fixes | `hotfix/security-patch` |
-| `refactor/` | Code refactoring | `refactor/optimize-queries` |
-| `docs/` | Documentation updates | `docs/update-api-guide` |
-| `test/` | Test additions | `test/add-click-tests` |
+| Prefix      | Use Case                | Example                      |
+| ----------- | ----------------------- | ---------------------------- |
+| `feature/`  | New functionality       | `feature/add-user-analytics` |
+| `bugfix/`   | Bug fixes               | `bugfix/fix-scroll-tracking` |
+| `hotfix/`   | Urgent production fixes | `hotfix/security-patch`      |
+| `refactor/` | Code refactoring        | `refactor/optimize-queries`  |
+| `docs/`     | Documentation updates   | `docs/update-api-guide`      |
+| `test/`     | Test additions          | `test/add-click-tests`       |
 
 ### Workflow Steps
 
@@ -122,18 +122,18 @@ We use **[Commitizen](https://commitizen-tools.github.io/commitizen/)** with **C
 
 ### Commit Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `feat` | New feature | `feat(auth): add token refresh endpoint` |
-| `fix` | Bug fix | `fix(clicks): resolve duplicate tracking issue` |
-| `docs` | Documentation | `docs(readme): update installation steps` |
-| `style` | Code style (formatting) | `style(models): apply black formatting` |
-| `refactor` | Code refactoring | `refactor(views): simplify query logic` |
-| `perf` | Performance improvement | `perf(elasticsearch): optimize bulk indexing` |
-| `test` | Adding/updating tests | `test(domain): add serializer tests` |
-| `build` | Build system changes | `build(docker): update base image` |
-| `ci` | CI/CD changes | `ci(github): add test workflow` |
-| `chore` | Maintenance tasks | `chore(deps): update dependencies` |
+| Type       | Description             | Example                                         |
+| ---------- | ----------------------- | ----------------------------------------------- |
+| `feat`     | New feature             | `feat(auth): add token refresh endpoint`        |
+| `fix`      | Bug fix                 | `fix(clicks): resolve duplicate tracking issue` |
+| `docs`     | Documentation           | `docs(readme): update installation steps`       |
+| `style`    | Code style (formatting) | `style(models): apply black formatting`         |
+| `refactor` | Code refactoring        | `refactor(views): simplify query logic`         |
+| `perf`     | Performance improvement | `perf(elasticsearch): optimize bulk indexing`   |
+| `test`     | Adding/updating tests   | `test(domain): add serializer tests`            |
+| `build`    | Build system changes    | `build(docker): update base image`              |
+| `ci`       | CI/CD changes           | `ci(github): add test workflow`                 |
+| `chore`    | Maintenance tasks       | `chore(deps): update dependencies`              |
 
 ### Using Commitizen
 
@@ -225,33 +225,33 @@ Our `.pre-commit-config.yaml` includes the following hooks:
 
 #### 🔒 Pre-commit Stage (runs on every commit)
 
-| Hook | Purpose |
-|------|---------|
-| **check-added-large-files** | Prevents large files from being committed |
-| **check-merge-conflict** | Detects unresolved merge conflicts |
-| **check-toml** | Validates TOML file syntax |
-| **check-yaml** | Validates YAML file syntax |
-| **trailing-whitespace** | Removes trailing whitespace |
-| **end-of-file-fixer** | Ensures files end with a newline |
-| **black** | Python code formatting (PEP 8) |
-| **isort** | Sorts and organizes imports |
-| **autoflake** | Removes unused imports |
-| **flake8** | Linting with plugins (bugbear, bandit, docstrings, etc.) |
-| **mypy** | Static type checking |
-| **pylint** | Code analysis with Django plugin |
-| **pyupgrade** | Upgrades syntax to Python 3.10+ |
-| **prettier** | Formats JS, CSS, Markdown, JSON, YAML |
-| **eslint** | JavaScript linting |
-| **django-upgrade** | Upgrades Django code to 4.2+ syntax |
-| **djhtml** | Formats Django HTML templates |
-| **curlylint** | Lints HTML/Jinja templates |
-| **blacken-docs** | Formats Python code in documentation |
-| **commitizen** | Validates commit message format |
+| Hook                        | Purpose                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| **check-added-large-files** | Prevents large files from being committed                |
+| **check-merge-conflict**    | Detects unresolved merge conflicts                       |
+| **check-toml**              | Validates TOML file syntax                               |
+| **check-yaml**              | Validates YAML file syntax                               |
+| **trailing-whitespace**     | Removes trailing whitespace                              |
+| **end-of-file-fixer**       | Ensures files end with a newline                         |
+| **black**                   | Python code formatting (PEP 8)                           |
+| **isort**                   | Sorts and organizes imports                              |
+| **autoflake**               | Removes unused imports                                   |
+| **flake8**                  | Linting with plugins (bugbear, bandit, docstrings, etc.) |
+| **mypy**                    | Static type checking                                     |
+| **pylint**                  | Code analysis with Django plugin                         |
+| **pyupgrade**               | Upgrades syntax to Python 3.10+                          |
+| **prettier**                | Formats JS, CSS, Markdown, JSON, YAML                    |
+| **eslint**                  | JavaScript linting                                       |
+| **django-upgrade**          | Upgrades Django code to 4.2+ syntax                      |
+| **djhtml**                  | Formats Django HTML templates                            |
+| **curlylint**               | Lints HTML/Jinja templates                               |
+| **blacken-docs**            | Formats Python code in documentation                     |
+| **commitizen**              | Validates commit message format                          |
 
 #### 🚀 Pre-push Stage
 
-| Hook | Purpose |
-|------|---------|
+| Hook                  | Purpose                         |
+| --------------------- | ------------------------------- |
 | **commitizen-branch** | Validates branch commit history |
 
 ### Installing Pre-commit Hooks
@@ -285,14 +285,14 @@ Our Flake8 configuration includes these plugins for comprehensive linting:
 
 All tools are configured in `pyproject.toml` and `.pre-commit-config.yaml`:
 
-| Tool | Purpose | Command |
-|------|---------|---------|
-| **Black** | Code formatting | `black app/` |
-| **isort** | Import sorting | `isort app/` |
-| **Flake8** | Linting | `flake8 app/` |
-| **MyPy** | Type checking | `mypy app/` |
-| **Pylint** | Code analysis | `pylint app/` |
-| **Pytest** | Testing | `pytest` |
+| Tool       | Purpose         | Command       |
+| ---------- | --------------- | ------------- |
+| **Black**  | Code formatting | `black app/`  |
+| **isort**  | Import sorting  | `isort app/`  |
+| **Flake8** | Linting         | `flake8 app/` |
+| **MyPy**   | Type checking   | `mypy app/`   |
+| **Pylint** | Code analysis   | `pylint app/` |
+| **Pytest** | Testing         | `pytest`      |
 
 ### Running All Checks Manually
 

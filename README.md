@@ -68,23 +68,27 @@ GESIS Surf Backend is the server-side component of the GESIS Web Tracking projec
 ### Using Docker (Recommended)
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/geomario/gesis_surf_backend.git
    cd gesis_surf_backend
    ```
 
 2. **Create environment file**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 3. **Build and start services**
+
    ```bash
    docker-compose up -d --build
    ```
 
 4. **Run migrations**
+
    ```bash
    docker-compose run --rm app sh -c "python manage.py migrate"
    ```
@@ -97,22 +101,26 @@ GESIS Surf Backend is the server-side component of the GESIS Web Tracking projec
 ### Local Development
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/geomario/gesis_surf_backend.git
    cd gesis_surf_backend
    ```
 
 2. **Install Poetry** (if not already installed)
+
    ```bash
    curl -sSL https://install.python-poetry.org | python3 -
    ```
 
 3. **Install dependencies**
+
    ```bash
    poetry install
    ```
 
 4. **Activate virtual environment**
+
    ```bash
    poetry shell
    ```
@@ -125,15 +133,15 @@ GESIS Surf Backend is the server-side component of the GESIS Web Tracking projec
 
 ### Useful Poetry Commands
 
-| Command | Description |
-|---------|-------------|
-| `poetry install` | Install all dependencies |
-| `poetry install --with dev` | Install with dev dependencies |
-| `poetry add <package>` | Add a new dependency |
-| `poetry add --group dev <package>` | Add a dev dependency |
-| `poetry update` | Update all dependencies |
-| `poetry shell` | Activate virtual environment |
-| `poetry run <command>` | Run command in virtual environment |
+| Command                            | Description                        |
+| ---------------------------------- | ---------------------------------- |
+| `poetry install`                   | Install all dependencies           |
+| `poetry install --with dev`        | Install with dev dependencies      |
+| `poetry add <package>`             | Add a new dependency               |
+| `poetry add --group dev <package>` | Add a dev dependency               |
+| `poetry update`                    | Update all dependencies            |
+| `poetry shell`                     | Activate virtual environment       |
+| `poetry run <command>`             | Run command in virtual environment |
 
 ## 💻 Usage
 
@@ -152,24 +160,24 @@ docker-compose down
 
 ### Common Commands
 
-| Command | Description |
-|---------|-------------|
-| `docker-compose run --rm app sh -c "python manage.py test"` | Run all tests |
-| `docker-compose run --rm app sh -c "python manage.py test APP_NAME"` | Run specific app tests |
-| `docker-compose run --rm app sh -c "python manage.py makemigrations"` | Create migrations |
-| `docker-compose run --rm app sh -c "python manage.py migrate"` | Apply migrations |
-| `docker-compose run --rm app sh -c "flake8"` | Run linting |
+| Command                                                               | Description            |
+| --------------------------------------------------------------------- | ---------------------- |
+| `docker-compose run --rm app sh -c "python manage.py test"`           | Run all tests          |
+| `docker-compose run --rm app sh -c "python manage.py test APP_NAME"`  | Run specific app tests |
+| `docker-compose run --rm app sh -c "python manage.py makemigrations"` | Create migrations      |
+| `docker-compose run --rm app sh -c "python manage.py migrate"`        | Apply migrations       |
+| `docker-compose run --rm app sh -c "flake8"`                          | Run linting            |
 
 ### Access Points
 
-| Service | URL |
-|---------|-----|
-| API | http://localhost:8000/api/ |
-| Admin | http://localhost:8000/admin/ |
-| API Docs | http://localhost:8000/api/docs/ |
-| Flower (Celery) | http://localhost:5555/ |
-| Kibana | http://localhost:5601/ |
-| PgAdmin | http://localhost:5050/ |
+| Service         | URL                             |
+| --------------- | ------------------------------- |
+| API             | http://localhost:8000/api/      |
+| Admin           | http://localhost:8000/admin/    |
+| API Docs        | http://localhost:8000/api/docs/ |
+| Flower (Celery) | http://localhost:5555/          |
+| Kibana          | http://localhost:5601/          |
+| PgAdmin         | http://localhost:5050/          |
 
 ## 📚 API Documentation
 
@@ -180,15 +188,15 @@ Interactive API documentation is available via **drf-spectacular**:
 
 ### Key Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/user/` | POST | User registration |
-| `/api/user/token/` | POST | Obtain auth token |
-| `/api/window/` | GET, POST | Window management |
-| `/api/tab/` | GET, POST | Tab tracking |
-| `/api/domain/` | GET | Domain information |
-| `/api/clicks/` | POST | Click events |
-| `/api/scrolls/` | POST | Scroll events |
+| Endpoint           | Method    | Description        |
+| ------------------ | --------- | ------------------ |
+| `/api/user/`       | POST      | User registration  |
+| `/api/user/token/` | POST      | Obtain auth token  |
+| `/api/window/`     | GET, POST | Window management  |
+| `/api/tab/`        | GET, POST | Tab tracking       |
+| `/api/domain/`     | GET       | Domain information |
+| `/api/clicks/`     | POST      | Click events       |
+| `/api/scrolls/`    | POST      | Scroll events      |
 
 ## 🗃️ Database Design
 
@@ -198,14 +206,14 @@ Interactive API documentation is available via **drf-spectacular**:
 
 ### Key Relationships
 
-| Relationship | Type | Description |
-|--------------|------|-------------|
-| User ↔ Wave | Many-to-Many | Users participate in research waves |
-| User → Window | One-to-Many | Users have multiple browser windows |
-| Window → Tab | One-to-Many | Windows contain multiple tabs |
-| Tab → Domain | Many-to-One | Tabs belong to domains |
-| Tab → Click | One-to-Many | Tabs record click events |
-| Tab → Scroll | One-to-Many | Tabs record scroll events |
+| Relationship  | Type         | Description                         |
+| ------------- | ------------ | ----------------------------------- |
+| User ↔ Wave   | Many-to-Many | Users participate in research waves |
+| User → Window | One-to-Many  | Users have multiple browser windows |
+| Window → Tab  | One-to-Many  | Windows contain multiple tabs       |
+| Tab → Domain  | Many-to-One  | Tabs belong to domains              |
+| Tab → Click   | One-to-Many  | Tabs record click events            |
+| Tab → Scroll  | One-to-Many  | Tabs record scroll events           |
 
 ## 🧪 Testing
 
@@ -274,8 +282,8 @@ See [CITATION.cff](CITATION.cff) for more citation formats.
 
 ## 👥 Authors
 
-- **Mario Ramirez** - *Lead Research Software Engineer* - [@geomario](https://github.com/geomario) [@MarioGesis](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
-- **Fernando Guzman** -*Software Architect Consultant* - [@Fernando](https://www.linkedin.com/in/fernando-guzman-9262801b/)
+- **Mario Ramirez** - _Lead Research Software Engineer_ - [@geomario](https://github.com/geomario) [@MarioGesis](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
+- **Fernando Guzman** -_Software Architect Consultant_ - [@Fernando](https://www.linkedin.com/in/fernando-guzman-9262801b/)
 
 ## 🙏 Acknowledgments
 

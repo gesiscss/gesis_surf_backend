@@ -26,9 +26,9 @@ keywords:
   - data-collection
   - browser-extension
 license: MIT
-version: 2.0.0 
-date-released: '2026-15-01'  
-# doi: '10.1016/j.softx.2025.xxxxxx' 
+version: 2.0.0
+date-released: '2026-15-01'
+# doi: '10.1016/j.softx.2025.xxxxxx'
 # identifiers:
 #   - type: doi
 #     value: '10.1016/j.softx.2025.xxxxxx'
