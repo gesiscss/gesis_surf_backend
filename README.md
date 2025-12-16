@@ -222,28 +222,32 @@ docker-compose run --rm app sh -c "python manage.py test core.tests.test_models"
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+We welcome contributions! Please see our **[Contributing Guide](CONTRIBUTING.md)** for detailed information on:
+
+- 🌿 **Branching Strategy** - `dev` → `main` → `prod` workflow
+- 📝 **Commit Conventions** - Using Commitizen with Conventional Commits
+- 🔍 **Code Quality** - Pre-commit hooks, linting, and formatting
+- 🔀 **Pull Request Process** - Guidelines and review workflow
+
+### Quick Start
 
 1. **Fork the repository**
-2. **Create a feature branch**
+2. **Create a feature branch** from `dev`
    ```bash
+   git checkout dev && git pull origin dev
    git checkout -b feature/amazing-feature
    ```
-3. **Commit your changes**
+3. **Install pre-commit hooks**
    ```bash
-   git commit -m 'Add amazing feature'
+   poetry install
+   poetry run pre-commit install
    ```
-4. **Push to the branch**
+4. **Commit using Commitizen**
    ```bash
-   git push origin feature/amazing-feature
+   git add .
+   poetry run cz commit
    ```
-5. **Open a Pull Request**
-
-### Code Style
-
-- Follow [PEP 8](https://pep8.org/) guidelines
-- Use [Black](https://black.readthedocs.io/) for formatting
-- Run `flake8` before committing
+5. **Push and open a Pull Request** targeting `dev`
 
 ## 📄 License
 
@@ -252,7 +256,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👥 Authors
 
 - **Mario Ramirez** - *Lead Research Software Engineer* - [@geomario](https://github.com/geomario) [@MarioGesis](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
-- **Fernando Guzman** -Software Architect Consultant - [@Fernando](https://www.linkedin.com/in/fernando-guzman-9262801b/)
+- **Fernando Guzman** -*Software Architect Consultant* - [@Fernando](https://www.linkedin.com/in/fernando-guzman-9262801b/)
 
 ## 🙏 Acknowledgments
 
