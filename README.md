@@ -5,7 +5,7 @@
 
 # GESIS Surf Backend
 
-**A Django-based backend for web tracking research services**
+**A Django-based backend for GESIS Surf research services**
 
 [![Python](https://img.shields.io/badge/python-3.10+-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-4.2-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
@@ -26,7 +26,9 @@
 
 ## 📖 Overview
 
-GESIS Surf Backend is the server-side component of the GESIS Web Tracking project, designed to collect and manage browsing behavior data for social science research. Built with Django REST Framework, it provides a robust API for browser extension integration.
+GESIS Surf Backend is the server-side component of the GESIS Surf project, designed to collect and manage browsing behavior data for social science research. Built with Django REST Framework, it provides a robust API for browser extension integration.
+
+> 🔗 **Looking for the browser extension?** Check out [GESIS Surf Extension](https://github.com/gesiscss/gesis_surf_extension)
 
 ## ✨ Features
 
@@ -283,7 +285,9 @@ See [CITATION.cff](CITATION.cff) for more citation formats.
 ## 👥 Authors
 
 - **Mario Ramirez** - _Lead Research Software Engineer_ - [@geomario](https://github.com/geomario) [@MarioGesis](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
-- **Fernando Guzman** -_Software Architect Consultant_ - [@Fernando](https://www.linkedin.com/in/fernando-guzman-9262801b/)
+- **Fernando Guzman** - _Software Architect Consultant_ - [@Fernando](https://www.linkedin.com/in/fernando-guzman-9262801b/)
+- **Prof. Dr. Sebastian Stier** - _Department Director CSS_ [@Seb](https://www.gesis.org/en/institute/about-us/staff/person/sebastian.stier)
+- **Dr. Frank Mangold** - _Kommissarischer Teamleiter DDD_ [@Frank](https://www.gesis.org/institut/ueber-uns/mitarbeitendenverzeichnis/person/Frank.Mangold)
 
 ## 🙏 Acknowledgments
 

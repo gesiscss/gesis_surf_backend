@@ -10,6 +10,17 @@ authors:
     email: mario.ramirez@gesis.org
     affiliation: GESIS - Leibniz Institute for the Social Sciences
     orcid: 'https://orcid.org/0009-0005-0960-4745'
+  - given-names: Fernando
+    family-names: Guzman
+    affiliation: Software Architect Consultant
+  - given-names: Sebastian
+    family-names: Stier
+    affiliation: GESIS - Leibniz Institute for the Social Sciences
+    orcid: 'https://orcid.org/0000-0000-0000-0000'  # TODO: Add Sebastian's ORCID
+  - given-names: Frank
+    family-names: Mangold
+    affiliation: GESIS - Leibniz Institute for the Social Sciences
+    orcid: 'https://orcid.org/0000-0000-0000-0000'  # TODO: Add Frank's ORCID
 repository-code: 'https://github.com/geomario/gesis_surf_backend'
 url: 'https://www.gesis.org/'
 abstract: >-
