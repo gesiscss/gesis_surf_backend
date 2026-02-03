@@ -628,14 +628,14 @@ files = [
 
 [[package]]
 name = "django"
-version = "4.2.7"
+version = "4.2.28"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.8"
 groups = ["main", "dev"]
 files = [
-    {file = "Django-4.2.7-py3-none-any.whl", hash = "sha256:e1d37c51ad26186de355cbcec16613ebdabfa9689bbade9c538835205a8abbe9"},
-    {file = "Django-4.2.7.tar.gz", hash = "sha256:8e0f1c2c2786b5c0e39fe1afce24c926040fad47c8ea8ad30aaf1188df29fc41"},
+    {file = "django-4.2.28-py3-none-any.whl", hash = "sha256:49a23c1b83ef31525f8d71a57b040f91d34660edb3f086280a8519855655ed3c"},
+    {file = "django-4.2.28.tar.gz", hash = "sha256:a4b9cd881991add394cafa8bb3b11ad1742d1e1470ba99c3ef53dc540316ccfe"},
 ]
 
 [package.dependencies]
@@ -2164,4 +2164,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "9d506404ef98c29b7597886ed9b2121ca7586975f649bca55b1f49139661533d"
+content-hash = "462f5077b4d91c0fcb359d49f7b32db24ab3ce38655808743782d6d02ded5e5e"
