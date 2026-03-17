@@ -1,5 +1,5 @@
 """
-App configuration for the addons app.
+App configuration for the wavelets app.
 """
 
 from datetime import datetime
@@ -12,15 +12,15 @@ from django.dispatch import receiver
 from elasticsearch_dsl import connections
 
 
-class AddonsConfig(AppConfig):
-    """_description_
+class WaveletsConfig(AppConfig):
+    """Configuration for the Wavelets app.
 
     Args:
         AppConfig (_type_): _description_
     """
 
     default_auto_field = "django.db.models.BigAutoField"
-    name = "addons"
+    name = "wavelets"
 
     def ready(self) -> None:
         """

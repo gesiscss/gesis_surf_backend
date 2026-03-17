@@ -2,7 +2,7 @@
 URLs for the Twitter app.
 """
 
-from addons.twitter import views
+from wavelets.twitter import views
 from django.urls import path
 
 app_name = "twitter"  # pylint: disable=invalid-name

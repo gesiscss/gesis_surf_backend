@@ -2,7 +2,7 @@
 Views for the ChatGPT addon.
 """
 
-from addons.chatgpt import serializers
+from wavelets.chatgpt import serializers
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated

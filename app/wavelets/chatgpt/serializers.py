@@ -1,5 +1,5 @@
 """
-Serializers for the Addons APIs.
+Serializers for the Wavelets APIs.
 """
 
 from core.indexes.chatgpt_index import ChatGPTIndex
@@ -12,10 +12,14 @@ class ChatGPTDataSerializer(serializers.Serializer):
     Serializer for the ChatGPT data object.
     """
 
-    user_id: serializers.CharField = serializers.CharField()
     conversation_id: serializers.CharField = serializers.CharField()
     conversation: serializers.CharField = serializers.CharField()
     timestamp: serializers.DateTimeField = serializers.DateTimeField()
+    domain_id: serializers.CharField = serializers.CharField()
+    message_id: serializers.CharField = serializers.CharField()
+    message_type: serializers.CharField = serializers.CharField()
+    turn_index: serializers.IntegerField = serializers.IntegerField()
+    llm_provider: serializers.CharField = serializers.CharField()
 
     def create(self, validated_data: dict) -> object:
         """

@@ -35,6 +35,6 @@ urlpatterns = [
     path("api/globalsession/", include("globalsession.urls")),
     path("api/clicks/", include("clicks.urls")),
     path("api/scrolls/", include("scrolls.urls")),
-    path("api/twitter/", include("addons.twitter.urls")),
-    path("api/chatgpt/", include("addons.chatgpt.urls")),
+    path("api/twitter/", include("wavelets.twitter.urls")),
+    path("api/chatgpt/", include("wavelets.chatgpt.urls")),
 ]
