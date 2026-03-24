@@ -2,8 +2,8 @@
 URLs for the chatgpt addon.
 """
 
-from wavelets.chatgpt import views
 from django.urls import path
+from wavelets.chatgpt import views
 
 app_name = "chatgpt"  # pylint: disable=invalid-name
 

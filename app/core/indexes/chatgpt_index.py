@@ -2,7 +2,7 @@
 Index that works with ChatGPT models
 """
 
-from elasticsearch_dsl import Date, Keyword, Text, Integer
+from elasticsearch_dsl import Date, Integer, Keyword, Text
 
 from .base_index import BaseIndex
 
