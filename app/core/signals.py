@@ -8,12 +8,16 @@ from celery.exceptions import OperationalError
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from .models import Host
-from .tasks import update_extension_versions_task
+from .models import Host, SelectorConfig
+from .tasks import (
+    update_extension_versions_task,
+    update_selector_versions_task,
+)
 
 logger = logging.getLogger(__name__)
 
-_host_old_versions = {}
+_host_old_versions: dict[int, str | None] = {}
+_selector_old_versions: dict[int, str | None] = {}
 
 
 @receiver(pre_save, sender=Host)
@@ -104,6 +108,100 @@ def update_extension_versions(sender, instance, created, update_fields, **kwargs
     except ValueError as exception:
         logger.error(
             "Celery value error scheduling failed for host %s: %s",
+            instance.pk,
+            str(exception),
+        )
+
+
+@receiver(pre_save, sender=SelectorConfig)
+def capture_old_selector_version(
+    sender, instance, **kwargs
+):  # pylint: disable=unused-argument
+    """
+    Signal to capture the old version of the SelectorConfig before it is saved.
+
+    Args:
+        sender (_type_): The model class
+        instance (_type_): The instance being saved
+    """
+    if instance.pk:
+        try:
+            # pylint: disable=no-member
+            old_instance = SelectorConfig.objects.get(pk=instance.pk)
+            _selector_old_versions[instance.pk] = old_instance.version
+            logger.info(
+                "Captured old version for SelectorConfig %s (%s): %s",
+                instance.pk,
+                instance.provider,
+                old_instance.version,
+            )
+        except SelectorConfig.DoesNotExist:
+            logger.warning(
+                "SelectorConfig with pk %s does not exist. Cannot capture old version.",
+                instance.pk,
+            )
+            _selector_old_versions[instance.pk] = None
+
+
+# pylint: disable=unused-argument
+@receiver(post_save, sender=SelectorConfig)
+def update_extension_selector_versions(
+    sender, instance, created, update_fields, **kwargs
+):
+    """
+    Signal to update extension selector_version when a SelectorConfig is created or updated.
+    Deferred 3 hours via Celery, matching the host version propagation pattern.
+
+    Args:
+        sender (_type_): The model class
+        instance (_type_): The instance being created or updated
+        created (_type_): Whether the instance was created or updated
+        update_fields (_type_): The fields that were updated
+    """
+    old_version = _selector_old_versions.pop(instance.pk, None) if instance.pk else None
+
+    if not created and update_fields and "version" not in update_fields:
+        logger.info(
+            "Skipping update_selector_versions_task for SelectorConfig %s", instance.pk
+        )
+        return
+
+    action = "created" if created else "updated"
+    logger.info(
+        "SelectorConfig %s (%s) %s - version: %s (old: %s)",
+        instance.pk,
+        instance.provider,
+        action,
+        instance.version,
+        old_version or "N/A",
+    )
+
+    try:
+        task = update_selector_versions_task.apply_async(  # type: ignore
+            args=(instance.pk, created, old_version),
+            countdown=10800,
+            description=f"Update selector versions for SelectorConfig {instance.pk}",
+        )
+        logger.info(
+            "Scheduled update_selector_versions_task for SelectorConfig %s in 3 hours. Task ID: %s",
+            instance.pk,
+            task.id,
+        )
+    except OperationalError as exception:
+        logger.error(
+            "Celery broker scheduling failed for SelectorConfig %s: %s",
+            instance.pk,
+            str(exception),
+        )
+    except RuntimeError as exception:
+        logger.error(
+            "Celery runtime error for SelectorConfig %s: %s",
+            instance.pk,
+            str(exception),
+        )
+    except ValueError as exception:
+        logger.error(
+            "Celery value error for SelectorConfig %s: %s",
             instance.pk,
             str(exception),
         )
