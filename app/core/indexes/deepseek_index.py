@@ -1,5 +1,5 @@
 """
-Index that works with ChatGPT models
+Index that works with DeepSeek models
 """
 
 from elasticsearch_dsl import Date, Integer, Keyword, Text
@@ -7,12 +7,8 @@ from elasticsearch_dsl import Date, Integer, Keyword, Text
 from .base_index import BaseIndex
 
 
-class ChatGPTIndex(BaseIndex):
-    """Index that works with ChatGPT models
-
-    Args:
-        BaseIndex (_type_): _description_
-    """
+class DeepSeekIndex(BaseIndex):
+    """Index that works with DeepSeek models"""
 
     chat_session_id = Keyword()
     message_content = Text()
@@ -26,6 +22,6 @@ class ChatGPTIndex(BaseIndex):
     url = Keyword()
 
     class Index:
-        """Default settings for all indexes"""
+        """Elasticsearch index configuration for DeepSeek data."""
 
-        name = "chatgpt_index"
+        name = "deepseek_index"

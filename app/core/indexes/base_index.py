@@ -2,7 +2,7 @@
 Base index for all indexes
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from elasticsearch_dsl import Date, Document
 
@@ -31,7 +31,7 @@ class BaseIndex(Document):
         """
 
         if date_obj is None:
-            date_obj = datetime.now()
+            date_obj = datetime.now(timezone.utc)
 
         # pylint: disable=protected-access
         base_name = cls._index._name
@@ -77,6 +77,11 @@ class BaseIndex(Document):
         """
         Override save to set timestamps.
         """
+        now = datetime.now(timezone.utc)
+
+        if not self.created_at:
+            self.created_at = now  # type: ignore[assignment]
+        self.updated_at = now  # type: ignore[assignment]
 
         if index is None:
             index = self.get_current_index()

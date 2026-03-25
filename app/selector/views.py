@@ -12,7 +12,7 @@ from selector import serializers
 from selector.tasks import get_selectors_async
 
 
-class SelectorViewSet(viewsets.ModelViewSet):
+class SelectorViewSet(viewsets.GenericViewSet):
     """
     Manage selectors in the database.
     """

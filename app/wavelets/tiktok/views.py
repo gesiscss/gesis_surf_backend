@@ -1,5 +1,5 @@
 """
-Views for the ChatGPT addon.
+Views for the TikTok wavelets API.
 """
 
 from rest_framework import status
@@ -7,25 +7,21 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from wavelets.chatgpt import serializers
+from wavelets.tiktok import serializers
 
 
-class ChatGPTDataView(APIView):
+class TikTokDataView(APIView):
     """
-    API view for ChatGPT data.
+    API view for TikTok wavelet data.
     """
 
-    authentication_classes = [
-        TokenAuthentication,
-    ]
-    permission_classes = [
-        IsAuthenticated,
-    ]
-    serializer_class = serializers.ChatGPTDataSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.TikTokDataSerializer
 
     def post(self, request) -> Response:
         """
-        Create a new ChatGPT data object.
+        Create a new TikTok data document in the signal-specific ES index.
         """
         serializer = self.serializer_class(data=request.data)
 

@@ -5,7 +5,13 @@ App configuration for the wavelets app.
 from datetime import datetime
 
 from core.indexes.chatgpt_index import ChatGPTIndex
+from core.indexes.claude_index import ClaudeIndex
+from core.indexes.deepseek_index import DeepSeekIndex
+from core.indexes.gemini_index import GeminiIndex
+from core.indexes.tiktok_feed_index import TikTokFeedIndex
+from core.indexes.tiktok_played_index import TikTokPlayedIndex
 from core.indexes.twitter_index import TwitterIndex
+from core.indexes.youtube_shorts_index import YouTubeShortsIndex
 from django.apps import AppConfig
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -51,7 +57,13 @@ class WaveletsConfig(AppConfig):
 
             index_classes = [
                 ChatGPTIndex,
+                ClaudeIndex,
+                DeepSeekIndex,
+                GeminiIndex,
                 TwitterIndex,
+                TikTokFeedIndex,
+                TikTokPlayedIndex,
+                YouTubeShortsIndex,
             ]
 
             current_date = datetime.now()

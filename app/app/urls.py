@@ -36,6 +36,8 @@ urlpatterns = [
     path("api/clicks/", include("clicks.urls")),
     path("api/scrolls/", include("scrolls.urls")),
     path("api/selectors/", include("selector.urls")),
-    path("api/twitter/", include("wavelets.twitter.urls")),
-    path("api/chatgpt/", include("wavelets.chatgpt.urls")),
+    path("api/x/", include("wavelets.twitter.urls")),
+    path("api/llm/", include("wavelets.llm.urls")),
+    path("api/tiktok/", include("wavelets.tiktok.urls")),
+    path("api/youtube-shorts/", include("wavelets.youtube.urls")),
 ]
