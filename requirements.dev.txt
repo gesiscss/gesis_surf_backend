@@ -286,7 +286,7 @@ djangorestframework==3.14.0 ; python_version >= "3.10" and python_version < "4.0
 drf-spectacular==0.27.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:0a4cada4b7136a0bf17233476c066c511a048bc6a485ae2140326ac7ba4003b2 \
     --hash=sha256:452e0cff3c12ee057b897508a077562967b9e62717992eeec10e62dbbc7b5a33
-exceptiongroup==1.2.0 ; python_version >= "3.10" and python_version < "3.11" \
+exceptiongroup==1.2.0 ; python_version == "3.10" \
     --hash=sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14 \
     --hash=sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68
 filelock==3.13.1 ; python_version >= "3.10" and python_version < "4.0" \
@@ -482,6 +482,8 @@ pycparser==2.22 ; python_version >= "3.10" and python_version < "4.0" and platfo
 pyflakes==3.1.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:4132f6d49cb4dae6819e5379898f2b8cce3c5f23994194c24b77d5da2e36f774 \
     --hash=sha256:a0aae034c444db0071aa077972ba4768d40c830d9539fd45bf4cd3f8f6992efc
+pygraphviz==1.14 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:c10df02377f4e39b00ae17c862f4ee7e5767317f1c6b2dfd04cea6acc7fc2bea
 pylint-django==2.5.5 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:2f339e4bf55776958283395c5139c37700c91bd5ef1d8251ef6ac88b5abbba9b \
     --hash=sha256:5abd5c2228e0e5e2a4cb6d0b4fc1d1cef1e773d0be911412f4dd4fc1a1a440b7
@@ -678,7 +680,7 @@ sqlparse==0.4.4 ; python_version >= "3.10" and python_version < "4.0" \
 termcolor==2.3.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:3afb05607b89aed0ffe25202399ee0867ad4d3cb4180d98aaf8eefa6a5f7d475 \
     --hash=sha256:b5b08f68937f138fe92f6c089b99f1e2da0ae56c52b78bf7075fd95420fd9a5a
-tomli==2.0.1 ; python_version >= "3.10" and python_version < "3.11" \
+tomli==2.0.1 ; python_version == "3.10" \
     --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
     --hash=sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f
 tomlkit==0.12.3 ; python_version >= "3.10" and python_version < "4.0" \
@@ -720,8 +722,8 @@ uritemplate==4.1.1 ; python_version >= "3.10" and python_version < "4.0" \
 urllib3==2.1.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:55901e917a5896a349ff771be919f8bd99aff50b79fe58fec595eb37bbc56bb3 \
     --hash=sha256:df7aa8afb0148fa78488e7899b2c59b5f4ffcfa82e6c54ccb9dd37c1d7b52d54
-uwsgi==2.0.24 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:77b6dd5cd633f4ae87ee393f7701f617736815499407376e78f3d16467523afe
+uwsgi==2.0.31 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:e8f8b350ccc106ff93a65247b9136f529c14bf96b936ac5b264c6ff9d0c76257
 vine==5.1.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:40fdf3c48b2cfe1c38a49e9ae2da6fda88e4794c810050a728bd7413811fb1dc \
     --hash=sha256:8b62e981d35c41049211cf62a0a1242d8c1ee9bd15bb196ce38aefd6799e61e0
@@ -734,6 +736,3 @@ wcwidth==0.2.12 ; python_version >= "3.10" and python_version < "4.0" \
 zipp==3.17.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:0e923e726174922dce09c53c59ad483ff7bbb8e572e00c7f7c46b88556409f31 \
     --hash=sha256:84e64a1c28cf7e91ed2078bb8cc8c259cb19b76942096c8d7b84947690cabaf0
-django-cors-headers==4.6.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:14d76b4b4c8d39375baeddd89e4f08899051eeaf177cb02a29bd6eae8cf63aa8 \
-    --hash=sha256:8edbc0497e611c24d5150e0055d3b178c6534b8ed826fb6f53b21c63f5d48ba3
