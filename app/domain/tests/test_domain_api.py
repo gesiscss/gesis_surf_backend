@@ -162,7 +162,7 @@ class PrivateDomainApiTests(APITestCase):
 
     def test_retrieve_html_snapshot(self) -> None:
         """
-        Test retrieving the HTML snapshot for a domain
+        Test retrieving the HTML snapshot for a domain.
         """
         domain = create_domain(
             user=self.user, snapshot_html="<html>Test Snapshot</html>"

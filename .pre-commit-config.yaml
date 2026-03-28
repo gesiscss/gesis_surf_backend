@@ -28,26 +28,26 @@ repos:
         exclude: ^(.*/)?(models/)?
         name: typecheck
     repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.1
   - hooks:
       - id: autoflake
         name: remove unused imports
     repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
+    rev: v2.3.3
   - hooks:
       - id: black
         name: format
     repo: https://github.com/psf/black
-    rev: 25.9.0
+    rev: 26.3.1
   - hooks:
       - id: commitizen
       - id: commitizen-branch
         stages:
           - push
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.9.1
+    rev: v4.13.9
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.28.0
+    rev: 1.30.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.2"]
@@ -74,7 +74,7 @@ repos:
           - --fix
         id: eslint
     repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.36.0
+    rev: v10.1.0
   - repo: https://github.com/pre-commit/mirrors-pylint
     rev: v3.0.0a5
     hooks:
@@ -85,6 +85,7 @@ repos:
             "--disable=django-not-configured",
             "--output-format=colorized",
             "--disable=too-many-ancestors",
+            "--disable=too-few-public-methods",
             "--jobs=4",
             "--disable=E0401",
           ]
@@ -106,27 +107,28 @@ repos:
           - --tabwidth=2
         id: djhtml
     repo: https://github.com/rtts/djhtml
-    rev: 3.0.9
+    rev: 3.0.11
   - hooks:
       - args:
           - --py310-plus
         id: pyupgrade
     repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
+    rev: v3.21.2
   - hooks:
       - id: black
     repo: https://github.com/psf/black
-    rev: 25.9.0
+    rev: 26.3.1
   - hooks:
       - additional_dependencies:
           - black==23.11.0
+          - markdown-it-py[plugins]==2.2.0
         id: blacken-docs
     repo: https://github.com/asottile/blacken-docs
     rev: 1.20.0
   - hooks:
       - id: isort
     repo: https://github.com/pycqa/isort
-    rev: 6.0.1
+    rev: 8.0.1
   - hooks:
       - additional_dependencies:
           - flake8-bugbear

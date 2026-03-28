@@ -1,130 +1,308 @@
+<div align="center">
+<table><tr><td bgcolor="white" style="padding: 20px;">
+<img src="images/gesis.png" alt="GESIS" height="60">
+</td></tr></table>
+
 # GESIS Surf Backend
 
-![GESIS](https://upload.wikimedia.org/wikipedia/commons/4/42/GESIS-Logo.svg)
+**A Django-based backend for GESIS Surf research services**
 
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+[![Python](https://img.shields.io/badge/python-3.10+-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/django-4.2-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/postgresql-13-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
 
-Backend for GESIS Web Tracking services. By [Geomario](https://github.com/geomario).
-Questions? -> <mario.ramirez@gesis.org>
+[Features](#-features) •
+[Installation](#-installation) •
+[Usage](#-usage) •
+[API Documentation](#-api-documentation) •
+[Contributing](#-contributing) •
+[License](#-license)
 
-## Commands
+</div>
 
-Testing development inside Docker and running flake8 linting
+---
 
-```bsh
-docker-compose run --rm app sh -c "flake8"
+## 📖 Overview
+
+GESIS Surf Backend is the server-side component of the GESIS Surf project, designed to collect and manage browsing behavior data for social science research. Built with Django REST Framework, it provides a robust API for browser extension integration.
+
+> 🔗 **Looking for the browser extension?** Check out [GESIS Surf Extension](https://github.com/gesiscss/gesis_surf_extension)
+
+## ✨ Features
+
+- 🔐 **Secure Authentication** - Token-based user authentication
+- 📊 **Data Collection** - Track windows, tabs, domains, clicks, scrolls and HTMLs
+- 🔄 **Real-time Processing** - Celery-powered async task queue
+- 🔍 **Elasticsearch Integration** - Fast and scalable search capabilities
+- 📈 **Monitoring** - ELK stack for logging and visualization
+- 🐳 **Docker Ready** - Full containerized deployment
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Browser Ext.   │────▶│   Django API    │────▶│   PostgreSQL    │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                               │
+                               ▼
+                        ┌─────────────────┐
+                        │  Celery/Redis   │
+                        └─────────────────┘
+                               │
+                               ▼
+                        ┌─────────────────┐
+                        │  Elasticsearch  │
+                        └─────────────────┘
 ```
 
-Testing service, up & running
+## 📋 Requirements
 
-```bsh
-docker compose up -d
+- Python 3.10+
+- Docker & Docker Compose
+- PostgreSQL 13+
+- Redis 7+
+- Elasticsearch 7.x
+
+## 🚀 Installation
+
+### Using Docker (Recommended)
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/geomario/gesis_surf_backend.git
+   cd gesis_surf_backend
+   ```
+
+2. **Create environment file**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. **Build and start services**
+
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. **Run migrations**
+
+   ```bash
+   docker-compose run --rm app sh -c "python manage.py migrate"
+   ```
+
+5. **Create superuser**
+   ```bash
+   docker-compose run --rm app sh -c "python manage.py createsuperuser"
+   ```
+
+### Local Development
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/geomario/gesis_surf_backend.git
+   cd gesis_surf_backend
+   ```
+
+2. **Install Poetry** (if not already installed)
+
+   ```bash
+   curl -sSL https://install.python-poetry.org | python3 -
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   poetry install
+   ```
+
+4. **Activate virtual environment**
+
+   ```bash
+   poetry shell
+   ```
+
+5. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+### Useful Poetry Commands
+
+| Command                            | Description                        |
+| ---------------------------------- | ---------------------------------- |
+| `poetry install`                   | Install all dependencies           |
+| `poetry install --with dev`        | Install with dev dependencies      |
+| `poetry add <package>`             | Add a new dependency               |
+| `poetry add --group dev <package>` | Add a dev dependency               |
+| `poetry update`                    | Update all dependencies            |
+| `poetry shell`                     | Activate virtual environment       |
+| `poetry run <command>`             | Run command in virtual environment |
+
+## 💻 Usage
+
+### Running the Application
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop services
+docker-compose down
 ```
 
-Running specific migrations
+### Common Commands
 
-```bsh
-docker-compose run --rm app sh -c "python manage.py makemigrations APP_NAME"
-```
+| Command                                                               | Description            |
+| --------------------------------------------------------------------- | ---------------------- |
+| `docker-compose run --rm app sh -c "python manage.py test"`           | Run all tests          |
+| `docker-compose run --rm app sh -c "python manage.py test APP_NAME"`  | Run specific app tests |
+| `docker-compose run --rm app sh -c "python manage.py makemigrations"` | Create migrations      |
+| `docker-compose run --rm app sh -c "python manage.py migrate"`        | Apply migrations       |
+| `docker-compose run --rm app sh -c "flake8"`                          | Run linting            |
 
-Specific testing
+### Access Points
 
-```bsh
-docker-compose run --rm app sh -c "python manage.py test APP_NAME"
-```
+| Service         | URL                             |
+| --------------- | ------------------------------- |
+| API             | http://localhost:8000/api/      |
+| Admin           | http://localhost:8000/admin/    |
+| API Docs        | http://localhost:8000/api/docs/ |
+| Flower (Celery) | http://localhost:5555/          |
+| Kibana          | http://localhost:5601/          |
+| PgAdmin         | http://localhost:5050/          |
 
-visit the service
-[backend service](127.0.0.1:8000)
+## 📚 API Documentation
 
-## Data Base Design
+Interactive API documentation is available via **drf-spectacular**:
 
-A database is a structured set of data held in a computer. For the backend of our tool, we will be using a PostgreSQL database; a relational database. A relational database is composed of tables and references. Describes entities and relationships between them, the Data is well-structured.
+- **Swagger UI**: `http://localhost:8000/api/docs/`
+- **OpenAPI Schema**: `http://localhost:8000/api/schema/`
 
-A relational database is suggested when the workload fits thousands of transactions per second. Our current participant's sample corresponds to ~400 users. The data at the same time needs to offer integrity. A relational database is highly structured and brings integrity. Additionally, the database needs to offer availability. Availability refers to the action of returning a response of the most actual data. Our department at CSS, need to have data access, consequently, working with a relational database grants complex query that express relationships in our tables.
+### Key Endpoints
 
-Finally, the database is centralized and can be replicated asynchronously, such that we can offer accessibility to our data for social scientists.
+| Endpoint           | Method    | Description        |
+| ------------------ | --------- | ------------------ |
+| `/api/user/`       | POST      | User registration  |
+| `/api/user/token/` | POST      | Obtain auth token  |
+| `/api/window/`     | GET, POST | Window management  |
+| `/api/tab/`        | GET, POST | Tab tracking       |
+| `/api/domain/`     | GET       | Domain information |
+| `/api/clicks/`     | POST      | Click events       |
+| `/api/scrolls/`    | POST      | Scroll events      |
 
-> Relational Model was proposed by Edgar F Codd. The model structures data as entities and creates relationships with entities.
+## 🗃️ Database Design
 
-## Entity Relationship Diagram (ERD)
-
-An ERD is a relationship visual representation of a database. The visualization shows relationships between entities in a database. An Entity is a named object composed of data fields (attributes). Attributes can be data types, primitive data types, Time stamps, UUID
-
-### Integrity constrain
-
-Integrity constraints in a database ensure that our data is consistent and correct, not incorrect or dirty; keeps the data clean in a database. Moreover, integrity constraints enforce a set of rules defined by the database admin. It is ideal for our system such that it will enhance the performance of our database queries, either for
-validity or to prevent the insertion of incorrect data.
-
-> Integrity constraints can be nullability, uniqueness, etc.
-
-## Entity Relationship in Data Base
-
-The next table summarizes the modeling of a database.
-
-| Concept                         |    Notation     |
-| ------------------------------- | :-------------: |
-| Attribute                       |      Oval       |
-| Entity                          |    Rectangle    |
-| Relationship                    |     Diamond     |
-| Is-A Relationship               |    Triangle     |
-| Unique                          | Underlined Text |
-| Participates 0 or more times    |      Line       |
-| Participates 1 or more times    |    Bold Line    |
-| Participates at most once       |      Arrow      |
-| Participates once and only once |   Bold Arrow    |
-
-## Relationship Types
-
-Many - Many
-Many - One
-One - One
-
-### Example
-
-User - Wave **(Many to Many)**
-A User can be active.
-A User can be a staff.
-A User can be a superuser.
-A User has a staff classification.
-A Wave must have a client_id.
-A Wave must have a wave number.
-A Wave must have a start date.
-A Wave must have an end date.
-
-#### Relationship
-
-A User belongs to 1 or more Waves.
-A User belongs at to least 1 Wave.
-A Wave must have at least 1 User.
-
-User - Window **(Many to One)**
-A User must have a token.
-A Window must have a start time.
-A Window must have a closing time.
-A Window must have a creation time.
-A Window must have at most one and a single User. (Possible Change)
-A User must have 1 or more Windows.
-
-Window - Tab **(Many to One)**
-A Window must have at least one Tab.
-A Tab belongs to at most one Window.
-
-Tab - Domain **(Many to One)**
-A Tab has at most one Domain.
-A Domain belongs to at least one Tab.
-
-Tab - HTML **(Many to Many)**
-A Tab has at least one HTML.
-An HTML belongs to at least one Tab.
-
-Tab - Click **(Many to One)**
-A Tab can have clicks.
-A Click belongs to at least and only one Tab.
-
-Tab - Scroll **(Many to One)**
-A Tab can have scrolls.
-A Scroll belongs to at least one and only Tab.
-
-## ERD Diagram
+### Entity Relationship Diagram
 
 ![ERD GESIS](./images/entity_relationship_diagram.png)
+
+### Key Relationships
+
+| Relationship  | Type         | Description                         |
+| ------------- | ------------ | ----------------------------------- |
+| User ↔ Wave   | Many-to-Many | Users participate in research waves |
+| User → Window | One-to-Many  | Users have multiple browser windows |
+| Window → Tab  | One-to-Many  | Windows contain multiple tabs       |
+| Tab → Domain  | Many-to-One  | Tabs belong to domains              |
+| Tab → Click   | One-to-Many  | Tabs record click events            |
+| Tab → Scroll  | One-to-Many  | Tabs record scroll events           |
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+docker-compose run --rm app sh -c "python manage.py test"
+
+# Run with coverage
+docker-compose run --rm app sh -c "coverage run manage.py test && coverage report"
+
+# Run specific test
+docker-compose run --rm app sh -c "python manage.py test core.tests.test_models"
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our **[Contributing Guide](CONTRIBUTING.md)** for detailed information on:
+
+- 🌿 **Branching Strategy** - `dev` → `main` → `prod` workflow
+- 📝 **Commit Conventions** - Using Commitizen with Conventional Commits
+- 🔍 **Code Quality** - Pre-commit hooks, linting, and formatting
+- 🔀 **Pull Request Process** - Guidelines and review workflow
+
+### Quick Start
+
+1. **Fork the repository**
+2. **Create a feature branch** from `dev`
+   ```bash
+   git checkout dev && git pull origin dev
+   git checkout -b feature/amazing-feature
+   ```
+3. **Install pre-commit hooks**
+   ```bash
+   poetry install
+   poetry run pre-commit install
+   ```
+4. **Commit using Commitizen**
+   ```bash
+   git add .
+   poetry run cz commit
+   ```
+5. **Push and open a Pull Request** targeting `dev`
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📝 Citing
+
+If you use this software in your research, please cite:
+
+```bibtex
+@article{ramirez2025gesis,
+  title = {GESIS Surf },
+  author = {Ramirez, Mario and },
+  journal = {SoftwareX},
+  volume = {XX},
+  pages = {XXXXXX},
+  year = {2026},
+  publisher = {Elsevier},
+  doi = {10.1016/j.softx.2025.xxxxxx}
+}
+```
+
+See [CITATION.cff](CITATION.cff) for more citation formats.
+
+## 👥 Authors
+
+- **Mario Ramirez** - _Lead Research Software Engineer_ - [@geomario](https://github.com/geomario) [@MarioGesis](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
+- **Fernando Guzman** - _Software Architect Consultant_ - [@Fernando](https://www.linkedin.com/in/fernando-guzman-9262801b/)
+- **Prof. Dr. Sebastian Stier** - _Department Director CSS_ [@Seb](https://www.gesis.org/en/institute/about-us/staff/person/sebastian.stier)
+- **Dr. Frank Mangold** - _Kommissarischer Teamleiter DDD_ [@Frank](https://www.gesis.org/institut/ueber-uns/mitarbeitendenverzeichnis/person/Frank.Mangold)
+
+## 🙏 Acknowledgments
+
+- [GESIS - Leibniz Institute for the Social Sciences](https://www.gesis.org/)
+- [Computational Social Science Department](https://www.gesis.org/en/institute/about-us/departments/computational-social-science)
+
+## 📧 Contact
+
+Questions or feedback? Reach out!
+
+- **Email**: mario.ramirez@gesis.org
+- **GitHub Issues**: [Create an issue](https://github.com/geomario/gesis_surf_backend/issues)
+
+---
+
+<div align="center">
+Made with ❤️ at GESIS
+</div>
