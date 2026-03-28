@@ -252,10 +252,10 @@ class PrivateTabApiTests(APITestCase):
                     "domain_last_accessed": "Test Status",
                     "start_time": datetime.strptime(
                         "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                     "closing_time": datetime.strptime(
                         "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                 },
                 {
                     "domain_title": "Test Domain 2",
@@ -264,10 +264,10 @@ class PrivateTabApiTests(APITestCase):
                     "domain_last_accessed": "Test Status 2",
                     "start_time": datetime.strptime(
                         "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                     "closing_time": datetime.strptime(
                         "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                 },
             ],
         }
@@ -353,8 +353,12 @@ class PrivateTabApiTests(APITestCase):
             domain_fav_icon="Test Icon",
             domain_last_accessed="2024-06-01T17:00:00Z",
             domain_session_id="domain_12345",
-            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            start_time=datetime.strptime(
+                "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
+            closing_time=datetime.strptime(
+                "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
             snapshot_html="<html></html>",
         )
 
@@ -556,10 +560,10 @@ class PrivateTabApiTests(APITestCase):
                         "domain_last_accessed": "Test Status",
                         "start_time": datetime.strptime(
                             "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                        ),
+                        ).replace(tzinfo=timezone.utc),
                         "closing_time": datetime.strptime(
                             "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                        ),
+                        ).replace(tzinfo=timezone.utc),
                         "snapshot_html": "<html></html>",
                     }
                 ]
@@ -587,8 +591,12 @@ class PrivateTabApiTests(APITestCase):
             domain_url="Test URL",
             domain_fav_icon="Test Icon",
             domain_last_accessed="Test Status",
-            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            start_time=datetime.strptime(
+                "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
+            closing_time=datetime.strptime(
+                "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
             snapshot_html="<html></html>",
             domain_session_id="domain_12345",
         )
