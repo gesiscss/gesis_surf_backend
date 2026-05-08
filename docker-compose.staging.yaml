@@ -52,11 +52,11 @@ services:
       - static-data:/vol/static
     environment:
       - DB_HOST=db
-      - DB_NAME=dbname
-      - DB_USER=rootuser
-      - DB_PASSWORD=changeme
-      - DJANGO_SECRET_KEY=changeme
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+      - DB_NAME=${DB_NAME:-dbname}
+      - DB_USER=${DB_USER:-rootuser}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
     depends_on:
       - db
 
@@ -65,9 +65,9 @@ services:
     image: postgres:13.3-alpine
     restart: always
     environment:
-      - POSTGRES_DB=dbname
-      - POSTGRES_USER=rootuser
-      - POSTGRES_PASSWORD=changeme
+      - POSTGRES_DB=${DB_NAME:-dbname}
+      - POSTGRES_USER=${DB_USER:-rootuser}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
@@ -83,11 +83,11 @@ services:
       sh -c "celery -A app worker -l info"
     environment:
       - DB_HOST=db
-      - DB_NAME=dbname
-      - DB_USER=rootuser
-      - DB_PASSWORD=changeme
-      - DJANGO_SECRET_KEY=changeme
-      - DJANGO_ALLOWED_HOSTS=localhost,
+      - DB_NAME=${DB_NAME:-dbname}
+      - DB_USER=${DB_USER:-rootuser}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
     depends_on:
       - redis
       - db
