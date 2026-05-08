@@ -1,5 +1,6 @@
 [run]
 source = .
+data_file = /tmp/.coverage
 omit =
     */tests/*
     */migrations/*
