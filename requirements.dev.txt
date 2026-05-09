@@ -690,9 +690,9 @@ redis==5.0.3 ; python_version >= "3.10" and python_version < "4.0" \
 referencing==0.33.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:39240f2ecc770258f28b642dd47fd74bc8b02484de54e1882b74b35ebd779bd5 \
     --hash=sha256:c775fedf74bc0f9189c2a3be1c12fd03e8c23f4d371dce795df44e06c5b412f7
-requests==2.31.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f \
-    --hash=sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1
+requests==2.32.4 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:27babd3cda2a6d50b30443204ee89830707d396671944c998b5975b031ac2b2c \
+    --hash=sha256:27d0316682c8a29834d3264820024b62a36942083d52caf2f14c0591336d3422
 rpds-py==0.17.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:01f58a7306b64e0a4fe042047dd2b7d411ee82e54240284bab63e325762c1147 \
     --hash=sha256:0210b2668f24c078307260bf88bdac9d6f1093635df5123789bfee4d8d7fc8e7 \
