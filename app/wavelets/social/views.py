@@ -1,5 +1,5 @@
 """
-Views for the TikTok wavelets API.
+Views for the social wavelets API.
 """
 
 from rest_framework import status
@@ -7,21 +7,23 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from wavelets.tiktok import serializers
+from wavelets.social import serializers
 
 
-class TikTokDataView(APIView):
+class SocialPostView(APIView):
     """
-    API view for TikTok wavelet data.
+    API view for all social platform wavelet data.
+    Accepts X (Twitter), TikTok, YouTube Shorts, and Instagram posts
+    via a single endpoint, routed internally by platform + signal_type.
     """
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.TikTokDataSerializer
+    serializer_class = serializers.SocialPostSerializer
 
     def post(self, request) -> Response:
         """
-        Create a new TikTok data document in the signal-specific ES index.
+        Create a new social post document in the platform-specific ES index.
         """
         serializer = self.serializer_class(data=request.data)
 

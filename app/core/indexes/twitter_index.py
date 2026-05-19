@@ -10,12 +10,12 @@ from .base_index import BaseIndex
 class TwitterIndex(BaseIndex):
     """Index that works with X (Twitter) posts"""
 
-    tweet_id = Keyword()
+    post_id = Keyword()
     author_handle = Keyword()
     author_display_name = Keyword()
-    tweet_text = Text()
-    tweet_url = Keyword()
-    tweet_timestamp = Date()
+    content_text = Text()
+    permalink = Keyword()
+    post_timestamp = Date()
     captured_at = Date()
     replies = Integer()
     reposts = Integer()
@@ -25,7 +25,7 @@ class TwitterIndex(BaseIndex):
     page_url = Keyword()
     domain_id = Keyword()
 
-    class Index:
+    class Index(BaseIndex.Index):
         """Elasticsearch index configuration for X (Twitter) posts."""
 
         name = "twitter_index"

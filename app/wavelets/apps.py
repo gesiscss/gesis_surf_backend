@@ -8,6 +8,7 @@ from core.indexes.chatgpt_index import ChatGPTIndex
 from core.indexes.claude_index import ClaudeIndex
 from core.indexes.deepseek_index import DeepSeekIndex
 from core.indexes.gemini_index import GeminiIndex
+from core.indexes.instagram_index import InstagramIndex
 from core.indexes.tiktok_feed_index import TikTokFeedIndex
 from core.indexes.tiktok_played_index import TikTokPlayedIndex
 from core.indexes.twitter_index import TwitterIndex
@@ -64,6 +65,7 @@ class WaveletsConfig(AppConfig):
                 TikTokFeedIndex,
                 TikTokPlayedIndex,
                 YouTubeShortsIndex,
+                InstagramIndex,
             ]
 
             current_date = datetime.now()

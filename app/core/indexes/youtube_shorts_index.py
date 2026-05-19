@@ -10,17 +10,17 @@ from .base_index import BaseIndex
 class YouTubeShortsIndex(BaseIndex):
     """Index that works with YouTube Shorts"""
 
-    video_id = Keyword()
+    post_id = Keyword()
     channel_handle = Keyword()
-    title = Text()
+    content_text = Text()
+    permalink = Keyword()
     likes = Integer()
     comments = Integer()
-    video_url = Keyword()
     captured_at = Date()
     page_url = Keyword()
     domain_id = Keyword()
 
-    class Index:
+    class Index(BaseIndex.Index):
         """Elasticsearch index configuration for YouTube Shorts."""
 
         name = "youtube_shorts_index"

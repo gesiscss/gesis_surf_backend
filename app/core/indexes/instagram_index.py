@@ -1,5 +1,5 @@
 """
-Index that works with TikTok feed signals
+Instagram Index that works with Instagram posts
 """
 
 from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
@@ -7,28 +7,25 @@ from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
 from .base_index import BaseIndex
 
 
-class TikTokFeedIndex(BaseIndex):
-    """Index that works with TikTok feed signals"""
+class InstagramIndex(BaseIndex):
+    """Index that works with Instagram posts"""
 
     post_id = Keyword()
-    feed_position = Integer()
+    shortcode = Keyword()
     author_handle = Keyword()
     author_display_name = Keyword()
     is_verified = Boolean()
     content_text = Text()
     permalink = Keyword()
-    music_id = Keyword()
-    music_name = Keyword()
+    post_timestamp = Date()
+    post_type = Keyword()
     likes = Integer()
     comments = Integer()
-    shares = Integer()
-    favorites = Integer()
-    signal_type = Keyword()
     captured_at = Date()
     page_url = Keyword()
     domain_id = Keyword()
 
     class Index(BaseIndex.Index):
-        """Elasticsearch index configuration for TikTok feed signals."""
+        """Elasticsearch index configuration for Instagram posts."""
 
-        name = "tiktok_feed_index"
+        name = "instagram_index"
