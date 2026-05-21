@@ -11,13 +11,13 @@ from core.indexes.linkedin_index import LinkedInIndex
 from core.indexes.reddit_index import RedditIndex
 from core.indexes.threads_index import ThreadsIndex
 from core.indexes.tiktok_feed_index import TikTokFeedIndex
-from core.indexes.youtube_feed_index import YouTubeFeedIndex
-from core.indexes.youtube_watch_index import YouTubeWatchIndex
 from core.indexes.tiktok_played_index import TikTokPlayedIndex
 from core.indexes.twitch_feed_index import TwitchFeedIndex
 from core.indexes.twitch_stream_index import TwitchStreamIndex
 from core.indexes.twitter_index import TwitterIndex
+from core.indexes.youtube_feed_index import YouTubeFeedIndex
 from core.indexes.youtube_shorts_index import YouTubeShortsIndex
+from core.indexes.youtube_watch_index import YouTubeWatchIndex
 from elasticsearch.exceptions import TransportError
 from elasticsearch_dsl.field import Field as EsField
 from rest_framework import serializers
