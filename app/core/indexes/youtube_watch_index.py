@@ -1,5 +1,5 @@
 """
-Instagram Index that works with Instagram posts
+YouTube Watch Index for storing data from watched YouTube videos (/watch page).
 """
 
 from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
@@ -7,19 +7,19 @@ from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
 from .base_index import BaseIndex
 
 
-class InstagramIndex(BaseIndex):
-    """Index that works with Instagram posts"""
+class YouTubeWatchIndex(BaseIndex):
+    """Index for YouTube videos that were actively watched (signal_type='played')."""
 
     post_id = Keyword()
-    shortcode = Keyword()
-    author_handle = Keyword()
+    channel_handle = Keyword()
     author_display_name = Keyword()
-    is_verified = Boolean()
     is_ad = Boolean()
     content_text = Text()
     permalink = Keyword()
     post_timestamp = Date()
     post_type = Keyword()
+    signal_type = Keyword()
+    views = Integer()
     likes = Integer()
     comments = Integer()
     captured_at = Date()
@@ -27,6 +27,6 @@ class InstagramIndex(BaseIndex):
     domain_id = Keyword()
 
     class Index(BaseIndex.Index):
-        """Elasticsearch index configuration for Instagram posts."""
+        """Elasticsearch index configuration for YouTube watched videos."""
 
-        name = "instagram_index"
+        name = "youtube_watch_index"

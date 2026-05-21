@@ -8,9 +8,17 @@ from core.indexes.chatgpt_index import ChatGPTIndex
 from core.indexes.claude_index import ClaudeIndex
 from core.indexes.deepseek_index import DeepSeekIndex
 from core.indexes.gemini_index import GeminiIndex
+from core.indexes.facebook_index import FacebookIndex
 from core.indexes.instagram_index import InstagramIndex
+from core.indexes.linkedin_index import LinkedInIndex
+from core.indexes.reddit_index import RedditIndex
+from core.indexes.threads_index import ThreadsIndex
 from core.indexes.tiktok_feed_index import TikTokFeedIndex
+from core.indexes.youtube_feed_index import YouTubeFeedIndex
+from core.indexes.youtube_watch_index import YouTubeWatchIndex
 from core.indexes.tiktok_played_index import TikTokPlayedIndex
+from core.indexes.twitch_feed_index import TwitchFeedIndex
+from core.indexes.twitch_stream_index import TwitchStreamIndex
 from core.indexes.twitter_index import TwitterIndex
 from core.indexes.youtube_shorts_index import YouTubeShortsIndex
 from django.apps import AppConfig
@@ -66,6 +74,14 @@ class WaveletsConfig(AppConfig):
                 TikTokPlayedIndex,
                 YouTubeShortsIndex,
                 InstagramIndex,
+                LinkedInIndex,
+                YouTubeFeedIndex,
+                FacebookIndex,
+                RedditIndex,
+                ThreadsIndex,
+                TwitchFeedIndex,
+                TwitchStreamIndex,
+                YouTubeWatchIndex,
             ]
 
             current_date = datetime.now()

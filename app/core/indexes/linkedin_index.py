@@ -1,5 +1,5 @@
 """
-Index that works with TikTok played signals
+Index that works with LinkedIn feed posts
 """
 
 from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
@@ -7,29 +7,32 @@ from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
 from .base_index import BaseIndex
 
 
-class TikTokPlayedIndex(BaseIndex):
-    """Index that works with TikTok played signals"""
+class LinkedInIndex(BaseIndex):
+    """Index that works with LinkedIn feed posts"""
 
     post_id = Keyword()
-    feed_position = Integer()
     author_handle = Keyword()
     author_display_name = Keyword()
     is_verified = Boolean()
     is_ad = Boolean()
     content_text = Text()
     permalink = Keyword()
-    music_id = Keyword()
-    music_name = Keyword()
+    post_timestamp = Date()
+    post_type = Keyword()
     likes = Integer()
     comments = Integer()
-    shares = Integer()
-    favorites = Integer()
+    reposts = Integer()
     signal_type = Keyword()
+    # LinkedIn-specific context fields
+    feed_context_type = Keyword()
+    feed_context_actor = Keyword()
+    feed_context_action = Keyword()
+    group_name = Keyword()
     captured_at = Date()
     page_url = Keyword()
     domain_id = Keyword()
 
     class Index(BaseIndex.Index):
-        """Elasticsearch index configuration for TikTok played signals."""
+        """Elasticsearch index configuration for LinkedIn feed posts."""
 
-        name = "tiktok_played_index"
+        name = "linkedin_index"

@@ -2,7 +2,7 @@
 Index that works with X (Twitter) posts
 """
 
-from elasticsearch_dsl import Date, Integer, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
 
 from .base_index import BaseIndex
 
@@ -13,6 +13,7 @@ class TwitterIndex(BaseIndex):
     post_id = Keyword()
     author_handle = Keyword()
     author_display_name = Keyword()
+    is_ad = Boolean()
     content_text = Text()
     permalink = Keyword()
     post_timestamp = Date()

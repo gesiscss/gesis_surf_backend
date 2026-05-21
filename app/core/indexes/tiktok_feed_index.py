@@ -15,6 +15,7 @@ class TikTokFeedIndex(BaseIndex):
     author_handle = Keyword()
     author_display_name = Keyword()
     is_verified = Boolean()
+    is_ad = Boolean()
     content_text = Text()
     permalink = Keyword()
     music_id = Keyword()
