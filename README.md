@@ -128,3 +128,5 @@ A Scroll belongs to at least one and only Tab.
 ## ERD Diagram
 
 ![ERD GESIS](./images/entity_relationship_diagram.png)
+
+docker-compose exec app python manage.py seed_selector_configs --force
