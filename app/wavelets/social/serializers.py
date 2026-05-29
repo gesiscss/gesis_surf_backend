@@ -19,7 +19,6 @@ from core.indexes.youtube_feed_index import YouTubeFeedIndex
 from core.indexes.youtube_shorts_index import YouTubeShortsIndex
 from core.indexes.youtube_watch_index import YouTubeWatchIndex
 from elasticsearch.exceptions import TransportError
-from elasticsearch_dsl.field import Field as EsField
 from rest_framework import serializers
 
 IndexClass = type[BaseIndex]
@@ -101,12 +100,9 @@ class SocialPostSerializer(serializers.Serializer):
 
     def _index_field_names(self, index_class: IndexClass) -> set[str]:
         """Return the set of field names declared on the given index class."""
-        return {
-            name
-            for cls in index_class.__mro__
-            for name, val in vars(cls).items()
-            if isinstance(val, EsField)
-        }
+        # pylint: disable=protected-access
+        mapping_dict = index_class._doc_type.mapping.to_dict()
+        return set(mapping_dict.get("properties", {}).keys())
 
     def create(self, validated_data: dict) -> object:
         """
