@@ -41,9 +41,7 @@ SELECTOR_CONFIGS = [
             "favorites_button": ["button[aria-label*='Favorites']"],
             "music_link": ["[data-e2e='video-music']"],
             "feed_section": ["[data-e2e='feed-video']"],
-            "content_flex": [
-                "div[class*='DivContentFlexLayout']"
-            ],  # used by TikTokWavelet + TikTokPlayedWavelet
+            "content_flex": ["div[class*='DivContentFlexLayout']"],
         },
     },
     {
@@ -71,7 +69,8 @@ SELECTOR_CONFIGS = [
             "channel_link": ["a[href^='/@']"],
             "metadata": ["yt-content-metadata-view-model"],
             "duration": [
-                "badge-shape .ytBadgeShapeText, .ytThumbnailBottomOverlayViewModelBadge .ytBadgeShapeText"
+                "badge-shape .ytBadgeShapeText, "
+                ".ytThumbnailBottomOverlayViewModelBadge .ytBadgeShapeText"
             ],
             "thumbnail": ["img[src*='ytimg.com']"],
             "live_badge": [".ytSpecAvatarShapeLiveBadge, [aria-label*='live' i]"],
@@ -92,22 +91,30 @@ SELECTOR_CONFIGS = [
                 "ytd-video-primary-info-renderer h1.title yt-formatted-string"
             ],
             "channel_link": [
-                "ytd-video-owner-renderer a[href^='/@'], ytd-channel-name a[href^='/@']"
+                "ytd-video-owner-renderer a[href^='/@'], "
+                "ytd-channel-name a[href^='/@']"
             ],
             "view_count": [
-                "ytd-video-view-count-renderer .view-count, ytd-watch-info-text #view-count"
+                "ytd-video-view-count-renderer .view-count, "
+                "ytd-watch-info-text #view-count"
             ],
             "upload_date": [
-                "ytd-video-primary-info-renderer #info-strings yt-formatted-string, ytd-watch-info-text #date-text yt-formatted-string"
+                "ytd-video-primary-info-renderer #info-strings "
+                "yt-formatted-string, ytd-watch-info-text "
+                "#date-text yt-formatted-string"
             ],
             "like_button": [
-                "like-button-view-model button[aria-label*='like' i], ytd-menu-renderer like-button-view-model button"
+                "like-button-view-model button[aria-label*='like' i], "
+                "ytd-menu-renderer like-button-view-model button"
             ],
             "comments_header": [
-                "ytd-comments-header-renderer #count, ytd-engagement-panel-title-header-renderer #title"
+                "ytd-comments-header-renderer #count, "
+                "ytd-engagement-panel-title-header-renderer #title"
             ],
             "description": [
-                "ytd-text-inline-expander #snippet-text, ytd-expandable-video-description-body-renderer ytd-text-inline-expander #snippet-text"
+                "ytd-text-inline-expander #snippet-text, "
+                "ytd-expandable-video-description-body-renderer "
+                "ytd-text-inline-expander #snippet-text"
             ],
         },
     },
@@ -129,20 +136,50 @@ SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "facebook",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "hostname_patterns": ["facebook.com"],
         "selectors": {
             "article": ["div[role='article']"],
-            "ad_marker": ["a[aria-label='Publicidad']"],
             "profile_link": ["[data-ad-rendering-role='profile_name'] a"],
+            "story_message": [
+                "[data-ad-rendering-role='story_message']",
+                "blockquote",
+            ],
             "time_link": ["a[href*='/posts/']"],
-            "story_message": ["[data-ad-rendering-role='story_message']"],
-            "like_button": ["div[aria-label='Me gusta'], div[aria-label='Like']"],
+            "sponsored_marker": [
+                "a[aria-label='Publicidad']",
+                "a[aria-label='Sponsored']",
+                "a[aria-label='Patrocinado']",
+                "a[aria-label='Gesponsert']",
+                "a[aria-label='Sponsorisé']",
+            ],
+            "ads_link": ["a[href*='/ads/']"],
+            "like_button": [
+                "div[aria-label='Me gusta']",
+                "div[aria-label='Like']",
+                "div[aria-label='Gefällt mir']",
+                "div[aria-label='J'aime']",
+                "div[aria-label='Curtir']",
+                "[data-ad-rendering-role='like_button']",
+            ],
             "comment_button": [
-                "div[aria-label='Dejar un comentario'], div[aria-label='Comment']"
+                "div[aria-label='Dejar un comentario']",
+                "div[aria-label='Leave a comment']",
+                "div[aria-label='Comment']",
+                "div[aria-label='Kommentar hinterlassen']",
+                "div[aria-label='Laisser un commentaire']",
+                "div[aria-label='Comentar']",
+                "[data-ad-rendering-role='comment_button']",
             ],
             "share_button": [
-                "div[aria-label^='Envía'], div[aria-label^='Enviar'], div[aria-label^='Compartir'], div[aria-label^='Share']"
+                "div[aria-label^='Envía']",
+                "div[aria-label^='Enviar']",
+                "div[aria-label^='Compartir']",
+                "div[aria-label^='Share']",
+                "div[aria-label^='Teilen']",
+                "div[aria-label^='Partager']",
+                "div[aria-label^='Compartilhar']",
+                "[data-ad-rendering-role='share_button']",
             ],
         },
     },
@@ -213,6 +250,8 @@ SELECTOR_CONFIGS = [
 
 
 class Command(BaseCommand):
+    """Seed SelectorConfig entries for all social wavelets."""
+
     help = "Seed SelectorConfig entries for all social wavelets."
 
     def add_arguments(self, parser):
