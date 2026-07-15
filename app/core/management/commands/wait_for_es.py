@@ -7,7 +7,7 @@ import time
 from django.core.management.base import BaseCommand
 from django.db.utils import OperationalError
 from elasticsearch_dsl import connections
-from requests.exceptions import ConnectionError as RequestsConnectionError
+from elasticsearch.exceptions import ConnectionError as RequestsConnectionError
 
 
 class Command(BaseCommand):
