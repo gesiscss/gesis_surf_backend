@@ -10,6 +10,8 @@ from django.dispatch import receiver
 
 from .models import Host, SelectorConfig
 from .tasks import (
+    HOST_VERSION_PROPAGATION_DELAY_SECONDS,
+    SELECTOR_VERSION_PROPAGATION_DELAY_SECONDS,
     update_extension_versions_task,
     update_selector_versions_task,
 )
@@ -54,7 +56,7 @@ def capture_old_host_version(
 def update_extension_versions(sender, instance, created, update_fields, **kwargs):
     """
     Signal to update extension versions when a host is created or updated
-    This works with a countdown of 3 hours to avoid multiple updates in a short period of time.
+    This works with a countdown of 15 minutes to avoid multiple updates in a short period of time.
 
     Args:
         sender (_type_): The model class
@@ -82,12 +84,12 @@ def update_extension_versions(sender, instance, created, update_fields, **kwargs
     try:
         task = update_extension_versions_task.apply_async(  # type: ignore
             args=(instance.pk, created, old_version),
-            countdown=10800,
+            countdown=HOST_VERSION_PROPAGATION_DELAY_SECONDS,
             description=f"Update extension versions for host {instance.pk}",
         )
 
         logger.info(
-            "Scheduled update_extension_versions_task for host %s in 3 hours. Task ID: %s",
+            "Scheduled update_extension_versions_task for host %s in 15 minutes. Task ID: %s",
             instance.pk,
             task.id,
         )
@@ -150,7 +152,7 @@ def update_extension_selector_versions(
 ):
     """
     Signal to update extension selector_version when a SelectorConfig is created or updated.
-    Deferred 3 hours via Celery, matching the host version propagation pattern.
+    Deferred 5 minutes via Celery, matching the selector propagation pattern.
 
     Args:
         sender (_type_): The model class
@@ -179,11 +181,11 @@ def update_extension_selector_versions(
     try:
         task = update_selector_versions_task.apply_async(  # type: ignore
             args=(instance.pk, created, old_version),
-            countdown=10800,
+            countdown=SELECTOR_VERSION_PROPAGATION_DELAY_SECONDS,
             description=f"Update selector versions for SelectorConfig {instance.pk}",
         )
         logger.info(
-            "Scheduled update_selector_versions_task for SelectorConfig %s in 3 hours. Task ID: %s",
+            "Scheduled update_selector_versions_task for SelectorConfig %s in 5 minutes. Task ID: %s",
             instance.pk,
             task.id,
         )

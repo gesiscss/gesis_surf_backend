@@ -16,13 +16,16 @@ from .models import Extension, Host, SelectorConfig
 
 logger = logging.getLogger(__name__)
 
+HOST_VERSION_PROPAGATION_DELAY_SECONDS = 900
+SELECTOR_VERSION_PROPAGATION_DELAY_SECONDS = 180
+
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def update_extension_versions_task(self, host_id, created, old_hosts_version=None):
     """
     Update all user extensions with the new host version.
 
-    This task is scheduled 3 hours after a Host is created or updated.
+    This task is scheduled after the configured host propagation delay.
 
     Logic:
     - If Host was CREATED: Update ALL extensions to use this new version
@@ -164,8 +167,8 @@ def update_selector_versions_task(self, selector_id, created, old_version=None):
     """
     Update all user extensions with the new SelectorConfig version.
 
-    This task is scheduled 3 hours after a SelectorConfig is created or updated,
-    matching the same deferred pattern used for host version propagation.
+    This task is scheduled after the configured selector propagation delay,
+    matching the same deferred pattern used for selector version propagation.
 
     Logic:
     - If SelectorConfig was CREATED: Update ALL extensions to use this new version
@@ -301,5 +304,40 @@ def update_selector_versions_task(self, selector_id, created, old_version=None):
     except (DatabaseError, IntegrityError) as db_exc:
         error_msg = f"Database error updating selector  \
             versions for SelectorConfig {selector_id}: {str(db_exc)}"
+        logger.error(error_msg, exc_info=True)
+        raise self.retry(exc=db_exc, countdown=60) from db_exc
+
+
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+def update_selector_bundle_version_task(self, target_version):
+    """Update all user extensions to the current selector bundle version."""
+    try:
+        # pylint: disable=no-member
+        updated_count = Extension.objects.exclude(
+            selector_version=target_version
+        ).update(selector_version=target_version)
+
+        logger.info(
+            "Successfully updated %d extensions to selector bundle version %s",
+            updated_count,
+            target_version,
+        )
+
+        return {
+            "status": "success",
+            "action": "selector_bundle_updated",
+            "selector_version": target_version,
+            "extension_updates": updated_count,
+            "message": (
+                f"Updated {updated_count} extensions to selector version "
+                f"{target_version}."
+            ),
+        }
+
+    except (DatabaseError, IntegrityError) as db_exc:
+        error_msg = (
+            f"Database error updating selector bundle version to "
+            f"{target_version}: {str(db_exc)}"
+        )
         logger.error(error_msg, exc_info=True)
         raise self.retry(exc=db_exc, countdown=60) from db_exc
