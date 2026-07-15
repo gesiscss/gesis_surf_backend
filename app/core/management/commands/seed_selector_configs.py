@@ -4,28 +4,42 @@ Run with: python manage.py seed_selector_configs
 Use --force to overwrite existing entries.
 """
 
-from core.models import SelectorConfig
 from django.core.management.base import BaseCommand
+from django.db.models.signals import post_save
+
+from core.models import SelectorConfig
+from core.signals import update_extension_selector_versions
+from core.tasks import (
+    SELECTOR_VERSION_PROPAGATION_DELAY_SECONDS,
+    update_selector_bundle_version_task,
+)
 
 SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "x",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["x.com", "twitter.com"],
         "selectors": {
             "tweet_article": ["article[data-testid='tweet']"],
             "status_link": ["a[href*='/status/']"],
             "tweet_text": ["[data-testid='tweetText']"],
+            "retweet_btn": ["[data-testid='retweet']"],
             "display_name": ["[data-testid='User-Name'] span"],
             "timestamp": ["time"],
             "metrics_group": ["[role='group']"],
+            "verified_badge": [
+                "[data-testid='User-Name'] svg[data-testid='icon-verified']"
+            ],
+            "video_player": ["[data-testid='videoPlayer']", "video"],
+            "photo": ["[data-testid='tweetPhoto']"],
+            "promoted_indicator": ["[data-testid='promotedIndicator']"],
         },
     },
     {
         "family": "social",
         "provider": "tiktok",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["tiktok.com"],
         "selectors": {
             "player_wrapper": ["[id^='xgwrapper-']"],
@@ -47,7 +61,7 @@ SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "youtube_shorts",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["youtube.com"],
         "selectors": {
             "reel_overlay": ["ytd-reel-player-overlay-renderer"],
@@ -60,7 +74,7 @@ SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "youtube_feed",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["youtube.com"],
         "selectors": {
             "feed_item": ["ytd-rich-item-renderer, ytd-video-renderer"],
@@ -82,7 +96,7 @@ SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "youtube_watch",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["youtube.com"],
         "selectors": {
             "watch_flexy": ["ytd-watch-flexy"],
@@ -93,6 +107,11 @@ SELECTOR_CONFIGS = [
             "channel_link": [
                 "ytd-video-owner-renderer a[href^='/@'], "
                 "ytd-channel-name a[href^='/@']"
+            ],
+            "channel_name": [
+                "ytd-channel-name #text, "
+                "ytd-video-owner-renderer #text, "
+                "#upload-info #channel-name #text"
             ],
             "view_count": [
                 "ytd-video-view-count-renderer .view-count, "
@@ -121,7 +140,7 @@ SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "instagram",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["instagram.com"],
         "selectors": {
             "post_article": ["article"],
@@ -130,13 +149,14 @@ SELECTOR_CONFIGS = [
             "author_handle": ["span._ap3a._aacw"],
             "timestamp": ["time[datetime]"],
             "caption": ["[data-testid='caption'] span, span._ap3a._aacu._aad7"],
+            "verified_badge": ["svg[aria-label='Verified']"],
             "carousel_list": ["._aagu ul"],
         },
     },
     {
         "family": "social",
         "provider": "facebook",
-        "version": "1.1.0",
+        "version": "1.7.5",
         "hostname_patterns": ["facebook.com"],
         "selectors": {
             "article": ["div[role='article']"],
@@ -145,7 +165,12 @@ SELECTOR_CONFIGS = [
                 "[data-ad-rendering-role='story_message']",
                 "blockquote",
             ],
-            "time_link": ["a[href*='/posts/']"],
+            "time_link": [
+                "a[href*='/posts/']",
+                "a[href*='/watch/']",
+                "a[href*='?v=']",
+                "a[href*='/photo/']",
+            ],
             "sponsored_marker": [
                 "a[aria-label='Publicidad']",
                 "a[aria-label='Sponsored']",
@@ -154,11 +179,18 @@ SELECTOR_CONFIGS = [
                 "a[aria-label='Sponsorisé']",
             ],
             "ads_link": ["a[href*='/ads/']"],
+            "ad_role_marker": ["[data-ad-rendering-role='cta-']"],
+            "public_indicator": [
+                "svg[title*='Público']",
+                "svg[title*='Public']",
+                "svg[title*='Öffentlich']",
+                "svg[title*='Publiek']",
+            ],
             "like_button": [
                 "div[aria-label='Me gusta']",
                 "div[aria-label='Like']",
                 "div[aria-label='Gefällt mir']",
-                "div[aria-label='J'aime']",
+                "div[aria-label=\"J'aime\"]",
                 "div[aria-label='Curtir']",
                 "[data-ad-rendering-role='like_button']",
             ],
@@ -177,6 +209,7 @@ SELECTOR_CONFIGS = [
                 "div[aria-label^='Compartir']",
                 "div[aria-label^='Share']",
                 "div[aria-label^='Teilen']",
+                "div[aria-label^='Sende']",
                 "div[aria-label^='Partager']",
                 "div[aria-label^='Compartilhar']",
                 "[data-ad-rendering-role='share_button']",
@@ -185,18 +218,60 @@ SELECTOR_CONFIGS = [
     },
     {
         "family": "social",
+        "provider": "facebook_reels",
+        "version": "1.7.5",
+        "hostname_patterns": ["facebook.com"],
+        "selectors": {
+            "reel_card": ["a[href*='/reel/'][aria-label]"],
+            "thumbnail": ["img[src*='fbcdn']"],
+        },
+    },
+    {
+        "family": "social",
         "provider": "linkedin",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["linkedin.com"],
         "selectors": {
             "listitem": ["div[role='listitem']"],
             "post_text": ["[data-testid='expandable-text-box']"],
+            "visibility_icon": [
+                "svg#globe-americas-small",
+                "svg[aria-label^='Visibility:']",
+            ],
+            "control_menu_btn": [
+                "button[aria-label*='post by']",
+                "button[aria-label*='Beitrag von']",
+            ],
+            "reaction_button": [
+                "button[aria-label*='Reaction button']",
+                "button[aria-label*='Reaktionsbuttons']",
+            ],
+            "comment_button": [
+                "button[aria-label='Comment']",
+                "button[aria-label='Kommentieren']",
+            ],
+            "repost_button": [
+                "button[aria-label='Repost']",
+                "button[aria-label='Reposten']",
+            ],
+            "profile_link": ["a[href*='/in/']"],
+            "group_link": ["a[href*='/groups/']"],
+            "media_image": [
+                "img[alt^='View image']",
+                "img[src*='feedshare']",
+            ],
+            "external_link": ["a[target='_blank'][href^='http']"],
+            "author_link": [
+                "a[href*='/in/']",
+                "a[href*='/company/']",
+                "a[href*='/groups/']",
+            ],
         },
     },
     {
         "family": "social",
         "provider": "reddit",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["reddit.com"],
         "selectors": {
             "shreddit_post": ["shreddit-post"],
@@ -205,7 +280,7 @@ SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "twitch_feed",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["twitch.tv"],
         "selectors": {
             "stream_card": ["[data-test-selector='shelf-card-selector']"],
@@ -215,7 +290,9 @@ SELECTOR_CONFIGS = [
             "game_link": ["[data-test-selector='GameLink']"],
             "viewer_count": [".tw-media-card-stat"],
             "tags": [".tw-tag"],
-            "verified": ["svg[title='Verified']"],
+            "verified": [
+                "a[data-test-selector='TitleAndChannel'][aria-label*='(Verified)']"
+            ],
             "live_badge": [".tw-channel-status-text-indicator"],
             "thumbnail": ["img.tw-image"],
         },
@@ -223,7 +300,7 @@ SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "twitch_stream",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["twitch.tv"],
         "selectors": {
             "stream_info": ["#live-channel-stream-information"],
@@ -240,10 +317,75 @@ SELECTOR_CONFIGS = [
     {
         "family": "social",
         "provider": "threads",
-        "version": "1.0.0",
+        "version": "1.7.5",
         "hostname_patterns": ["threads.com", "threads.net"],
         "selectors": {
             "threads_post": ["[data-pressable-container='true']"],
+            "post_link": ["a[href*='/post/']"],
+            "author_link": ["a[href^='/@']"],
+            "verified_badge": [
+                "svg[aria-label='Verified']",
+                "svg[aria-label='Verificado']",
+            ],
+            "ufi_group": [
+                "[role='group']",
+                "div[class*='ufi']",
+                "div[aria-label*='like']",
+                "div[aria-label*='repost']",
+            ],
+            "timestamp": ["time[datetime]"],
+        },
+    },
+    {
+        "family": "llm",
+        "provider": "chatgpt",
+        "version": "1.7.5",
+        "hostname_patterns": ["chatgpt.com", "chat.openai.com"],
+        "selectors": {
+            "role_attribute": ["data-message-author-role"],
+            "content": [".whitespace-pre-wrap"],
+            "message_id_attribute": ["data-message-id"],
+            "message_container": ["[data-message-author-role]"],
+        },
+    },
+    {
+        "family": "llm",
+        "provider": "claude",
+        "version": "1.7.5",
+        "hostname_patterns": ["claude.ai"],
+        "selectors": {
+            "user_content": [".whitespace-pre-wrap"],
+            "assistant_content": [".font-claude-response-body"],
+            "user_container": ["[data-testid='user-message']"],
+            "streaming_attribute": ["data-is-streaming"],
+        },
+    },
+    {
+        "family": "llm",
+        "provider": "deepseek",
+        "version": "1.7.5",
+        "hostname_patterns": ["deepseek.com"],
+        "selectors": {
+            "assistant_marker": [":scope > .ds-markdown"],
+            "content_exclude": [".ds-think-content"],
+            "message_container": [".ds-message"],
+            "stable_id_closest": ["[data-virtual-list-item-key]"],
+            "stable_id_attribute": ["data-virtual-list-item-key"],
+        },
+    },
+    {
+        "family": "llm",
+        "provider": "gemini",
+        "version": "1.7.5",
+        "hostname_patterns": ["gemini.google.com"],
+        "selectors": {
+            "user_content": ["p.query-text-line"],
+            "assistant_content": [".markdown.markdown-main-panel"],
+            "streaming_element": [".markdown.markdown-main-panel"],
+            "user_container": ["user-query"],
+            "assistant_container": ["model-response"],
+            "stable_id_closest": [".conversation-container"],
+            "streaming_attribute": ["aria-busy"],
         },
     },
 ]
@@ -266,30 +408,49 @@ class Command(BaseCommand):
         created_count = 0
         updated_count = 0
         skipped_count = 0
+        bundle_version = SELECTOR_CONFIGS[0]["version"]
 
-        for config in SELECTOR_CONFIGS:
-            provider = config["provider"]
-            exists = SelectorConfig.objects.filter(provider=provider).exists()
+        post_save.disconnect(update_extension_selector_versions, sender=SelectorConfig)
 
-            if exists and not force:
-                self.stdout.write(
-                    f"  SKIP     {provider} (already exists, use --force to overwrite)"
+        try:
+            for config in SELECTOR_CONFIGS:
+                provider = config["provider"]
+                exists = SelectorConfig.objects.filter(provider=provider).exists()
+
+                if exists and not force:
+                    self.stdout.write(
+                        f"  SKIP     {provider} (already exists, use --force to overwrite)"
+                    )
+                    skipped_count += 1
+                    continue
+
+                _, created = SelectorConfig.objects.update_or_create(
+                    provider=provider,
+                    defaults={k: v for k, v in config.items() if k != "provider"},
                 )
-                skipped_count += 1
-                continue
 
-            _, created = SelectorConfig.objects.update_or_create(
-                provider=provider,
-                defaults={k: v for k, v in config.items() if k != "provider"},
+                if created:
+                    self.stdout.write(self.style.SUCCESS(f"  CREATED  {provider}"))
+                    created_count += 1
+                else:
+                    self.stdout.write(self.style.WARNING(f"  UPDATED  {provider}"))
+                    updated_count += 1
+        finally:
+            post_save.connect(update_extension_selector_versions, sender=SelectorConfig)
+
+        if created_count or updated_count:
+            task = update_selector_bundle_version_task.apply_async(  # type: ignore
+                args=(bundle_version,),
+                countdown=SELECTOR_VERSION_PROPAGATION_DELAY_SECONDS,
+                description=f"Update selector bundle version to {bundle_version}",
+            )
+            self.stdout.write(
+                self.style.SUCCESS(
+                    "  SCHEDULED selector bundle propagation "
+                    f"to {bundle_version}. Task ID: {task.id}"
+                )
             )
 
-            if created:
-                self.stdout.write(self.style.SUCCESS(f"  CREATED  {provider}"))
-                created_count += 1
-            else:
-                self.stdout.write(self.style.WARNING(f"  UPDATED  {provider}"))
-                updated_count += 1
-
         self.stdout.write(
-            f"\nDone — {created_count} created, {updated_count} updated, {skipped_count} skipped."
+            f"\nDone - {created_count} created, {updated_count} updated, {skipped_count} skipped."
         )
