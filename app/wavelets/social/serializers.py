@@ -6,6 +6,7 @@ via a single unified endpoint routed by platform + signal_type.
 
 from core.indexes.base_index import BaseIndex
 from core.indexes.facebook_index import FacebookIndex
+from core.indexes.facebook_reels_index import FacebookReelsIndex
 from core.indexes.instagram_index import InstagramIndex
 from core.indexes.linkedin_index import LinkedInIndex
 from core.indexes.reddit_index import RedditIndex
@@ -30,7 +31,7 @@ INDEX_MAPPING: dict[str, dict[str, IndexClass]] = {
     "youtube_shorts": {"feed": YouTubeShortsIndex},
     "instagram": {"feed": InstagramIndex},
     "linkedin": {"feed": LinkedInIndex},
-    "facebook": {"feed": FacebookIndex},
+    "facebook": {"feed": FacebookIndex, "reel": FacebookReelsIndex},
     "reddit": {"feed": RedditIndex},
     "threads": {"feed": ThreadsIndex},
     "twitch": {"feed": TwitchFeedIndex, "played": TwitchStreamIndex},
@@ -53,6 +54,7 @@ class SocialPostSerializer(serializers.Serializer):
     author_display_name = serializers.CharField(allow_blank=True, default="")
     is_verified = serializers.BooleanField(default=False)
     is_ad = serializers.BooleanField(default=False)
+    is_public = serializers.BooleanField(default=False)
 
     # Content
     content_text = serializers.CharField(max_length=5000, allow_blank=True, default="")
@@ -79,6 +81,7 @@ class SocialPostSerializer(serializers.Serializer):
     feed_context_actor = serializers.CharField(allow_blank=True, default="")
     feed_context_action = serializers.CharField(allow_blank=True, default="")
     group_name = serializers.CharField(allow_blank=True, default="")
+    thumbnail_url = serializers.CharField(allow_blank=True, default="")
 
     # URLs & timestamps
     permalink = serializers.CharField()
