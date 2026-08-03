@@ -6,8 +6,8 @@ import time
 
 from django.core.management.base import BaseCommand
 from django.db.utils import OperationalError
+from elastic_transport import ConnectionError as ElasticsearchConnectionError
 from elasticsearch_dsl import connections
-from requests.exceptions import ConnectionError as RequestsConnectionError
 
 
 class Command(BaseCommand):
@@ -29,7 +29,7 @@ class Command(BaseCommand):
                     raise OperationalError(
                         "Elasticsearch did not respond with a ping=True"
                     )
-            except (RequestsConnectionError, OperationalError):
+            except (ElasticsearchConnectionError, OperationalError):
                 self.stdout.write("Elasticsearch unavailable, waiting 1 second...")
                 time.sleep(1)
 
