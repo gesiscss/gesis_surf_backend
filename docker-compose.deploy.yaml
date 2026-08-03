@@ -7,8 +7,6 @@ services:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "xpack.security.enabled=false"
-    ports:
-      - "9200:9200"
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
 
@@ -18,8 +16,6 @@ services:
     restart: always
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
     depends_on:
       - elasticsearch
 
@@ -31,9 +27,6 @@ services:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5044:5044"
-      - "9600:9600"
     depends_on:
       - elasticsearch
 
@@ -63,6 +56,7 @@ services:
     container_name: celery_GESIS_worker_1
     build:
       context: .
+    command: run-celery.sh
     restart: always
     volumes:
       - static-data:/vol/static
@@ -81,6 +75,9 @@ services:
     container_name: flower_GESIS
     build:
       context: .
+    command: run-flower.sh
+    profiles:
+      - monitoring
     restart: always
     volumes:
       - static-data:/vol/static
@@ -92,7 +89,7 @@ services:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_ALLOWED_HOSTS=${DOMAIN}
     ports:
-      - 5555:5555
+      - "127.0.0.1:5555:5555"
     depends_on:
       - db
       - redis
