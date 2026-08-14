@@ -17,6 +17,7 @@
 [Installation](#-installation) •
 [Usage](#-usage) •
 [API Documentation](#-api-documentation) •
+[Deployment](DEPLOYMENT.md) •
 [Contributing](#-contributing) •
 [License](#-license)
 

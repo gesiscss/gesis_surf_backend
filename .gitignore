@@ -103,3 +103,5 @@ db.sqlite3
 **/.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
+.continue/agents/new-config.yaml
+/.idea
