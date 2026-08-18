@@ -356,6 +356,61 @@ docker compose -f docker-compose.deploy.yaml exec -T db pg_dump -U "$DB_USER" "$
 
 For S3 backups, attach an EC2 instance role with permission to write to one backup bucket, then upload the dump with the AWS CLI. This does not require app code changes.
 
+### S3 Upload Setup
+
+The S3 bucket used for Greek deployment dumps is:
+
+```text
+gesis-surf-greek-dumps
+```
+
+Install the AWS CLI on EC2 if it is not already installed:
+
+```bash
+sudo apt update
+sudo apt install -y awscli
+aws --version
+```
+
+The EC2 instance should use an IAM instance role with write access to this bucket. Avoid storing long-lived AWS access keys on the server.
+
+Minimum S3 permissions for the EC2 instance role:
+
+```text
+s3:ListBucket on arn:aws:s3:::gesis-surf-greek-dumps
+s3:GetObject on arn:aws:s3:::gesis-surf-greek-dumps/*
+s3:PutObject on arn:aws:s3:::gesis-surf-greek-dumps/*
+```
+
+Add these values to `.env`:
+
+```env
+S3_BUCKET=gesis-surf-greek-dumps
+S3_PREFIX=
+AWS_REGION=eu-central-1
+```
+
+Test full DB backup generation:
+
+```bash
+chmod +x scripts/export-full-backup.sh
+./scripts/export-full-backup.sh
+```
+
+Test S3 sync:
+
+```bash
+chmod +x scripts/sync-dumps-to-s3.sh
+./scripts/sync-dumps-to-s3.sh
+```
+
+The S3 layout is:
+
+```text
+s3://gesis-surf-greek-dumps/data-dumps/
+s3://gesis-surf-greek-dumps/backups/
+```
+
 ## Analyst Access And Data Dumps
 
 ### Recommended Access Model
@@ -512,7 +567,7 @@ pg_restore --list gesis_surf_tables_YYYYMMDD_HHMMSS.dump
 pg_restore -d target_database gesis_surf_tables_YYYYMMDD_HHMMSS.dump
 ```
 
-### Automate Daily Dumps
+### Automate Dumps And S3 Uploads
 
 Add a cron job on EC2:
 
@@ -520,13 +575,47 @@ Add a cron job on EC2:
 crontab -e
 ```
 
-Example daily export at 02:30:
+Example analytics export every 12 hours:
 
 ```cron
-30 2 * * * cd /home/ubuntu/gesis_surf_backend && OUTPUT_DIR=/srv/gesis-surf/dumps ./scripts/export-data-dump.sh >> /var/log/gesis-surf-dump.log 2>&1
+0 */12 * * * cd /home/ubuntu/gesis_surf_backend && ./scripts/export-data-dump.sh >> /home/ubuntu/gesis_surf_backend/data-dumps/dump.log 2>&1
 ```
 
-Copy dumps to the GESIS analysis server with `scp` or `rsync`, depending on the access provided by the server administrators.
+Example full recovery backup once per day at 02:30:
+
+```cron
+30 2 * * * cd /home/ubuntu/gesis_surf_backend && ./scripts/export-full-backup.sh >> /home/ubuntu/gesis_surf_backend/backups/backup.log 2>&1
+```
+
+Example S3 sync after each analytics dump:
+
+```cron
+15 */12 * * * cd /home/ubuntu/gesis_surf_backend && ./scripts/sync-dumps-to-s3.sh >> /home/ubuntu/gesis_surf_backend/data-dumps/s3-sync.log 2>&1
+```
+
+Example S3 sync after the daily full backup:
+
+```cron
+45 2 * * * cd /home/ubuntu/gesis_surf_backend && ./scripts/sync-dumps-to-s3.sh >> /home/ubuntu/gesis_surf_backend/backups/s3-sync.log 2>&1
+```
+
+The sync script uploads both local folders:
+
+```text
+data-dumps/ -> s3://gesis-surf-greek-dumps/data-dumps/
+backups/    -> s3://gesis-surf-greek-dumps/backups/
+```
+
+It uses `aws s3 sync`, so already uploaded files are not uploaded again unless changed.
+
+Delete local dump and backup files older than 7 days:
+
+```cron
+0 3 * * * find /home/ubuntu/gesis_surf_backend/data-dumps -type f -name "*.dump" -mtime +7 -delete
+5 3 * * * find /home/ubuntu/gesis_surf_backend/backups -type f -name "*.dump" -mtime +7 -delete
+```
+
+This cleanup only deletes local EC2/EBS files. Configure an S3 Lifecycle rule on the bucket if S3 objects should also expire automatically.
 
 ### Existing Production Pattern
 
