@@ -35,4 +35,7 @@ urlpatterns = [
     path("api/globalsession/", include("globalsession.urls")),
     path("api/clicks/", include("clicks.urls")),
     path("api/scrolls/", include("scrolls.urls")),
+    path("api/selectors/", include("selector.urls")),
+    path("api/llm/", include("wavelets.llm.urls")),
+    path("api/social/", include("wavelets.social.urls")),
 ]

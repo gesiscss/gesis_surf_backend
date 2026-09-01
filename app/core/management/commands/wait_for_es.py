@@ -2,8 +2,8 @@
 Django command to wait for Elasticsearch to be available
 """
 
-import time
 import os
+import time
 
 from django.core.management.base import BaseCommand
 from django.db.utils import OperationalError

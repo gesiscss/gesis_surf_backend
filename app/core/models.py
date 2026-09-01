@@ -147,6 +147,7 @@ class Extension(models.Model):
     extension_data_collection = models.BooleanField(default=True)
     history = HistoricalRecords()
     host_version = models.CharField(max_length=32, blank=False, default="0")
+    selector_version = models.CharField(max_length=32, blank=False, default="0")
 
     def __str__(self) -> str:
         """
@@ -503,3 +504,27 @@ class Criteria(models.Model):
     criteria_click = models.BooleanField(blank=False)
     criteria_scroll = models.BooleanField(blank=False)
     snapshot_html = models.BooleanField(blank=False, default=False)
+
+
+class SelectorConfig(models.Model):
+    """Create the selector config model to store the selector configuration for the extension.
+    This model is used to store the selector configuration for the extension,
+    which is used to determine which elements should be tracked by the extension
+    based on the host version and selector version.
+    """
+
+    FAMILY_CHOICES = [
+        ("llm", "LLM"),
+        ("social", "Social"),
+    ]
+
+    family = models.CharField(max_length=32, choices=FAMILY_CHOICES)
+    provider = models.CharField(max_length=32, unique=True)
+    version = models.CharField(max_length=32)
+    hostname_patterns = models.JSONField(default=list, blank=True)
+    selectors = models.JSONField(default=dict, blank=True)
+    is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.family} - {self.provider} ({self.version})"

@@ -179,6 +179,12 @@ Run database migrations as a one-off command:
 docker compose -f docker-compose.deploy.yaml run --rm app python manage.py migrate
 ```
 
+Seed selector configuration for the extension:
+
+```bash
+docker compose -f docker-compose.deploy.yaml run --rm app python manage.py seed_selector_configs --force
+```
+
 Start the backend, Celery worker, and proxy:
 
 ```bash
@@ -262,6 +268,7 @@ cd gesis_surf_backend
 git pull
 docker compose -f docker-compose.deploy.yaml build app celery_worker_1
 docker compose -f docker-compose.deploy.yaml run --rm app python manage.py migrate
+docker compose -f docker-compose.deploy.yaml run --rm app python manage.py seed_selector_configs --force
 docker compose -f docker-compose.deploy.yaml up -d app celery_worker_1 proxy
 docker compose -f docker-compose.deploy.yaml ps
 docker compose -f docker-compose.deploy.yaml logs -f app

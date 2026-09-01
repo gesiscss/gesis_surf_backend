@@ -207,6 +207,14 @@ Interactive API documentation is available via **drf-spectacular**:
 
 ![ERD GESIS](./images/entity_relationship_diagram.png)
 
+### Selector Configuration
+
+Seed or refresh selector configuration data after migrations:
+
+```bash
+docker-compose exec app python manage.py seed_selector_configs --force
+```
+
 ### Key Relationships
 
 | Relationship  | Type         | Description                         |

@@ -65,6 +65,8 @@ INSTALLED_APPS = [
     "host",
     "globalsession",
     "clicks",
+    "selector",
+    "wavelets",
 ]
 
 MIDDLEWARE = [
