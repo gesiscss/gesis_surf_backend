@@ -26,7 +26,7 @@
 
 ## 📖 Overview
 
-GESIS Surf Backend is the server-side component of the GESIS Surf project, designed to collect and manage browsing behavior data for social science research. Built with Django REST Framework, it provides a robust API for browser extension integration.
+GESIS Surf Backend is the server-side component of GESIS Surf, designed to collect web browsing behavior data for social science research. Built with Django REST Framework, it provides a robust API for browser extension integration.
 
 > 🔗 **Looking for the browser extension?** Check out [GESIS Surf Extension](https://github.com/gesiscss/gesis_surf_extension)
 
@@ -72,7 +72,7 @@ GESIS Surf Backend is the server-side component of the GESIS Surf project, desig
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/geomario/gesis_surf_backend.git
+   git clone https://github.com/gesiscss/gesis_surf_backend.git
    cd gesis_surf_backend
    ```
 
@@ -105,7 +105,7 @@ GESIS Surf Backend is the server-side component of the GESIS Surf project, desig
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/geomario/gesis_surf_backend.git
+   git clone https://github.com/gesiscss/gesis_surf_backend.git
    cd gesis_surf_backend
    ```
 
@@ -269,8 +269,8 @@ If you use this software in your research, please cite:
 
 ```bibtex
 @article{ramirez2025gesis,
-  title = {GESIS Surf },
-  author = {Ramirez, Mario and },
+  title = {GESIS Surf: An Open-Source Infrastructure for Privacy-Preserving Web Browsing Data Collection},
+  author = {Mario Alberto Ramirez Munoz and Frank Mangold and Sebastian Stier},
   journal = {SoftwareX},
   volume = {XX},
   pages = {XXXXXX},
@@ -286,12 +286,12 @@ See [CITATION.cff](CITATION.cff) for more citation formats.
 
 - **Mario Ramirez** - _Lead Research Software Engineer_ - [@geomario](https://github.com/geomario) [@MarioGesis](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
 - **Fernando Guzman** - _Software Architect Consultant_ - [@Fernando](https://www.linkedin.com/in/fernando-guzman-9262801b/)
-- **Prof. Dr. Sebastian Stier** - _Department Director CSS_ [@Seb](https://www.gesis.org/en/institute/about-us/staff/person/sebastian.stier)
-- **Dr. Frank Mangold** - _Kommissarischer Teamleiter DDD_ [@Frank](https://www.gesis.org/institut/ueber-uns/mitarbeitendenverzeichnis/person/Frank.Mangold)
+- **Sebastian Stier** - _Scientific Director_ [@Seb](https://www.gesis.org/en/institute/about-us/staff/person/sebastian.stier)
+- **Frank Mangold** - _Senior Researcher_ [@Frank](https://www.gesis.org/institut/ueber-uns/mitarbeitendenverzeichnis/person/Frank.Mangold)
 
-## 🙏 Acknowledgments
+## 🙏 Institutional Affiliation
 
-- [GESIS - Leibniz Institute for the Social Sciences](https://www.gesis.org/)
+- [GESIS - Leibniz Institute for the Social Sciences](https://www.gesis.org/en/home)
 - [Computational Social Science Department](https://www.gesis.org/en/institute/about-us/departments/computational-social-science)
 
 ## 📧 Contact
@@ -299,7 +299,7 @@ See [CITATION.cff](CITATION.cff) for more citation formats.
 Questions or feedback? Reach out!
 
 - **Email**: mario.ramirez@gesis.org
-- **GitHub Issues**: [Create an issue](https://github.com/geomario/gesis_surf_backend/issues)
+- **GitHub Issues**: [Create an issue](https://github.com/gesiscss/gesis_surf_backend/issues)
 
 ---
 
