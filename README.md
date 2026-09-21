@@ -270,7 +270,7 @@ If you use this software in your research, please cite:
 ```bibtex
 @article{ramirez2025gesis,
   title = {GESIS Surf: An Open-Source Infrastructure for Privacy-Preserving Web Browsing Data Collection},
-  author = {Mario Alberto Ramirez Munoz and Frank Mangold and Sebastian Stier},
+  author = {Ramirez Munoz, Mario Alberto and Mangold, Frank and Stier, Sebastian},
   journal = {SoftwareX},
   volume = {XX},
   pages = {XXXXXX},
