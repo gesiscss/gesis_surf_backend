@@ -5,6 +5,7 @@ Views for the host app.
 from celery.result import AsyncResult
 from core.models import Category, Criteria, Host
 from core.tasks import HOST_VERSION_PROPAGATION_DELAY_SECONDS, update_extension_versions_task
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models.signals import post_save, pre_save
 from django.http import JsonResponse
@@ -42,8 +43,24 @@ class HostViewSet(viewsets.ModelViewSet):
     def async_hosts(self, _request):
         """
         Trigger an asynchronous task to fetch hosts and return the task ID.
+        Returns a cached task ID if the result for the current hosts version
+        is already available, avoiding redundant heavy computations.
         """
+        current_version = (
+            Host.objects.values_list("hosts_version", flat=True)
+            .order_by("-created_at")
+            .first()
+        )
+        cache_key = f"hosts_task_{current_version}"
+        cached_task_id = cache.get(cache_key)
+
+        if cached_task_id:
+            result = AsyncResult(cached_task_id)
+            if result.ready():
+                return Response({"task_id": cached_task_id})
+
         task = get_hosts_async.delay()
+        cache.set(cache_key, task.id, timeout=3600)
         return Response({"task_id": task.id})
 
     def get_async_task_result(self, _request, task_id):

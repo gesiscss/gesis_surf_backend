@@ -9,6 +9,7 @@ data with new categories and criteria.
 import logging
 
 from celery import shared_task
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import DatabaseError, IntegrityError
 
@@ -18,6 +19,21 @@ logger = logging.getLogger(__name__)
 
 HOST_VERSION_PROPAGATION_DELAY_SECONDS = 900
 SELECTOR_VERSION_PROPAGATION_DELAY_SECONDS = 180
+
+
+def _prewarm_hosts_cache(version: str) -> None:
+    """Pre-warm the host list cache for the given version.
+
+    Fires get_hosts_async on the heavy queue and stores the task ID in the
+    Django cache so the first user request returns instantly.
+    """
+    from host.tasks import get_hosts_async
+
+    cache_key = f"hosts_task_{version}"
+    if not cache.get(cache_key):
+        task = get_hosts_async.delay()
+        cache.set(cache_key, task.id, timeout=3600)
+        logger.info("Pre-warmed host list cache for version %s, task_id: %s", version, task.id)
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
@@ -77,6 +93,8 @@ def update_extension_versions_task(self, host_id, created, old_hosts_version=Non
                 current_version,
                 host.id,
             )
+
+            _prewarm_hosts_cache(current_version)
 
             return {
                 "status": "success",
@@ -143,6 +161,8 @@ def update_extension_versions_task(self, host_id, created, old_hosts_version=Non
             current_version,
             host.id,
         )
+
+        _prewarm_hosts_cache(current_version)
 
         return {
             "status": "success",
