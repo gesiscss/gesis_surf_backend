@@ -31,7 +31,9 @@ server {
     }
 
     location / {
-        uwsgi_pass           ${APP_HOST}:${APP_PORT};
+        resolver 127.0.0.11 valid=10s;
+        set $app_upstream "${APP_HOST}:${APP_PORT}";
+        uwsgi_pass           $app_upstream;
         include              /etc/nginx/uwsgi_params;
         client_max_body_size 20M;
     }

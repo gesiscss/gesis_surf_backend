@@ -186,7 +186,7 @@ LOGGING = {
             "tags": ["app"],
         },
         "console": {
-            "level": "INFO",
+            "level": "WARNING",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },

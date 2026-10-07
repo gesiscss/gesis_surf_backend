@@ -8,7 +8,7 @@ from django.db.models import QuerySet
 from host.serializers import HostSerializer
 
 
-@shared_task
+@shared_task(queue='heavy')
 def get_hosts_async() -> QuerySet:
     """
     Get all hosts.
