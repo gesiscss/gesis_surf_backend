@@ -268,7 +268,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you use this software in your research, please cite:
 
 ```bibtex
-@article{ramirez2025gesis,
+@article{ramirez2026gesis,
   title = {GESIS Surf: An Open-Source Infrastructure for Privacy-Preserving Web Browsing Data Collection},
   author = {Ramirez Munoz, Mario Alberto and Mangold, Frank and Stier, Sebastian},
   journal = {SoftwareX},
@@ -276,7 +276,7 @@ If you use this software in your research, please cite:
   pages = {XXXXXX},
   year = {2026},
   publisher = {Elsevier},
-  doi = {10.1016/j.softx.2025.xxxxxx}
+  doi = {10.1016/j.softx.2026.xxxxxx}
 }
 ```
 
@@ -284,10 +284,10 @@ See [CITATION.cff](CITATION.cff) for more citation formats.
 
 ## 👥 Authors
 
-- **Mario Ramirez** - _Lead Research Software Engineer_ - [@geomario](https://github.com/geomario) [Mario@GESIS](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
-- **Fernando Guzman** - _Software Architect Consultant_ - [Fernando@LinkedIn](https://www.linkedin.com/in/fernando-guzman-9262801b/)
-- **Frank Mangold** - _Senior Researcher_ - [Frank@GESIS](https://www.gesis.org/institut/ueber-uns/mitarbeitendenverzeichnis/person/Frank.Mangold)
-- **Sebastian Stier** - _Scientific Director_ - [@sebstier](https://github.com/sebstier) [Sebastian@GESIS](https://www.gesis.org/en/institute/about-us/staff/person/sebastian.stier)
+- **Mario Ramirez** - _Lead Research Software Engineer_ - [@geomario](https://github.com/geomario) [GESIS](https://www.gesis.org/en/institute/about-us/staff/person/mario.ramirez)
+- **Fernando Guzman** - _Software Architect Consultant_ - [LinkedIn](https://www.linkedin.com/in/fernando-guzman-9262801b/)
+- **Frank Mangold** - _Senior Researcher_ - [GESIS](https://www.gesis.org/institut/ueber-uns/mitarbeitendenverzeichnis/person/Frank.Mangold)
+- **Sebastian Stier** - _Scientific Director_ - [@sebstier](https://github.com/sebstier) [GESIS](https://www.gesis.org/en/institute/about-us/staff/person/sebastian.stier)
 
 ## 🙏 Institutional Affiliation
 

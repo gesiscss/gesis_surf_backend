@@ -399,7 +399,7 @@ dev ─────────────────────────�
 ## ❓ Questions?
 
 - **Email**: mario.ramirez@gesis.org
-- **GitHub Issues**: [Create an issue](https://github.com/geomario/gesis_surf_backend/issues)
+- **GitHub Issues**: [Create an issue](https://github.com/gesiscss/gesis_surf_backend/issues)
 
 ---
 
