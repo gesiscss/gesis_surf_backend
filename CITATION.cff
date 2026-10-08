@@ -10,18 +10,15 @@ authors:
     email: mario.ramirez@gesis.org
     affiliation: GESIS - Leibniz Institute for the Social Sciences
     orcid: 'https://orcid.org/0009-0005-0960-4745'
-  - given-names: Fernando
-    family-names: Guzman
-    affiliation: Software Architect Consultant
-  - given-names: Sebastian
-    family-names: Stier
-    affiliation: GESIS - Leibniz Institute for the Social Sciences
-    orcid: 'https://orcid.org/0000-0000-0000-0000'  # TODO: Add Sebastian's ORCID
   - given-names: Frank
     family-names: Mangold
     affiliation: GESIS - Leibniz Institute for the Social Sciences
     orcid: 'https://orcid.org/0000-0000-0000-0000'  # TODO: Add Frank's ORCID
-repository-code: 'https://github.com/geomario/gesis_surf_backend'
+  - given-names: Sebastian
+    family-names: Stier
+    affiliation: GESIS - Leibniz Institute for the Social Sciences
+    orcid: 'https://orcid.org/0000-0000-0000-0000'  # TODO: Add Sebastian's ORCID
+repository-code: 'https://github.com/gesiscss/gesis_surf_backend'
 url: 'https://www.gesis.org/'
 abstract: >-
   A Django-based backend for web tracking research services,
@@ -39,10 +36,10 @@ keywords:
 license: MIT
 version: 2.0.0
 date-released: '2026-15-01'
-# doi: '10.1016/j.softx.2025.xxxxxx'
+# doi: '10.1016/j.softx.2026.xxxxxx'
 # identifiers:
 #   - type: doi
-#     value: '10.1016/j.softx.2025.xxxxxx'
+#     value: '10.1016/j.softx.2026.xxxxxx'
 #     description: SoftwareX journal article
 #   - type: doi
 #     value: '10.5281/zenodo.xxxxxxx'
@@ -55,10 +52,10 @@ date-released: '2026-15-01'
 #       orcid: 'https://orcid.org/0000-0000-0000-0000'
 #   title: 'GESIS Surf Backend: A Django-based Platform for Web Tracking Research'
 #   journal: SoftwareX
-#   year: 2025
+#   year: 2026
 #   volume: XX
 #   issue: X
-#   doi: '10.1016/j.softx.2025.xxxxxx'
+#   doi: '10.1016/j.softx.2026.xxxxxx'
 institution:
   name: GESIS - Leibniz Institute for the Social Sciences
   address: Unter Sachsenhausen 6-8
