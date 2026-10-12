@@ -2,7 +2,7 @@ default_install_hook_types:
   - pre-commit
   - pre-push
 default_language_version:
-  python: python3.10
+  python: python3.12
 repos:
   - hooks:
       - id: check-added-large-files
@@ -110,7 +110,7 @@ repos:
     rev: 3.0.11
   - hooks:
       - args:
-          - --py310-plus
+          - --py312-plus
         id: pyupgrade
     repo: https://github.com/asottile/pyupgrade
     rev: v3.21.2
