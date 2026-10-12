@@ -62,7 +62,7 @@ services:
 
   db:
     container_name: db_GESIS_staging
-    image: postgres:13.3-alpine
+    image: postgres:16-alpine
     restart: always
     environment:
       - POSTGRES_DB=${DB_NAME:-dbname}
