@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "web-tracker-backend"
-version = "0.1.0"
+version = "2.0.0"
 description = "GESIS Backend for Web Tracking Tool"
 authors = ["geomario <marm1984@gmail.com>"]
 license = "MIT"
@@ -50,7 +50,7 @@ pylint-django = "^2.5.5"
 pylint = "^3.3.3"
 [tool.commitizen]
 name = "cz_conventional_commits"
-tag_format = "$version"
+tag_format = "v$version"
 version_scheme = "pep440"
 version_provider = "poetry"
 update_changelog_on_bump = true
