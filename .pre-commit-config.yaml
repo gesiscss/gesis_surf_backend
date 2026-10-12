@@ -50,7 +50,7 @@ repos:
     rev: 1.30.0
     hooks:
       - id: django-upgrade
-        args: [--target-version, "4.2"]
+        args: [--target-version, "5.2"]
   - hooks:
       - additional_dependencies:
           - prettier@2.5.1
