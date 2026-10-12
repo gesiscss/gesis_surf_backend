@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{ include = "web_tracker_backend" }]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
 django = "^5.2.17"
 djangorestframework = "^3.16.0"
 django-stubs = "^5.2.0"
