@@ -57,7 +57,7 @@ def create_window(user, **params):
     """
     defaults = {
         "start_time": datetime.now(timezone.utc),
-        "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        "closing_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
         "window_num": random.randint(1, 100),
         # Window session ID unique
         "window_session_id": f"session_{random.randint(10000, 99999)}",
@@ -75,7 +75,7 @@ def create_tab(user, **params) -> Tab:
     """
     defaults = {
         "start_time": datetime.now(timezone.utc),
-        "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        "closing_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
         "tab_num": "Test Tab ID",
         "window_num": 1,  # it is not unique such that can close the tab
         "tab_session_id": f"session_{user.id}_{datetime.now().timestamp()}",
@@ -97,7 +97,7 @@ def create_domain(user, **params) -> Domain:
         "domain_last_accessed": datetime.now(timezone.utc),
         "domain_session_id": f"session_{user.id}_{datetime.now().timestamp()}",
         "start_time": datetime.now(timezone.utc),
-        "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        "closing_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
         "snapshot_html": "<html></html>",
     }
     defaults.update(params)
@@ -112,7 +112,7 @@ def create_click(user, **params) -> Click:
 
     defaults = {
         "click_type": "click",
-        "click_time": "2024-06-01 17:00:00",
+        "click_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
         "click_target_element": "button",
         "click_target_tag": "button",
         "click_target_class": "btn",
@@ -136,7 +136,7 @@ def create_scroll(user, **params) -> Scroll:
         "scroll_y": 0,
         "page_x_offset": 0,
         "page_y_offset": 0,
-        "scroll_time": "2024-06-01 17:00:00",
+        "scroll_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
         "domain": create_domain(user=user),
     }
     defaults.update(params)

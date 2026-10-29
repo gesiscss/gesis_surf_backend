@@ -100,7 +100,10 @@ def main() -> None:
 
         if args.generate_key:
             key = generate_key()
-            logger.info("New encryption key generated: %s", key.decode())
+            logger.info(
+                "New encryption key generated. Store it securely as PATTERN_ENCRYPTION_KEY."
+            )
+            print(key.decode())  # Print to stdout only — do not log secrets
             return
 
         if args.update_patterns:

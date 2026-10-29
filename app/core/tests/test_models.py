@@ -57,8 +57,12 @@ class ModelTests(APITestCase):
         """
 
         wave = models.Wave.objects.create(
-            start_date=datetime.strptime("2021-01-01", "%Y-%m-%d"),
-            end_date=datetime.strptime("2021-02-28", "%Y-%m-%d"),
+            start_date=datetime.strptime("2021-01-01", "%Y-%m-%d").replace(
+                tzinfo=timezone.utc
+            ),
+            end_date=datetime.strptime("2021-02-28", "%Y-%m-%d").replace(
+                tzinfo=timezone.utc
+            ),
             created_at=datetime.now(timezone.utc),
             wave_status="active",
             wave_type="test",
@@ -66,8 +70,14 @@ class ModelTests(APITestCase):
             client_id="test",
         )
 
-        self.assertEqual(wave.start_date, datetime.strptime("2021-01-01", "%Y-%m-%d"))
-        self.assertEqual(wave.end_date, datetime.strptime("2021-02-28", "%Y-%m-%d"))
+        self.assertEqual(
+            wave.start_date,
+            datetime.strptime("2021-01-01", "%Y-%m-%d").replace(tzinfo=timezone.utc),
+        )
+        self.assertEqual(
+            wave.end_date,
+            datetime.strptime("2021-02-28", "%Y-%m-%d").replace(tzinfo=timezone.utc),
+        )
         self.assertEqual(
             round_datetime(wave.created_at),
             round_datetime(datetime.now(timezone.utc)),
@@ -296,20 +306,24 @@ class ModelTests(APITestCase):
             privacy_mode=False,
             privacy_start_time=datetime.strptime(
                 "2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"
-            ),
+            ).replace(tzinfo=timezone.utc),
             privacy_end_time=datetime.strptime(
                 "2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-            ),
+            ).replace(tzinfo=timezone.utc),
         )
 
         self.assertEqual(privacy.privacy_mode, False)
         self.assertEqual(
             privacy.privacy_start_time,
-            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(
             privacy.privacy_end_time,
-            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(privacy.user, user)
 
