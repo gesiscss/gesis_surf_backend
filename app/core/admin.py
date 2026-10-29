@@ -5,6 +5,7 @@ Django admin customization.
 from core import models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 
@@ -60,3 +61,38 @@ admin.site.register(models.Criteria)
 admin.site.register(models.Privacy)
 admin.site.register(models.Extension)
 admin.site.register(models.SelectorConfig)
+
+
+class MobilePolicyReleaseAdmin(admin.ModelAdmin):
+    """
+    Define the admin pages for the published mobile policy releases.
+
+    Releases are immutable snapshots: they are inspected here, created and
+    activated by the publish command, and never deleted.
+    """
+
+    readonly_fields = [
+        "version",
+        "policy_hash",
+        "payload",
+        "is_active",
+        "created_at",
+        "created_by",
+    ]
+
+    def has_add_permission(  # pylint: disable=unused-argument
+        self, request: HttpRequest
+    ) -> bool:
+        """Releases are created by the publish command only."""
+        return False
+
+    def has_delete_permission(  # pylint: disable=unused-argument
+        self, request: HttpRequest, obj: models.MobilePolicyRelease | None = None
+    ) -> bool:
+        """Old releases are kept for replay and rollback."""
+        return False
+
+
+admin.site.register(models.MobileApp)
+admin.site.register(models.MobilePolicyRelease, MobilePolicyReleaseAdmin)
+admin.site.register(models.MobileClient)

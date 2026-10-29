@@ -528,3 +528,139 @@ class SelectorConfig(models.Model):
 
     def __str__(self) -> str:
         return f"{self.family} - {self.provider} ({self.version})"
+
+
+class MobileApp(models.Model):
+    """
+    Editable allow-list entry for the mobile app: one Android package and the
+    tier it belongs to. Published releases are built from the active entries.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    package_name = models.CharField(max_length=255, unique=True, blank=False)
+    display_name = models.CharField(max_length=128, blank=True)
+    # Allowed values (news, social, browser, messenger, email, other) are
+    # checked when a release is published, not by the model
+    category = models.CharField(max_length=32, default="other")
+    # Allowed values (tracked, usage_only, never_log) are checked when a
+    # release is published, not by the model
+    tier = models.CharField(max_length=32, default="usage_only")
+    is_active = models.BooleanField(default=True)
+    rationale = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    updated_at = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the mobile app.
+
+        Returns:
+            str: The package name with its tier.
+        """
+        return f"{self.package_name} ({self.tier})"
+
+
+class MobilePolicyRelease(models.Model):
+    """
+    Immutable, published snapshot of the mobile allow-list. Exactly one release
+    is active at a time; old releases are kept for replay and rollback.
+    """
+
+    IMMUTABLE_FIELDS = ("version", "policy_hash", "payload")
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    version = models.CharField(max_length=32, unique=True, blank=False)
+    # "sha256:" followed by 64 hex characters
+    policy_hash = models.CharField(max_length=71, blank=False)
+    # schema_version, default_tier and apps[] (the part the hash is built from)
+    payload = models.JSONField(default=dict)
+    is_active = models.BooleanField(default=False)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="mobile_policy_releases",
+    )
+
+    class Meta:
+        """
+        Meta class to allow at most one active release.
+        """
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["is_active"],
+                condition=models.Q(is_active=True),
+                name="unique_active_mobile_policy_release",
+            )
+        ]
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Saves the release, refusing to change version, hash or payload of a
+        release that is already stored (only activation and notes may change).
+        """
+        if not self._state.adding:
+            stored = (
+                type(self)
+                .objects.filter(pk=self.pk)  # pylint: disable=no-member
+                .values(*self.IMMUTABLE_FIELDS)
+                .first()
+            )
+            if stored is not None and any(
+                stored[field] != getattr(self, field) for field in self.IMMUTABLE_FIELDS
+            ):
+                raise ValueError("A published mobile policy release is immutable.")
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the release.
+
+        Returns:
+            str: The version, marked when the release is active.
+        """
+        return f"{self.version}{' (active)' if self.is_active else ''}"
+
+
+class MobileClient(models.Model):
+    """
+    Per-user mobile state and kill switch. Created lazily on the first policy
+    fetch, so the user creation flow and the web Extension model stay untouched.
+    """
+
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, blank=False
+    )
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="mobile_client",
+    )
+    app_version = models.CharField(max_length=32, blank=True)
+    platform = models.CharField(max_length=32, blank=True)
+    # Reported by the app (telemetry only, no behaviour depends on them)
+    last_policy_version = models.CharField(max_length=32, blank=True)
+    last_policy_source = models.CharField(max_length=16, blank=True)
+    last_seen_at = models.DateTimeField(blank=True, null=True)
+    data_collection = models.BooleanField(default=True)
+    history = HistoricalRecords()
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the mobile client.
+
+        Returns:
+            str: The app version and the data collection state.
+        """
+        return (
+            f"{self.app_version or 'unknown'} (data_collection={self.data_collection})"
+        )
