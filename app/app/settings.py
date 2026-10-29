@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "clicks",
     "selector",
     "wavelets",
+    "mobile",
 ]
 
 MIDDLEWARE = [
