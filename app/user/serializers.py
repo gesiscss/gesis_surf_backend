@@ -93,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         model = get_user_model()
         fields = ("user_id", "password", "waves", "privacy", "extension")
-        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
+        extra_kwargs = {"password": {"write_only": True, "min_length": 10}}
 
     def to_representation(self, instance):
         """

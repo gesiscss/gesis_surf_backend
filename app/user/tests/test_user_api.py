@@ -48,7 +48,7 @@ class PublicUserApiTests(TestCase):
 
         payload = {
             "user_id": "test",
-            "password": "test123",
+            "password": "testpass12345",
             "privacy": {
                 "privacy_mode": False,
                 "privacy_start_time": datetime.now(timezone.utc).isoformat(),
@@ -77,7 +77,7 @@ class PublicUserApiTests(TestCase):
 
         payload = {
             "user_id": "test",
-            "password": "test123",
+            "password": "testpass12345",
             "privacy": {
                 "privacy_mode": False,
                 "privacy_start_time": datetime.now(timezone.utc).isoformat(),
@@ -107,7 +107,7 @@ class PublicUserApiTests(TestCase):
 
         payload = {
             "user_id": "test",
-            "password": "test123",
+            "password": "testpass12345",
             "privacy": {
                 "privacy_mode": False,
                 "privacy_start_time": datetime.now(timezone.utc).isoformat(),
@@ -153,7 +153,7 @@ class PublicUserApiTests(TestCase):
 
         payload = {
             "user_id": "test",
-            "password": "test123",
+            "password": "testpass12345",
         }
         create_user(**payload)
 
@@ -162,7 +162,7 @@ class PublicUserApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_password_too_short_error(self) -> None:
-        """Tests that the password must be more than 5 characters."""
+        """Tests that the password must be at least 10 characters."""
 
         superuser_credentials = {"user_id": "admin_user", "password": "adminpass123"}
         superuser = create_user(**superuser_credentials)
@@ -186,7 +186,7 @@ class PublicUserApiTests(TestCase):
 
         payload = {
             "user_id": "test",
-            "password": "test123",
+            "password": "testpass12345",
         }
         create_user(**payload)
         response = self.client.post(
@@ -223,6 +223,26 @@ class PublicUserApiTests(TestCase):
 
         self.assertNotIn("token", response.data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_token_endpoint_is_throttled(self) -> None:
+        """Tests that anonymous token attempts are rate limited (audit P1 #7).
+
+        More than 5 unauthenticated requests per minute to the token
+        endpoint must return 429. Legitimate extension logins stay far
+        below this rate.
+        """
+        create_user(user_id="throttle_test", password="testpass12345")
+
+        for _ in range(6):
+            response = self.client.post(
+                TOKEN_URL,
+                {
+                    "user_id": "throttle_test",
+                    "password": "wrongpass12345",
+                },
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
     def test_retrive_user_unauthorized(self) -> None:
         """Tests that authentication is required for users."""
@@ -271,7 +291,7 @@ class PrivateUserApiTests(TestCase):
         """Tests creating a user with waves."""
         payload = {
             "user_id": "test",
-            "password": "test123",
+            "password": "testpass12345",
             "waves": [
                 {
                     "start_date": datetime.now(timezone.utc),
@@ -289,7 +309,7 @@ class PrivateUserApiTests(TestCase):
 
     def test_create_user_without_waves_privacy_extension_authenticated(self) -> None:
         """Tests creating a user without privacy and extension"""
-        payload = {"user_id": "test_dos", "password": "test123"}
+        payload = {"user_id": "test_dos", "password": "testpass12345"}
         response = self.client.post(CREATE_USER_URL, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -303,7 +323,7 @@ class PrivateUserApiTests(TestCase):
         """Tests creating a user with extension"""
         payload = {
             "user_id": "test_tres",
-            "password": "test123",
+            "password": "testpass12345",
             "extension": {
                 "extension_version": "string",
                 "extension_installed_at": datetime.now(timezone.utc),
