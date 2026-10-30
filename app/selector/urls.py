@@ -14,5 +14,6 @@ urlpatterns = [
     path(
         "task-result/<str:task_id>/",
         views.SelectorViewSet.as_view({"get": "get_async_task_result"}),
+        name="selector-task-result",
     ),
 ]
