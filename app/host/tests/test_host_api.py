@@ -9,9 +9,9 @@ from django.urls import reverse
 from host.serializers import HostSerializer
 from rest_framework import status
 from rest_framework.test import APIClient
+from unittest.mock import patch
 
 HOST_URL = reverse("host:host-list")
-TASK_RESULT_URL = reverse("host:host-task-result", args=["nonexistent-task-id"])
 
 
 def create_user(**params):
@@ -127,20 +127,50 @@ class PrivateHostApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Host.objects.count(), 0)  # pylint: disable=no-member
 
-    def test_participant_cannot_trigger_async_hosts(self):
+    def test_participant_can_trigger_async_hosts_and_fetch_once(self):
         """
-        Participant cannot trigger the async host dump task.
+        Participant can trigger the async host task and fetch its result
+        exactly once (extension host sync contract).
         """
-        res = self.client.get(reverse("host:host-async-hosts"))
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_participant_cannot_read_task_result(self):
+        class SingleUseTaskResult:
+            """
+            Behavioral model of a result that is forgotten after fetch.
+            """
+
+            def __init__(self, payload):
+                self._payload = payload
+                self.fetched = False
+
+            def ready(self):
+                return not self.fetched
+
+            @property
+            def result(self):
+                return self._payload
+
+            def forget(self):
+                self.fetched = True
+
+        fake = SingleUseTaskResult([{"hostname": "sync.example"}])
+        result_url = reverse("host:host-task-result", args=["fake-task-id"])
+
+        with patch("host.views.AsyncResult", return_value=fake):
+            first = self.client.get(result_url)
+            self.assertEqual(first.status_code, status.HTTP_200_OK)
+            self.assertIn("sync.example", first.content.decode())
+
+            second = self.client.get(result_url)
+            self.assertEqual(second.status_code, status.HTTP_202_ACCEPTED)
+
+    def test_task_result_unknown_id_returns_processing(self):
         """
-        Participant cannot poll arbitrary Celery task results
-        (task-id oracle, audit P0 #5).
+        Unknown/expired task IDs return 202 Processing (indistinguishable
+        from a not-yet-finished task) without leaking anything.
         """
-        res = self.client.get(TASK_RESULT_URL)
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        res = self.client.get(reverse("host:host-task-result", args=["nonexistent"]))
+        self.assertEqual(res.status_code, status.HTTP_202_ACCEPTED)
+        self.assertIn("Processing", res.content.decode())
 
 
 class AdminHostApiTests(TestCase):
@@ -176,7 +206,12 @@ class AdminHostApiTests(TestCase):
 
     def test_admin_can_trigger_async_hosts(self):
         """
-        Admin async task trigger works.
+        Admin async task trigger works (task dispatch mocked — the real
+        broker round-trip is covered by QA on the compose stack).
         """
-        res = self.client.get(reverse("host:host-async-hosts"))
+        with patch("host.views.get_hosts_async") as mock_task:
+            mock_task.delay.return_value.id = "fake-id"
+            res = self.client.get(reverse("host:host-async-hosts"))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("task_id", res.data)
+        mock_task.delay.assert_called_once()
