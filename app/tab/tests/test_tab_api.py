@@ -518,7 +518,13 @@ class PrivateTabApiTests(APITestCase):
 
     def test_update_tab_assigned_domain(self) -> None:
         """
-        Test updating a tab with assigned domain
+        Test updating a tab with assigned domain.
+
+        The legacy domain_updates field is no longer a serializer field:
+        DRF ignores unknown payloads, so the request succeeds but the
+        domain attributes are NOT updated. This pins the removed
+        dead-code path (audit: domain_updates was never a declared
+        field, _update_domains was unreachable).
         """
 
         # Relationship with window and global session
@@ -537,6 +543,8 @@ class PrivateTabApiTests(APITestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn(domain, tab.domains.all())
+        domain.refresh_from_db()
+        self.assertEqual(domain.domain_title, "example.com")
 
     def test_create_new_domain_on_update(self) -> None:
         """
@@ -614,3 +622,66 @@ class PrivateTabApiTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn(domain, tab.domains.all())
         self.assertEqual(tab.domains.count(), 2)
+
+    def test_patch_with_foreign_domain_id_rejected(self) -> None:
+        """
+        BOLA regression (audit P0 #1): attaching another user's domain via
+        domain_ids must fail with 400 and must not attach the domain.
+        """
+        user_b = create_user(user_id="attacker_b", password="testpass12345")
+        domain_b = create_domain(user=user_b)
+
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+        tab = create_tab(user=self.user, window=window)
+
+        url = detail_url("tab", tab.id)
+        res = self.client.patch(
+            url, {"domain_ids": [str(domain_b.id)]}, format="json"
+        )
+
+        tab.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn(domain_b, tab.domains.all())
+
+    def test_patch_with_own_domain_id_accepted(self) -> None:
+        """
+        BOLA regression (audit P0 #1): attaching one's own domain via
+        domain_ids still works (the extension's normal attach flow).
+        """
+        domain = create_domain(user=self.user)
+
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+        tab = create_tab(user=self.user, window=window)
+
+        url = detail_url("tab", tab.id)
+        res = self.client.patch(
+            url, {"domain_ids": [str(domain.id)]}, format="json"
+        )
+
+        tab.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(domain, tab.domains.all())
+
+    def test_tab_response_does_not_leak_domain_owner(self) -> None:
+        """
+        BOLA regression (audit #14): the nested domain objects in tab
+        responses must not expose the owner's user UUID.
+        """
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+        tab = create_tab(user=self.user, window=window)
+        domain = create_domain(user=self.user)
+        tab.domains.add(domain)
+
+        url = detail_url("tab", tab.id)
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        domain_keys = set(res.data["domains"][0].keys())
+        self.assertNotIn("user", domain_keys)
+        for key in domain_keys:
+            self.assertNotIn(
+                key, ["user"], "owner field must not be serialized"
+            )

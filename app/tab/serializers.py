@@ -19,7 +19,6 @@ class DomainSerializer(serializers.ModelSerializer):
         model = Domain
         fields = [
             "id",
-            "user",
             "start_time",
             "closing_time",
             "domain_title",
@@ -43,9 +42,11 @@ class TabSerializer(serializers.ModelSerializer):
 
     domains = DomainSerializer(many=True, required=False)
 
+    # Scoped per-request in __init__ (BOLA: a queryset of all domains let
+    # any participant attach another participant's domain to their tab).
     domain_ids = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=Domain.objects.all(),
+        queryset=Domain.objects.none(),
         write_only=True,
         required=False,
         source="domains",
@@ -74,6 +75,21 @@ class TabSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
         extra_kwargs = {"user": {"read_only": True}}
 
+    def __init__(self, *args, **kwargs):
+        """
+        Scope the attachable domains to the requesting user (audit P0 #1).
+
+        domain_ids is a many=True related field: the queryset that
+        validates submitted IDs lives on the child_relation, not on the
+        list wrapper.
+        """
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.user and request.user.is_authenticated:
+            self.fields["domain_ids"].child_relation.queryset = (
+                Domain.objects.filter(user=request.user)
+            )
+
     def _create_domains(self, domains: list, tab: Tab) -> None:
         """
         Create the domain objects.
@@ -87,35 +103,17 @@ class TabSerializer(serializers.ModelSerializer):
     def _handle_domains(self, domains: list, tab: Tab) -> None:
         """
         Handle the domains for the tab.
+
+        Only domains owned by the tab's user can be attached (BOLA
+        ownership guard, belt-and-suspenders for the domain_ids scoping).
         """
         if domains and hasattr(domains[0], "id"):
             for domain in domains:
+                if domain.user_id != tab.user_id:
+                    continue
                 tab.domains.add(domain)
         else:
             self._create_domains(domains, tab)
-
-    def _update_domains(self, domain_updates: list, tab: Tab) -> None:
-        """
-        Update the domains for the tab.
-        """
-        auth_user = self.context["request"].user
-
-        for domain_data in domain_updates:
-
-            domain_id = domain_data.get("id")
-
-            if domain_id:
-                try:
-                    domain = Domain.objects.get(id=domain_id, user=auth_user)
-                    for attr, value in domain_data.items():
-                        setattr(domain, attr, value)
-                    domain.save()
-
-                    if domain not in tab.domains.all():
-                        tab.domains.add(domain)
-
-                except Domain.DoesNotExist:
-                    continue
 
     def create(self, validated_data):
         """
@@ -135,7 +133,6 @@ class TabSerializer(serializers.ModelSerializer):
         Update the tab object.
         """
         domains: list = validated_data.pop("domains", None)
-        domain_updates: list = validated_data.pop("domain_updates", None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -143,9 +140,6 @@ class TabSerializer(serializers.ModelSerializer):
         if domains is not None:
             # instance.domains.clear()
             self._handle_domains(domains, instance)
-
-        if domain_updates is not None:
-            self._update_domains(domain_updates, instance)
 
         instance.save()
         return instance
