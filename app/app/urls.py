@@ -39,4 +39,5 @@ urlpatterns = [
     path("api/llm/", include("wavelets.llm.urls")),
     path("api/social/", include("wavelets.social.urls")),
     path("api/mobile/policy/", include("mobile.policy.urls")),
+    path("api/mobile/events/", include("mobile.capture.urls")),
 ]
