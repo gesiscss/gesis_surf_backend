@@ -25,7 +25,9 @@ class SocialPostView(APIView):
         """
         Create a new social post document in the platform-specific ES index.
         """
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
 
         if serializer.is_valid():
             serializer.save()
