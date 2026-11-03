@@ -257,10 +257,21 @@ LOGGING = {
     },
 }
 
-CORS_ALLOWED_ORIGINS = [
+# Default origins: local development + the published Chrome Web Store
+# extension ID. Extra origins (e.g. a re-published extension's new ID)
+# can be added via the CORS_ALLOWED_ORIGINS env var without a code
+# deploy. Empty/malformed env values are filtered so an unset or empty
+# variable cannot crash the boot (RC-4).
+_default_cors_origins = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "chrome-extension://ocmaegpehmnegplnlcjnpphlpbdmdjnc",
+]
+
+CORS_ALLOWED_ORIGINS = _default_cors_origins + [
+    origin.strip()
+    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
 ]
 
 CORS_ALLOW_CREDENTIALS = True
