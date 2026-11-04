@@ -5,6 +5,7 @@ Tests for the user API.
 from datetime import datetime, timezone
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.db import models
 from django.test import TestCase
 from django.urls import reverse
@@ -371,3 +372,17 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(
             response.data["privacy"]["privacy_mode"], payload["privacy"]["privacy_mode"]
         )
+
+    def test_normal_browsing_rate_is_not_throttled(self) -> None:
+        """Tests that an authenticated burst of requests is not throttled.
+
+        The extension sends one request per tab, domain, HTML snapshot,
+        click and scroll. A 60/min limit dropped real browsing data
+        (429s are not retried), so a few hundred requests per minute
+        must pass.
+        """
+        cache.clear()
+
+        for _ in range(300):
+            response = self.client.get(ME_URL)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)

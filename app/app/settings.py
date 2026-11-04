@@ -165,8 +165,12 @@ AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # Flood guard only. The extension sends one request per tab, domain,
+    # HTML snapshot, click and scroll, so normal browsing (and restoring
+    # many tabs at startup) easily exceeds 60/min. Throttled requests are
+    # not retried by the extension and the data is lost.
     "DEFAULT_THROTTLE_RATES": {
-        "user": "60/min",
+        "user": "1200/min",
     },
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.UserRateThrottle",
