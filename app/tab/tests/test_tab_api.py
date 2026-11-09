@@ -503,18 +503,18 @@ class PrivateTabApiTests(APITestCase):
             ],
         }
 
-        # Verify no tab or domain was created
+        res = self.client.post(TAB_URL, payload, format="json")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        # Exactly one domain persisted; both list entries attached it.
         self.assertEqual(
             Domain.objects.filter(
                 domain_title="Duplicate Domain", domain_url="https://duplicate.com"
             ).count(),
-            0,
+            1,
         )
-        try:
-            res = self.client.post(TAB_URL, payload, format="json")
-            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        except django.db.utils.IntegrityError as integrity_error:
-            self.assertIsInstance(integrity_error, django.db.utils.IntegrityError)
+        tab = Tab.objects.get(id=res.data["id"])
+        self.assertEqual(tab.domains.count(), 1)
 
     def test_update_tab_assigned_domain(self) -> None:
         """
@@ -685,3 +685,117 @@ class PrivateTabApiTests(APITestCase):
             self.assertNotIn(
                 key, ["user"], "owner field must not be serialized"
             )
+
+    def test_create_tab_with_long_url_domain(self) -> None:
+        """
+        D9 regression: an 8 KB domain_url saves in full (the extension
+        data-loss investigation found the old index could reject long
+        URLs; the fingerprint index cannot overflow).
+        """
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+
+        payload = {
+            "start_time": datetime.now(timezone.utc).isoformat(),
+            "closing_time": datetime.now(timezone.utc).isoformat(),
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "tab_session_id": "session_12345",
+            "window": str(window.id),
+            "domains": [
+                {
+                    "domain_title": "T" * 8000,
+                    "domain_url": "https://example.com/" + "u" * 8000,
+                    "domain_fav_icon": "Test Icon",
+                    "domain_last_accessed": "Test Status",
+                    "start_time": datetime.now(timezone.utc).isoformat(),
+                    "closing_time": datetime.now(timezone.utc).isoformat(),
+                    "snapshot_html": "<html></html>",
+                }
+            ],
+        }
+
+        res = self.client.post(TAB_URL, payload, format="json")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tab = Tab.objects.get(id=res.data["id"])
+        domain = tab.domains.first()
+        self.assertEqual(len(domain.domain_url), len("https://example.com/") + 8000)
+        self.assertEqual(len(domain.domain_title), 8000)
+
+    def test_resend_same_domain_is_idempotent(self) -> None:
+        """
+        D9b regression: resending the exact same domain payload (an
+        extension retry after a lost response) succeeds and re-attaches
+        the existing row instead of failing on the unique constraint.
+        The tab identifiers differ per request (a retry creates a new
+        tab row; only the domain payload is resent verbatim).
+        """
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+
+        base_payload = {
+            "start_time": datetime.now(timezone.utc).isoformat(),
+            "closing_time": datetime.now(timezone.utc).isoformat(),
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "tab_session_id": "session_12345",
+            "window": str(window.id),
+            "domains": [
+                {
+                    "domain_title": "Retry Domain",
+                    "domain_url": "https://retry.com",
+                    "domain_fav_icon": "Test Icon",
+                    "domain_last_accessed": "Test Status",
+                    "start_time": "2024-06-01T17:00:00Z",
+                    "closing_time": "2024-06-01T17:00:00Z",
+                    "snapshot_html": "<html></html>",
+                }
+            ],
+        }
+
+        first_payload = dict(base_payload, tab_session_id="session_first")
+        first = self.client.post(TAB_URL, first_payload, format="json")
+        self.assertEqual(first.status_code, status.HTTP_201_CREATED)
+
+        second_payload = dict(base_payload, tab_session_id="session_second")
+        second = self.client.post(TAB_URL, second_payload, format="json")
+        self.assertEqual(second.status_code, status.HTTP_201_CREATED)
+
+        # Exactly one domain row; the resend attached the same one.
+        self.assertEqual(
+            Domain.objects.filter(domain_title="Retry Domain").count(), 1
+        )
+
+    def test_two_users_same_domain_url_time_both_save(self) -> None:
+        """
+        D9 regression: two different users visiting the identical domain
+        at the identical microsecond must BOTH save. The user column is
+        part of the fingerprint key, so cross-user false collisions are
+        impossible.
+        """
+        user_b = create_user(user_id="user_b_collide", password="testpass12345")
+        domain_time = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+
+        domain_a = Domain.objects.create(
+            user=self.user,
+            domain_title="Shared Title",
+            domain_url="https://shared.example.com",
+            domain_fav_icon="Test Icon",
+            domain_last_accessed="Test Status",
+            start_time=domain_time,
+            closing_time=domain_time,
+            snapshot_html="<html></html>",
+        )
+        domain_b = Domain.objects.create(
+            user=user_b,
+            domain_title="Shared Title",
+            domain_url="https://shared.example.com",
+            domain_fav_icon="Test Icon",
+            domain_last_accessed="Test Status",
+            start_time=domain_time,
+            closing_time=domain_time,
+            snapshot_html="<html></html>",
+        )
+
+        self.assertNotEqual(domain_a.id, domain_b.id)
+        self.assertEqual(Domain.objects.filter(domain_title="Shared Title").count(), 2)

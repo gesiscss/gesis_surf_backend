@@ -3,6 +3,7 @@ Serializers for the Tab APIs.
 """
 
 from core.models import Domain, Tab
+from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
 
@@ -92,13 +93,42 @@ class TabSerializer(serializers.ModelSerializer):
 
     def _create_domains(self, domains: list, tab: Tab) -> None:
         """
-        Create the domain objects.
+        Create the domain objects; duplicates become success (D9b).
+
+        A resent payload (extension retry after a lost response) hits
+        unique_domain_in_tab. Instead of failing, attach the existing
+        row: the lookup is user-scoped, so a resend can only ever
+        re-attach the sender's own domain (BOLA, a185ddb).
+
+        The try wraps the atomic() block (not inside it): after a
+        constraint violation Postgres marks the transaction aborted,
+        and only the savepoint exit clears that state, so the
+        recovery lookup must run after the atomic block.
         """
-        # Getting authenticated user.
         auth_user = self.context["request"].user
         for domain in domains:
-            domain_obj = Domain.objects.create(user=auth_user, **domain)
+            try:
+                with transaction.atomic():
+                    domain_obj = Domain.objects.create(
+                        user=auth_user, **domain
+                    )
+            except IntegrityError:
+                domain_obj = self._get_existing_domain(domain)
             tab.domains.add(domain_obj)
+
+    def _get_existing_domain(self, domain: dict) -> Domain:
+        """
+        Look up the domain a duplicate insert collided with. The
+        lookup is user-scoped: a resend can only ever re-attach the
+        sender's own row (BOLA, a185ddb).
+        """
+        lookup = {
+            "domain_title": domain["domain_title"],
+            "domain_url": domain["domain_url"],
+            "start_time": domain["start_time"],
+            "user": self.context["request"].user,
+        }
+        return Domain.objects.get(**lookup)
 
     def _handle_domains(self, domains: list, tab: Tab) -> None:
         """
@@ -117,31 +147,30 @@ class TabSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Create a new tab even with duplicated domains.
+        Create a new tab even with duplicated domains (D9b: atomic).
         """
         domains = validated_data.pop("domains", [])
-        tab = Tab.objects.create(**validated_data)
-
-        # Hanlde domains if any
-        if domains:
-            self._handle_domains(domains, tab)
-
+        with transaction.atomic():
+            tab = Tab.objects.create(**validated_data)
+            if domains:
+                self._handle_domains(domains, tab)
         return tab
 
     def update(self, instance: Tab, validated_data: dict) -> Tab:
         """
-        Update the tab object.
+        Update the tab object (D9b: atomic — tab fields and domains
+        save together or not at all).
         """
         domains: list = validated_data.pop("domains", None)
 
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
 
-        if domains is not None:
-            # instance.domains.clear()
-            self._handle_domains(domains, instance)
+            if domains is not None:
+                self._handle_domains(domains, instance)
 
-        instance.save()
+            instance.save()
         return instance
 
 

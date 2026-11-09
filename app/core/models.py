@@ -12,6 +12,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
+from django.db.models import Func
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
@@ -366,7 +367,10 @@ class Domain(models.Model):
 
         constraints = [
             models.UniqueConstraint(
-                fields=["domain_title", "domain_url", "start_time"],
+                "user",
+                Func("domain_title", function="MD5"),
+                Func("domain_url", function="MD5"),
+                "start_time",
                 name="unique_domain_in_tab",
             )
         ]
