@@ -42,6 +42,7 @@ class TabSerializer(serializers.ModelSerializer):
     """
 
     domains = DomainSerializer(many=True, required=False)
+    created_domains = serializers.SerializerMethodField()
 
     # Scoped per-request in __init__ (BOLA: a queryset of all domains let
     # any participant attach another participant's domain to their tab).
@@ -69,6 +70,7 @@ class TabSerializer(serializers.ModelSerializer):
             "tab_num",
             "tab_session_id",
             "domains",
+            "created_domains",
             "domain_ids",
         ]
 
@@ -85,11 +87,19 @@ class TabSerializer(serializers.ModelSerializer):
         list wrapper.
         """
         super().__init__(*args, **kwargs)
+        self._created_domains: list[Domain] = []
         request = self.context.get("request")
         if request and request.user and request.user.is_authenticated:
-            self.fields["domain_ids"].child_relation.queryset = (
-                Domain.objects.filter(user=request.user)
+            self.fields["domain_ids"].child_relation.queryset = Domain.objects.filter(
+                user=request.user
             )
+
+    def get_created_domains(self, instance: Tab) -> list:
+        """Return only nested domains created or recovered by this save."""
+        unique_domains = {domain.pk: domain for domain in self._created_domains}
+        return DomainSerializer(
+            list(unique_domains.values()), many=True, context=self.context
+        ).data
 
     def _create_domains(self, domains: list, tab: Tab) -> None:
         """
@@ -109,12 +119,11 @@ class TabSerializer(serializers.ModelSerializer):
         for domain in domains:
             try:
                 with transaction.atomic():
-                    domain_obj = Domain.objects.create(
-                        user=auth_user, **domain
-                    )
+                    domain_obj = Domain.objects.create(user=auth_user, **domain)
             except IntegrityError:
                 domain_obj = self._get_existing_domain(domain)
             tab.domains.add(domain_obj)
+            self._created_domains.append(domain_obj)
 
     def _get_existing_domain(self, domain: dict) -> Domain:
         """
@@ -149,6 +158,7 @@ class TabSerializer(serializers.ModelSerializer):
         """
         Create a new tab even with duplicated domains (D9b: atomic).
         """
+        self._created_domains = []
         domains = validated_data.pop("domains", [])
         with transaction.atomic():
             tab = Tab.objects.create(**validated_data)
@@ -161,6 +171,7 @@ class TabSerializer(serializers.ModelSerializer):
         Update the tab object (D9b: atomic — tab fields and domains
         save together or not at all).
         """
+        self._created_domains = []
         domains: list = validated_data.pop("domains", None)
 
         with transaction.atomic():
