@@ -104,6 +104,7 @@ class WaveletsConfig(AppConfig):
                     print(f"Created next month's index: {next_index_name}")
                 else:
                     print(f"Next month's index already exists: {next_index_name}")
+                    next_index_template.put_mapping()
 
             print("Elasticsearch indices setup complete.")
 

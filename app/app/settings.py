@@ -180,6 +180,16 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")
 
+# Enable only after the extension's visit-specific linkage contract is verified.
+WAVELET_LINKAGE_ENABLED = bool(int(os.environ.get("WAVELET_LINKAGE_ENABLED", 0)))
+CELERY_BEAT_SCHEDULE = {}
+if WAVELET_LINKAGE_ENABLED:
+    CELERY_BEAT_SCHEDULE["resolve-pending-wavelets"] = {
+        "task": "wavelets.tasks.resolve_pending_wavelets",
+        "schedule": 60.0,
+        "options": {"expires": 60},
+    }
+
 # Logstash configuration
 LOGGING = {
     "version": 1,

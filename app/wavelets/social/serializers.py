@@ -22,6 +22,7 @@ from core.indexes.youtube_watch_index import YouTubeWatchIndex
 from core.models import Domain
 from elasticsearch.exceptions import TransportError
 from rest_framework import serializers
+from wavelets.linkage import add_linkage_metadata
 
 IndexClass = type[BaseIndex]
 
@@ -90,6 +91,7 @@ class SocialPostSerializer(serializers.Serializer):
     captured_at = serializers.DateTimeField()
     page_url = serializers.CharField()
     domain_id = serializers.CharField(allow_blank=True, default="")
+    domain_session_id = serializers.CharField(allow_blank=True, default="")
 
     # Reddit-specific
     subreddit = serializers.CharField(allow_blank=True, default="")
@@ -109,9 +111,8 @@ class SocialPostSerializer(serializers.Serializer):
         A wavelet's domain_id is the join key for web-journey
         reconstruction: an unvalidated value lets any participant
         attach their social activity to another participant's domain
-        (research-data poisoning). Blank stays allowed — the extension
-        sends it for masked/denied domains or when the domain is not
-        yet persisted.
+        (research-data poisoning). Blank stays allowed for domain
+        creation races and older clients that do not send a domain ID.
         """
         if not value:
             return value
@@ -137,6 +138,9 @@ class SocialPostSerializer(serializers.Serializer):
         dynamic mapping pollution from platform-specific fields.
         """
         try:
+            validated_data = add_linkage_metadata(
+                validated_data, self.context.get("request")
+            )
             platform = validated_data["platform"]
             signal_type = validated_data.get("signal_type", "feed")
             platform_map = INDEX_MAPPING[platform]
