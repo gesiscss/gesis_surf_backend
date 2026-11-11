@@ -20,11 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "setmeinprod")
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.environ.get("DJANGO_DEBUG", 0)))
+
+# SECURITY WARNING: keep the secret key used in production secret!
+if not os.environ.get("DJANGO_SECRET_KEY") and not DEBUG:
+    raise ValueError(
+        "DJANGO_SECRET_KEY environment variable must be set when DJANGO_DEBUG=0"
+    )
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY", "dev-only-insecure-key-do-not-use-in-production"
+)
 
 ALLOWED_HOSTS: list[str] = (
     [] if DEBUG else os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
@@ -160,10 +166,30 @@ AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # Flood guard only. The extension sends one request per tab, domain,
+    # HTML snapshot, click and scroll, so normal browsing (and restoring
+    # many tabs at startup) easily exceeds 60/min. Throttled requests are
+    # not retried by the extension and the data is lost.
+    "DEFAULT_THROTTLE_RATES": {
+        "user": "1200/min",
+    },
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.UserRateThrottle",
+    ],
 }
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")
+
+# Enable only after the extension's visit-specific linkage contract is verified.
+WAVELET_LINKAGE_ENABLED = bool(int(os.environ.get("WAVELET_LINKAGE_ENABLED", 0)))
+CELERY_BEAT_SCHEDULE = {}
+if WAVELET_LINKAGE_ENABLED:
+    CELERY_BEAT_SCHEDULE["resolve-pending-wavelets"] = {
+        "task": "wavelets.tasks.resolve_pending_wavelets",
+        "schedule": 60.0,
+        "options": {"expires": 60},
+    }
 
 # Logstash configuration
 LOGGING = {
@@ -246,10 +272,21 @@ LOGGING = {
     },
 }
 
-CORS_ALLOWED_ORIGINS = [
+# Default origins: local development + the published Chrome Web Store
+# extension ID. Extra origins (e.g. a re-published extension's new ID)
+# can be added via the CORS_ALLOWED_ORIGINS env var without a code
+# deploy. Empty/malformed env values are filtered so an unset or empty
+# variable cannot crash the boot (RC-4).
+_default_cors_origins = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "chrome-extension://ocmaegpehmnegplnlcjnpphlpbdmdjnc",
+]
+
+CORS_ALLOWED_ORIGINS = _default_cors_origins + [
+    origin.strip()
+    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
 ]
 
 CORS_ALLOW_CREDENTIALS = True

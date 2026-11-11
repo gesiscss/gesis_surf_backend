@@ -17,6 +17,22 @@
 
 ## Quick Start
 
+### Exact domain results in tab responses (B5)
+
+Tab POST/PATCH responses include a read-only `created_domains` array containing
+the nested Domain records created or reused by that request, in input order
+with duplicate UUIDs removed. Entries use the existing nested domain response
+shape, including `id`, `domain_session_id`, and `start_time`.
+
+The existing `domains` array still contains all domains associated with the tab.
+GET responses, updates without nested domains, and attachments via `domain_ids`
+return `created_domains: []`. Client-provided `created_domains` is ignored.
+No database migration is needed.
+
+The extension can consume this array to match the exact visit session hint
+instead of sorting the tab's full domain history. This backend addition does not
+change the extension or enable Celery scheduling.
+
 ### What You Get
 
 - ✅ **Automatic Monthly Indexes**: `your_addon_2025_11`, `your_addon_2025_12`, etc.

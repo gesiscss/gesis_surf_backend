@@ -4,7 +4,7 @@ Base index for all indexes
 
 from datetime import datetime, timezone
 
-from elasticsearch_dsl import Date, Document
+from elasticsearch_dsl import Date, Document, Keyword
 
 
 class BaseIndex(Document):
@@ -14,6 +14,9 @@ class BaseIndex(Document):
 
     created_at = Date()
     updated_at = Date()
+    domain_session_id = Keyword()
+    user_id = Keyword()
+    link_status = Keyword()
 
     class Index:
         """
@@ -61,6 +64,7 @@ class BaseIndex(Document):
             print(f"Created monthly index: {current_index_name}")
         else:
             print(f"Monthly index already exists: {current_index_name}")
+            index_template.put_mapping()
 
         return current_index_name
 

@@ -6,8 +6,10 @@ from core.indexes.chatgpt_index import ChatGPTIndex
 from core.indexes.claude_index import ClaudeIndex
 from core.indexes.deepseek_index import DeepSeekIndex
 from core.indexes.gemini_index import GeminiIndex
+from core.models import Domain
 from elasticsearch.exceptions import TransportError
 from rest_framework import serializers
+from wavelets.linkage import add_linkage_metadata
 
 INDEX_MAPPING = {
     "chatgpt": ChatGPTIndex,
@@ -26,6 +28,7 @@ class LLMDataSerializer(serializers.Serializer):
     message_content = serializers.CharField()
     timestamp = serializers.DateTimeField()
     domain_id = serializers.CharField(allow_blank=True, default="")
+    domain_session_id = serializers.CharField(allow_blank=True, default="")
     message_id = serializers.CharField()
     message_type = serializers.CharField()
     llm_provider = serializers.ChoiceField(choices=list(INDEX_MAPPING.keys()))
@@ -33,11 +36,34 @@ class LLMDataSerializer(serializers.Serializer):
     page_title = serializers.CharField(allow_blank=True, default="")
     url = serializers.CharField(allow_blank=True, default="")
 
+    def validate_domain_id(self, value: str) -> str:
+        """
+        Reject domain_ids the sender does not own (BOLA, audit P0 #2).
+
+        A wavelet's domain_id is the join key for web-journey
+        reconstruction: an unvalidated value lets any participant
+        attach their LLM activity to another participant's domain
+        (research-data poisoning). Blank stays allowed for domain
+        creation races and older clients that do not send a domain ID.
+        """
+        if not value:
+            return value
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if not user or not user.is_authenticated:
+            raise serializers.ValidationError("Authentication required.")
+        if not Domain.objects.filter(id=value, user=user).exists():
+            raise serializers.ValidationError("Invalid domain_id.")
+        return value
+
     def create(self, validated_data: dict) -> object:
         """
         Create a new LLMData instance.
         """
         try:
+            validated_data = add_linkage_metadata(
+                validated_data, self.context.get("request")
+            )
             provider = validated_data["llm_provider"]
             index_class = INDEX_MAPPING[provider]
             doc = index_class(**validated_data)

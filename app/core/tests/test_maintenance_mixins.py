@@ -69,7 +69,7 @@ class PrivateDomainApiTestsMaintenance(APITestCase):
         self.assertEqual(get_response.status_code, status.HTTP_200_OK)
 
         # Test UPDATE user
-        update_response = self.client.patch(reverse("user:me"), {"password": "newpass"})
+        update_response = self.client.patch(reverse("user:me"), {"password": "newpassword123"})
         self.assertEqual(update_response.status_code, status.HTTP_200_OK)
 
     @override_settings(MAINTENANCE_MODE=True)

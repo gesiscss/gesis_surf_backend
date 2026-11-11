@@ -57,8 +57,12 @@ class ModelTests(APITestCase):
         """
 
         wave = models.Wave.objects.create(
-            start_date=datetime.strptime("2021-01-01", "%Y-%m-%d"),
-            end_date=datetime.strptime("2021-02-28", "%Y-%m-%d"),
+            start_date=datetime.strptime("2021-01-01", "%Y-%m-%d").replace(
+                tzinfo=timezone.utc
+            ),
+            end_date=datetime.strptime("2021-02-28", "%Y-%m-%d").replace(
+                tzinfo=timezone.utc
+            ),
             created_at=datetime.now(timezone.utc),
             wave_status="active",
             wave_type="test",
@@ -66,8 +70,14 @@ class ModelTests(APITestCase):
             client_id="test",
         )
 
-        self.assertEqual(wave.start_date, datetime.strptime("2021-01-01", "%Y-%m-%d"))
-        self.assertEqual(wave.end_date, datetime.strptime("2021-02-28", "%Y-%m-%d"))
+        self.assertEqual(
+            wave.start_date,
+            datetime.strptime("2021-01-01", "%Y-%m-%d").replace(tzinfo=timezone.utc),
+        )
+        self.assertEqual(
+            wave.end_date,
+            datetime.strptime("2021-02-28", "%Y-%m-%d").replace(tzinfo=timezone.utc),
+        )
         self.assertEqual(
             round_datetime(wave.created_at),
             round_datetime(datetime.now(timezone.utc)),
@@ -118,6 +128,40 @@ class ModelTests(APITestCase):
         self.assertEqual(domain.user, user)
         self.assertEqual(domain.domain_title, "example.com")
         self.assertEqual(domain.domain_url, "https://www.test.com")
+
+    def test_session_ids_follow_extension_format(self) -> None:
+        user = create_user(user_id="session-id-test", password="test123")
+        global_session = create_global_session(user=user)
+        window = create_window(user=user, global_session=global_session, window_num=12)
+        tab = create_tab(user=user, window=window, tab_num="34")
+        domain = create_domain(
+            user=user,
+            window=window,
+            tab=tab,
+            domain_url="https://example.com/page",
+        )
+
+        self.assertRegex(
+            global_session.global_session_id,
+            r"^global-session-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-"
+            r"[0-9a-f]{4}-[0-9a-f]{12}$",
+        )
+        self.assertEqual(
+            window.window_session_id,
+            f"{global_session.global_session_id}-windowId-12",
+        )
+        self.assertEqual(tab.tab_session_id, f"{window.window_session_id}-tabId-34")
+        self.assertEqual(
+            domain.domain_session_id,
+            f"{window.window_session_id}-tabId-34-domain-https://example.com/page",
+        )
+        for session_id in (
+            global_session.global_session_id,
+            window.window_session_id,
+            tab.tab_session_id,
+            domain.domain_session_id,
+        ):
+            self.assertNotIn(str(user.id), session_id)
 
     def test_create_click(self) -> None:
         """
@@ -296,20 +340,24 @@ class ModelTests(APITestCase):
             privacy_mode=False,
             privacy_start_time=datetime.strptime(
                 "2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"
-            ),
+            ).replace(tzinfo=timezone.utc),
             privacy_end_time=datetime.strptime(
                 "2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-            ),
+            ).replace(tzinfo=timezone.utc),
         )
 
         self.assertEqual(privacy.privacy_mode, False)
         self.assertEqual(
             privacy.privacy_start_time,
-            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(
             privacy.privacy_end_time,
-            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            datetime.strptime("2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=timezone.utc
+            ),
         )
         self.assertEqual(privacy.user, user)
 

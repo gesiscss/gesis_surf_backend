@@ -42,9 +42,16 @@ class SelectorViewSet(viewsets.GenericViewSet):
 
     def get_async_task_result(self, _request, task_id=None):
         """
-        Endpoint to get the result of an asynchronous task by its task ID.
+        Get the result of an asynchronous selector task by its task ID.
+
+        Single-use: the result is deleted from the backend (forget) right
+        after it is fetched, so a task ID cannot be re-read once served.
+        This is the extension's only selector fetch path, so it stays
+        participant-open (audit P0 #5, A-lite decision).
         """
         task_result = AsyncResult(task_id)
         if task_result.ready():
-            return JsonResponse(task_result.result, safe=False, status=200)
+            payload = task_result.result
+            task_result.forget()
+            return JsonResponse(payload, safe=False, status=200)
         return JsonResponse({"status": "Processing"}, status=202)

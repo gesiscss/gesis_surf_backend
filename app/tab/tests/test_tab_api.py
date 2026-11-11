@@ -252,10 +252,10 @@ class PrivateTabApiTests(APITestCase):
                     "domain_last_accessed": "Test Status",
                     "start_time": datetime.strptime(
                         "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                     "closing_time": datetime.strptime(
                         "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                 },
                 {
                     "domain_title": "Test Domain 2",
@@ -264,10 +264,10 @@ class PrivateTabApiTests(APITestCase):
                     "domain_last_accessed": "Test Status 2",
                     "start_time": datetime.strptime(
                         "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                     "closing_time": datetime.strptime(
                         "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                 },
             ],
         }
@@ -353,8 +353,12 @@ class PrivateTabApiTests(APITestCase):
             domain_fav_icon="Test Icon",
             domain_last_accessed="2024-06-01T17:00:00Z",
             domain_session_id="domain_12345",
-            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            start_time=datetime.strptime(
+                "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
+            closing_time=datetime.strptime(
+                "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
             snapshot_html="<html></html>",
         )
 
@@ -499,22 +503,28 @@ class PrivateTabApiTests(APITestCase):
             ],
         }
 
-        # Verify no tab or domain was created
+        res = self.client.post(TAB_URL, payload, format="json")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        # Exactly one domain persisted; both list entries attached it.
         self.assertEqual(
             Domain.objects.filter(
                 domain_title="Duplicate Domain", domain_url="https://duplicate.com"
             ).count(),
-            0,
+            1,
         )
-        try:
-            res = self.client.post(TAB_URL, payload, format="json")
-            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        except django.db.utils.IntegrityError as integrity_error:
-            self.assertIsInstance(integrity_error, django.db.utils.IntegrityError)
+        tab = Tab.objects.get(id=res.data["id"])
+        self.assertEqual(tab.domains.count(), 1)
 
     def test_update_tab_assigned_domain(self) -> None:
         """
-        Test updating a tab with assigned domain
+        Test updating a tab with assigned domain.
+
+        The legacy domain_updates field is no longer a serializer field:
+        DRF ignores unknown payloads, so the request succeeds but the
+        domain attributes are NOT updated. This pins the removed
+        dead-code path (audit: domain_updates was never a declared
+        field, _update_domains was unreachable).
         """
 
         # Relationship with window and global session
@@ -533,6 +543,8 @@ class PrivateTabApiTests(APITestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn(domain, tab.domains.all())
+        domain.refresh_from_db()
+        self.assertEqual(domain.domain_title, "example.com")
 
     def test_create_new_domain_on_update(self) -> None:
         """
@@ -556,10 +568,10 @@ class PrivateTabApiTests(APITestCase):
                         "domain_last_accessed": "Test Status",
                         "start_time": datetime.strptime(
                             "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                        ),
+                        ).replace(tzinfo=timezone.utc),
                         "closing_time": datetime.strptime(
                             "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-                        ),
+                        ).replace(tzinfo=timezone.utc),
                         "snapshot_html": "<html></html>",
                     }
                 ]
@@ -587,8 +599,12 @@ class PrivateTabApiTests(APITestCase):
             domain_url="Test URL",
             domain_fav_icon="Test Icon",
             domain_last_accessed="Test Status",
-            start_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-            closing_time=datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+            start_time=datetime.strptime(
+                "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
+            closing_time=datetime.strptime(
+                "2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
             snapshot_html="<html></html>",
             domain_session_id="domain_12345",
         )
@@ -606,3 +622,180 @@ class PrivateTabApiTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn(domain, tab.domains.all())
         self.assertEqual(tab.domains.count(), 2)
+
+    def test_patch_with_foreign_domain_id_rejected(self) -> None:
+        """
+        BOLA regression (audit P0 #1): attaching another user's domain via
+        domain_ids must fail with 400 and must not attach the domain.
+        """
+        user_b = create_user(user_id="attacker_b", password="testpass12345")
+        domain_b = create_domain(user=user_b)
+
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+        tab = create_tab(user=self.user, window=window)
+
+        url = detail_url("tab", tab.id)
+        res = self.client.patch(
+            url, {"domain_ids": [str(domain_b.id)]}, format="json"
+        )
+
+        tab.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn(domain_b, tab.domains.all())
+
+    def test_patch_with_own_domain_id_accepted(self) -> None:
+        """
+        BOLA regression (audit P0 #1): attaching one's own domain via
+        domain_ids still works (the extension's normal attach flow).
+        """
+        domain = create_domain(user=self.user)
+
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+        tab = create_tab(user=self.user, window=window)
+
+        url = detail_url("tab", tab.id)
+        res = self.client.patch(
+            url, {"domain_ids": [str(domain.id)]}, format="json"
+        )
+
+        tab.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(domain, tab.domains.all())
+
+    def test_tab_response_does_not_leak_domain_owner(self) -> None:
+        """
+        BOLA regression (audit #14): the nested domain objects in tab
+        responses must not expose the owner's user UUID.
+        """
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+        tab = create_tab(user=self.user, window=window)
+        domain = create_domain(user=self.user)
+        tab.domains.add(domain)
+
+        url = detail_url("tab", tab.id)
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        domain_keys = set(res.data["domains"][0].keys())
+        self.assertNotIn("user", domain_keys)
+        for key in domain_keys:
+            self.assertNotIn(
+                key, ["user"], "owner field must not be serialized"
+            )
+
+    def test_create_tab_with_long_url_domain(self) -> None:
+        """
+        D9 regression: an 8 KB domain_url saves in full (the extension
+        data-loss investigation found the old index could reject long
+        URLs; the fingerprint index cannot overflow).
+        """
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+
+        payload = {
+            "start_time": datetime.now(timezone.utc).isoformat(),
+            "closing_time": datetime.now(timezone.utc).isoformat(),
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "tab_session_id": "session_12345",
+            "window": str(window.id),
+            "domains": [
+                {
+                    "domain_title": "T" * 8000,
+                    "domain_url": "https://example.com/" + "u" * 8000,
+                    "domain_fav_icon": "Test Icon",
+                    "domain_last_accessed": "Test Status",
+                    "start_time": datetime.now(timezone.utc).isoformat(),
+                    "closing_time": datetime.now(timezone.utc).isoformat(),
+                    "snapshot_html": "<html></html>",
+                }
+            ],
+        }
+
+        res = self.client.post(TAB_URL, payload, format="json")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tab = Tab.objects.get(id=res.data["id"])
+        domain = tab.domains.first()
+        self.assertEqual(len(domain.domain_url), len("https://example.com/") + 8000)
+        self.assertEqual(len(domain.domain_title), 8000)
+
+    def test_resend_same_domain_is_idempotent(self) -> None:
+        """
+        D9b regression: resending the exact same domain payload (an
+        extension retry after a lost response) succeeds and re-attaches
+        the existing row instead of failing on the unique constraint.
+        The tab identifiers differ per request (a retry creates a new
+        tab row; only the domain payload is resent verbatim).
+        """
+        global_session = create_global_session(user=self.user)
+        window = create_window(user=self.user, global_session=global_session)
+
+        base_payload = {
+            "start_time": datetime.now(timezone.utc).isoformat(),
+            "closing_time": datetime.now(timezone.utc).isoformat(),
+            "tab_num": "Test Tab ID",
+            "window_num": "1",
+            "tab_session_id": "session_12345",
+            "window": str(window.id),
+            "domains": [
+                {
+                    "domain_title": "Retry Domain",
+                    "domain_url": "https://retry.com",
+                    "domain_fav_icon": "Test Icon",
+                    "domain_last_accessed": "Test Status",
+                    "start_time": "2024-06-01T17:00:00Z",
+                    "closing_time": "2024-06-01T17:00:00Z",
+                    "snapshot_html": "<html></html>",
+                }
+            ],
+        }
+
+        first_payload = dict(base_payload, tab_session_id="session_first")
+        first = self.client.post(TAB_URL, first_payload, format="json")
+        self.assertEqual(first.status_code, status.HTTP_201_CREATED)
+
+        second_payload = dict(base_payload, tab_session_id="session_second")
+        second = self.client.post(TAB_URL, second_payload, format="json")
+        self.assertEqual(second.status_code, status.HTTP_201_CREATED)
+
+        # Exactly one domain row; the resend attached the same one.
+        self.assertEqual(
+            Domain.objects.filter(domain_title="Retry Domain").count(), 1
+        )
+
+    def test_two_users_same_domain_url_time_both_save(self) -> None:
+        """
+        D9 regression: two different users visiting the identical domain
+        at the identical microsecond must BOTH save. The user column is
+        part of the fingerprint key, so cross-user false collisions are
+        impossible.
+        """
+        user_b = create_user(user_id="user_b_collide", password="testpass12345")
+        domain_time = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+
+        domain_a = Domain.objects.create(
+            user=self.user,
+            domain_title="Shared Title",
+            domain_url="https://shared.example.com",
+            domain_fav_icon="Test Icon",
+            domain_last_accessed="Test Status",
+            start_time=domain_time,
+            closing_time=domain_time,
+            snapshot_html="<html></html>",
+        )
+        domain_b = Domain.objects.create(
+            user=user_b,
+            domain_title="Shared Title",
+            domain_url="https://shared.example.com",
+            domain_fav_icon="Test Icon",
+            domain_last_accessed="Test Status",
+            start_time=domain_time,
+            closing_time=domain_time,
+            snapshot_html="<html></html>",
+        )
+
+        self.assertNotEqual(domain_a.id, domain_b.id)
+        self.assertEqual(Domain.objects.filter(domain_title="Shared Title").count(), 2)

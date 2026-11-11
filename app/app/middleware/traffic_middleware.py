@@ -14,6 +14,10 @@ from django.utils.deprecation import MiddlewareMixin
 
 logger: logging.Logger = logging.getLogger("app.middleware")
 
+# Never log full credentials: mask Authorization tokens to their first
+# 4 characters (audit P2 #13 — raw tokens were going to Logstash).
+AUTH_TOKEN_PREFIX_LENGTH = 4
+
 # Constants for logging messages
 REQUEST_LOG_MSG = (
     "Request by %(user_detail)s, Method: %(method)s, Path: %(path)s, "
@@ -56,6 +60,21 @@ class LoggingMiddleware(MiddlewareMixin):
     - 5xx status codes are logged as error
     """
 
+    def _mask_auth_header(self, auth_header: str) -> str:
+        """
+        Mask an Authorization header for logging: keep the scheme and
+        the first few token characters, drop the rest.
+
+        Args:
+            auth_header: The raw Authorization header value
+
+        Returns:
+            str: The masked header, safe for logs
+        """
+        scheme, _, token = auth_header.partition(" ")
+        prefix = token[:AUTH_TOKEN_PREFIX_LENGTH]
+        return f"{scheme} {prefix}****"
+
     def _get_user_detail(
         self, user: Any | None = None, auth_header: str | None = None
     ) -> str:
@@ -78,7 +97,8 @@ class LoggingMiddleware(MiddlewareMixin):
                 user = User.objects.get(auth_token=token)
                 return f"UUID: {user.id}"
             except (User.DoesNotExist, ValueError) as auth_error:
-                logger.warning("Auth Error: %s - %s", auth_header, str(auth_error))
+                masked = self._mask_auth_header(auth_header)
+                logger.warning("Auth Error: %s - %s", masked, str(auth_error))
                 return "Anonymous (Invalid Token)"
             except (AttributeError, TypeError) as validation_error:
                 # Handle specific validation errors

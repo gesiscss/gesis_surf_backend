@@ -10,49 +10,83 @@ from django.db.models.signals import post_save, pre_save
 from django.http import JsonResponse
 from host import serializers
 from host.tasks import get_hosts_async
-from rest_framework import status, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+
+
+class IsAdminOrReadOnly(IsAdminUser):
+    """
+    Allow read-only access to any authenticated user;
+    require admin for write operations.
+    """
+
+    def has_permission(self, request, view) -> bool:
+        is_admin = super().has_permission(request, view)
+        if request.method in permissions.SAFE_METHODS:
+            return request.user and request.user.is_authenticated
+        return is_admin
 
 
 class HostViewSet(viewsets.ModelViewSet):
     """
     Manage hosts in the database.
+
+    Reads are available to any authenticated user (extension clients fetch
+    hosts here). Mutations are admin-only: host writes schedule version
+    pushes to every participant extension, so they must not be reachable
+    by participants (audit P0 #3).
     """
 
     serializer_class = serializers.HostSerializer
-    # Objects available to the authenticated user.
+    # All hosts are readable by any authenticated user.
     queryset = Host.objects.all()  # pylint: disable=no-member
     authentication_classes = [
         TokenAuthentication,
     ]
     permission_classes = [
-        IsAuthenticated,
+        IsAdminOrReadOnly,
     ]
 
     def get_queryset(self):
         """
-        Return objects for the current authenticated user only.
+        Return a fresh queryset on every request: hosts are shared
+        reference data, not per-user objects, and every authenticated
+        extension client reads them. Cloning (all()) matters because the
+        class-level queryset would otherwise cache its first result set
+        and serve stale hosts forever.
         """
-        return self.queryset.filter()
+        return self.queryset.all()
 
     @action(detail=False, methods=["get"])
     def async_hosts(self, _request):
         """
         Trigger an asynchronous task to fetch hosts and return the task ID.
+
+        Participant-open: the extension host sync triggers this with the
+        participant token (me/ version check -> async_hosts -> poll
+        task-result). The result is single-use (see get_async_task_result).
         """
         task = get_hosts_async.delay()
         return Response({"task_id": task.id})
 
-    def get_async_task_result(self, _request, task_id):
+    def get_async_task_result(self, _request, task_id=None):
         """
-        Endpoint to get the result of an asynchronous task by its task ID.
+        Get the result of an asynchronous host task by its task ID.
+
+        Single-use: the result is deleted from the backend (forget) right
+        after it is fetched, so a task ID cannot be re-read once served.
+        Unfetched/expired IDs behave like unknown IDs (202 Processing),
+        closing the task-result oracle without touching the extension
+        contract (audit P0 #5, decided A-lite).
         """
         task_result = AsyncResult(task_id)
         if task_result.ready():
-            return JsonResponse(task_result.result, safe=False, status=200)
+            payload = task_result.result
+            task_result.forget()
+            return JsonResponse(payload, safe=False, status=200)
         return JsonResponse({"status": "Processing"}, status=202)
 
     @action(detail=False, methods=["post"], url_path="bulk")

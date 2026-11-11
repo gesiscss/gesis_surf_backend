@@ -5,7 +5,7 @@ Helper functions for tests.
 import random
 from datetime import datetime, timezone
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from core.models import Click, Domain, GlobalSession, Scroll, Tab, Window
 from django.contrib.auth import get_user_model
@@ -44,7 +44,7 @@ def create_global_session(user: AbstractUser, **params: Any) -> GlobalSession:
     """
     defaults: dict[str, Any] = {
         "start_time": datetime.now(timezone.utc),
-        "global_session_id": f"session_{random.randint(10000, 99999)}",
+        "global_session_id": f"global-session-{uuid4()}",
     }
     defaults.update(params)
 
@@ -55,13 +55,18 @@ def create_window(user, **params):
     """
     Create and return a sample window
     """
+    window_num = params.get("window_num", random.randint(1, 100))
+    global_session = params.get("global_session")
+    global_session_id = (
+        global_session.global_session_id
+        if global_session
+        else f"global-session-{uuid4()}"
+    )
     defaults = {
         "start_time": datetime.now(timezone.utc),
-        "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        "window_num": random.randint(1, 100),
-        # Window session ID unique
-        "window_session_id": f"session_{random.randint(10000, 99999)}",
-        # Global session ID relation
+        "closing_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
+        "window_num": window_num,
+        "window_session_id": f"{global_session_id}-windowId-{window_num}",
         "global_session": None,
     }
     # Update the defaults with the params provided in the function.
@@ -73,12 +78,19 @@ def create_tab(user, **params) -> Tab:
     """
     Create and return a sample tab
     """
+    tab_num = params.get("tab_num", "Test Tab ID")
+    window = params.get("window")
+    window_session_id = (
+        window.window_session_id
+        if window
+        else f"global-session-{uuid4()}-windowId-{params.get('window_num', 1)}"
+    )
     defaults = {
         "start_time": datetime.now(timezone.utc),
-        "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
-        "tab_num": "Test Tab ID",
+        "closing_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
+        "tab_num": tab_num,
         "window_num": 1,  # it is not unique such that can close the tab
-        "tab_session_id": f"session_{user.id}_{datetime.now().timestamp()}",
+        "tab_session_id": f"{window_session_id}-tabId-{tab_num}",
         "window": None,
     }
     defaults.update(params)
@@ -86,18 +98,34 @@ def create_tab(user, **params) -> Tab:
     return tab
 
 
-def create_domain(user, **params) -> Domain:
+def create_domain(
+    user, *, window: Window | None = None, tab: Tab | None = None, **params
+) -> Domain:
     """
     Create and return a sample domain
     """
+    if window is None and tab is not None:
+        window = tab.window
+
+    domain_url = params.get("domain_url", "https://www.example.com")
+    if window is not None and tab is not None:
+        window_session_id = window.window_session_id
+        tab_num = tab.tab_num
+    else:
+        window_num = random.randint(1, 100)
+        window_session_id = f"global-session-{uuid4()}-windowId-{window_num}"
+        tab_num = str(random.randint(1, 100))
+
     defaults = {
         "domain_title": "example.com",
-        "domain_url": "https://www.example.com",
+        "domain_url": domain_url,
         "domain_fav_icon": "https://www.example.com/favicon.ico",
         "domain_last_accessed": datetime.now(timezone.utc),
-        "domain_session_id": f"session_{user.id}_{datetime.now().timestamp()}",
+        "domain_session_id": (
+            f"{window_session_id}-tabId-{tab_num}-domain-{domain_url}"
+        ),
         "start_time": datetime.now(timezone.utc),
-        "closing_time": datetime.strptime("2024-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"),
+        "closing_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
         "snapshot_html": "<html></html>",
     }
     defaults.update(params)
@@ -112,7 +140,7 @@ def create_click(user, **params) -> Click:
 
     defaults = {
         "click_type": "click",
-        "click_time": "2024-06-01 17:00:00",
+        "click_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
         "click_target_element": "button",
         "click_target_tag": "button",
         "click_target_class": "btn",
@@ -136,7 +164,7 @@ def create_scroll(user, **params) -> Scroll:
         "scroll_y": 0,
         "page_x_offset": 0,
         "page_y_offset": 0,
-        "scroll_time": "2024-06-01 17:00:00",
+        "scroll_time": datetime(2024, 6, 1, 17, 0, 0, tzinfo=timezone.utc),
         "domain": create_domain(user=user),
     }
     defaults.update(params)

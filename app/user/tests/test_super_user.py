@@ -39,7 +39,7 @@ class SuperuserUserApiTests(TestCase):
         """
         payload = {
             "user_id": "testuser",
-            "password": "testpass",
+            "password": "testpass123",
             "privacy": {
                 "privacy_mode": False,
                 "privacy_start_time": datetime.now(timezone.utc).isoformat(),
@@ -88,7 +88,7 @@ class SuperuserUserApiTests(TestCase):
         self.client.force_authenticate(user)
         payload = {
             "user_id": "testuser",
-            "password": "testpass",
+            "password": "testpass123",
             "privacy": {
                 "privacy_mode": False,
                 "privacy_start_time": datetime.now(timezone.utc).isoformat(),

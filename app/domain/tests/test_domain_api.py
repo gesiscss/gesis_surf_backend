@@ -123,10 +123,12 @@ class PrivateDomainApiTests(APITestCase):
             "domain_url": "https://test.com",
             "domain_fav_icon": "https://test.com/favicon.ico",
             "domain_last_accessed": "inactive",
-            "start_time": datetime.strptime("2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"),
+            "start_time": datetime.strptime(
+                "2021-06-01 08:00:00", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc),
             "closing_time": datetime.strptime(
                 "2021-06-01 17:00:00", "%Y-%m-%d %H:%M:%S"
-            ),
+            ).replace(tzinfo=timezone.utc),
             "snapshot_html": "<html>Test</html>",
         }
         url = detail_url("domain", domain.id)
@@ -168,3 +170,5 @@ class PrivateDomainApiTests(APITestCase):
         url = detail_url("domain", domain.id)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotIn("snapshot_html", res.data)
+        self.assertEqual(domain.snapshot_html, "<html>Test Snapshot</html>")

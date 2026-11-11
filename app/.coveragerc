@@ -1,0 +1,11 @@
+[run]
+source = .
+data_file = /tmp/.coverage
+omit =
+    */tests/*
+    */migrations/*
+    */apps.py
+    manage.py
+    app/wsgi.py
+    app/asgi.py
+    app/celery.py

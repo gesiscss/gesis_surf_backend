@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "web-tracker-backend"
-version = "0.1.0"
+version = "2.0.0"
 description = "GESIS Backend for Web Tracking Tool"
 authors = ["geomario <marm1984@gmail.com>"]
 license = "MIT"
@@ -8,47 +8,49 @@ readme = "README.md"
 packages = [{ include = "web_tracker_backend" }]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-django = "^4.2.7"
-djangorestframework = "^3.14.0"
-django-stubs = "^4.2.6"
+python = "^3.12"
+django = "^5.2.17"
+djangorestframework = "^3.16.0"
+django-stubs = "^5.2.0"
 psycopg2 = "^2.9.9"
 types-psycopg2 = "^2.9.21.15"
-drf-spectacular = "^0.27.1"
-uwsgi = "^2.0.25"
+drf-spectacular = "^0.28.0"
+uwsgi = "^2.0.31"
 django-simple-history = "^3.5.0"
 celery = "^5.3.6"
 redis = "^5.0.3"
 flower = "^2.0.1"
 python-logstash = "^0.4.8"
-cryptography = "^44.0.1"
+cryptography = ">=44.0.1,<51.0.0"
 pygraphviz = "^1.11"
+django-cors-headers = "^4.9.0"
 elasticsearch = "^8.17.0"
 elasticsearch-dsl = "^8.17.0"
-django-cors-headers = "^4.9.0"
 celery-stubs = "^0.1.3"
 django-extensions = "^4.1"
 
 
 [tool.poetry.group.dev.dependencies]
+
+coverage = "^7.13.5"
+
+
 flake8 = "^6.1.0"
 flake8-bugbear = "^23.9.16"
 flake8-isort = "^6.1.0"
 flake8-annotations = "^3.0.1"
-black = "^23.10.1"
+black = "^26.3.1"
 pytest = "^7.4.3"
 mypy = "^1.6.1"
 commitizen = "^3.12.0"
 pre-commit = "^3.5.0"
-djangorestframework-stubs = "^3.14.4"
-django-stubs = "^4.2.6"
+djangorestframework-stubs = "^3.16.0"
+django-stubs = "^5.2.0"
 pylint-django = "^2.5.5"
 pylint = "^3.3.3"
-
-
 [tool.commitizen]
 name = "cz_conventional_commits"
-tag_format = "$version"
+tag_format = "v$version"
 version_scheme = "pep440"
 version_provider = "poetry"
 update_changelog_on_bump = true

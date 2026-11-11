@@ -3,9 +3,22 @@ Views for the user app.
 """
 
 from rest_framework import authentication, generics, permissions
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from user.serializers import AuthTokenSerializer, UserSerializer
+
+
+class TokenAnonRateThrottle(AnonRateThrottle):
+    """
+    Brute-force guard for the token endpoint (audit P1 #7).
+
+    Allows 5 unauthenticated attempts per minute: guessing user_id +
+    password becomes impractical, while a legitimate extension login
+    is unaffected.
+    """
+
+    rate = "5/min"
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -25,6 +38,7 @@ class CreateTokenView(ObtainAuthToken):
 
     serializer_class = AuthTokenSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+    throttle_classes = (TokenAnonRateThrottle,)
 
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
