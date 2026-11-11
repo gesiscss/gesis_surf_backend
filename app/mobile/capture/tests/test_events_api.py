@@ -222,6 +222,19 @@ class StoreMobileEventsTests(MobileEventsTestCase):
             len(events),
         )
 
+    def test_truncated_last_line_is_rejected_alone(self) -> None:
+        """
+        Tests a line cut off by an interrupted write does not affect the
+        lines before it.
+        """
+        lines = [json.dumps(create_event()), json.dumps(create_event())[:-20]]
+
+        response = self.post(lines)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["accepted"], 1)
+        self.assertEqual([error["index"] for error in response.data["errors"]], [1])
+
     def test_value_refused_by_elasticsearch_is_rejected(self) -> None:
         """
         Tests an event whose value does not fit its field is rejected with its
