@@ -35,7 +35,6 @@ updates:
           - "djangorestframework-stubs"
   - package-ecosystem: "github-actions"
     directory: "/"
-    target-ecosystem: "github-actions"
     target-branch: "dev"
     schedule:
       interval: "weekly"
