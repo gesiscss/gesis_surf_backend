@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "web-tracker-backend"
-version = "2.0.0"
+version = "2.5.0"
 description = "GESIS Backend for Web Tracking Tool"
 authors = ["geomario <marm1984@gmail.com>"]
 license = "MIT"
