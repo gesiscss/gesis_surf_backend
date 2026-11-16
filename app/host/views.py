@@ -3,8 +3,12 @@ Views for the host app.
 """
 
 from celery.result import AsyncResult
-from core.models import Category, Criteria, Host
-from core.tasks import HOST_VERSION_PROPAGATION_DELAY_SECONDS, update_extension_versions_task
+from core.models import Host
+from core.signals import capture_old_host_version, update_extension_versions
+from core.tasks import (
+    HOST_VERSION_PROPAGATION_DELAY_SECONDS,
+    update_extension_versions_task,
+)
 from django.db import transaction
 from django.db.models.signals import post_save, pre_save
 from django.http import JsonResponse
@@ -101,11 +105,6 @@ class HostViewSet(viewsets.ModelViewSet):
         Expected payload: list of HostSerializer-compatible dicts.
         Returns: { "created": <int>, "failed": <int>, "errors": [...] }
         """
-        from core.signals import (
-            capture_old_host_version,
-            update_extension_versions,
-        )
-
         items = request.data
         if not isinstance(items, list):
             return Response(
@@ -149,5 +148,9 @@ class HostViewSet(viewsets.ModelViewSet):
                 "failed": len(errors),
                 "errors": errors[:50],  # cap error list to avoid huge responses
             },
-            status=status.HTTP_201_CREATED if created_count > 0 else status.HTTP_400_BAD_REQUEST,
+            status=(
+                status.HTTP_201_CREATED
+                if created_count > 0
+                else status.HTTP_400_BAD_REQUEST
+            ),
         )

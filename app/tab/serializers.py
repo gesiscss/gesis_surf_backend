@@ -94,7 +94,7 @@ class TabSerializer(serializers.ModelSerializer):
                 user=request.user
             )
 
-    def get_created_domains(self, instance: Tab) -> list:
+    def get_created_domains(self, _instance: Tab) -> list:
         """Return only nested domains created or recovered by this save."""
         unique_domains = {domain.pk: domain for domain in self._created_domains}
         return DomainSerializer(

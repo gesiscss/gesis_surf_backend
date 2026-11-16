@@ -185,7 +185,8 @@ def update_extension_selector_versions(
             description=f"Update selector versions for SelectorConfig {instance.pk}",
         )
         logger.info(
-            "Scheduled update_selector_versions_task for SelectorConfig %s in 5 minutes. Task ID: %s",
+            "Scheduled update_selector_versions_task for SelectorConfig %s "
+            "in 5 minutes. Task ID: %s",
             instance.pk,
             task.id,
         )

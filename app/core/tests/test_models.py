@@ -130,6 +130,7 @@ class ModelTests(APITestCase):
         self.assertEqual(domain.domain_url, "https://www.test.com")
 
     def test_session_ids_follow_extension_format(self) -> None:
+        """Keep nested session identifiers compatible with extension payloads."""
         user = create_user(user_id="session-id-test", password="test123")
         global_session = create_global_session(user=user)
         window = create_window(user=user, global_session=global_session, window_num=12)

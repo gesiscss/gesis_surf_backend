@@ -13,7 +13,12 @@ from django.conf import settings
 from django.db import DatabaseError
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from elasticsearch import ApiError, ConflictError, Elasticsearch, TransportError
+from elasticsearch import (
+    ApiError,
+    ConflictError,
+    Elasticsearch,
+    TransportError,
+)
 from elasticsearch_dsl import connections
 from redis import Redis
 from redis.exceptions import RedisError

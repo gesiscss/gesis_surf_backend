@@ -2,6 +2,8 @@
 Test cases for the host app.
 """
 
+from unittest.mock import patch
+
 from core.models import Host
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -9,7 +11,6 @@ from django.urls import reverse
 from host.serializers import HostSerializer
 from rest_framework import status
 from rest_framework.test import APIClient
-from unittest.mock import patch
 
 HOST_URL = reverse("host:host-list")
 
@@ -91,7 +92,9 @@ class PrivateHostApiTests(TestCase):
         res = self.client.post(HOST_URL, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(
-            Host.objects.filter(hostname="attacker.example").exists()  # pylint: disable=no-member
+            Host.objects.filter(
+                hostname="attacker.example"
+            ).exists()  # pylint: disable=no-member
         )
 
     def test_participant_cannot_update_host(self):
@@ -113,7 +116,9 @@ class PrivateHostApiTests(TestCase):
         host = create_host(hostname="example.com")
         res = self.client.delete(detail_url(host.id))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertTrue(Host.objects.filter(pk=host.pk).exists())  # pylint: disable=no-member
+        self.assertTrue(
+            Host.objects.filter(pk=host.pk).exists()
+        )  # pylint: disable=no-member
 
     def test_participant_cannot_bulk_create_hosts(self):
         """
@@ -143,13 +148,16 @@ class PrivateHostApiTests(TestCase):
                 self.fetched = False
 
             def ready(self):
+                """Report availability until the result is consumed."""
                 return not self.fetched
 
             @property
             def result(self):
+                """Expose the task payload."""
                 return self._payload
 
             def forget(self):
+                """Mark this result as consumed."""
                 self.fetched = True
 
         fake = SingleUseTaskResult([{"hostname": "sync.example"}])
@@ -183,7 +191,9 @@ class AdminHostApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.admin = create_user(user_id="admin", is_staff=True, password="adminpass123")
+        self.admin = create_user(
+            user_id="admin", is_staff=True, password="adminpass123"
+        )
         self.admin.is_superuser = True
         self.admin.save()
         self.client.force_authenticate(self.admin)

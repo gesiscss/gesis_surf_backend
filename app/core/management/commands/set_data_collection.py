@@ -58,9 +58,8 @@ Notes
 
 from datetime import datetime
 
-from django.core.management.base import BaseCommand, CommandError
-
 from core.models import Extension
+from django.core.management.base import BaseCommand, CommandError
 
 
 def _parse_date(value: str, arg_name: str) -> datetime:
@@ -85,7 +84,7 @@ def _load_user_ids_from_csv(path: str) -> list[str]:
     - Whitespace is stripped from each value.
     """
     try:
-        with open(path, "r", encoding="utf-8") as fh:
+        with open(path, encoding="utf-8") as fh:
             lines = fh.readlines()
     except OSError as exc:
         raise CommandError(f"Could not read CSV file {path!r}: {exc}") from exc
@@ -213,9 +212,7 @@ class Command(BaseCommand):
         if user_id:
             qs = qs.filter(user__user_id=user_id)
             if not qs.exists():
-                raise CommandError(
-                    f"No Extension found for user_id={user_id!r}."
-                )
+                raise CommandError(f"No Extension found for user_id={user_id!r}.")
         if csv_user_ids is not None:
             qs = qs.filter(user__user_id__in=csv_user_ids)
             if not qs.exists():
@@ -262,9 +259,7 @@ class Command(BaseCommand):
         csv_user_ids: list[str] | None = None
         if csv_path:
             csv_user_ids = _load_user_ids_from_csv(csv_path)
-            self.stdout.write(
-                f"Loaded {len(csv_user_ids)} user_id(s) from {csv_path}"
-            )
+            self.stdout.write(f"Loaded {len(csv_user_ids)} user_id(s) from {csv_path}")
 
         qs = self._build_queryset(options, csv_user_ids)
         scope_label = self._build_scope_label(options, csv_user_ids, csv_path)
@@ -294,10 +289,14 @@ class Command(BaseCommand):
 
         # Confirm before a bulk change (unless --no-input).
         if not no_input:
-            confirm = input(
-                f"\nSet extension_data_collection={target_value} for "
-                f"{match_count} extension(s) ({scope_label})? [y/N]: "
-            ).strip().lower()
+            confirm = (
+                input(
+                    f"\nSet extension_data_collection={target_value} for "
+                    f"{match_count} extension(s) ({scope_label})? [y/N]: "
+                )
+                .strip()
+                .lower()
+            )
             if confirm not in ("y", "yes"):
                 self.stdout.write(self.style.WARNING("Aborted. No changes made."))
                 return

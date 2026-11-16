@@ -57,9 +57,11 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.domain = create_domain(user=self.user)
 
     def fake_elasticsearch_save(self, document, *args, **kwargs):
+        """Assign an ID without writing to Elasticsearch."""
         document.meta.id = "test-document-id"
 
     def test_llm_with_own_domain_id_accepted(self):
+        """Accept a domain owned by the authenticated participant."""
         with patch.object(ChatGPTIndex, "save", autospec=True) as save:
             save.side_effect = self.fake_elasticsearch_save
             res = self.client.post(
@@ -73,6 +75,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertEqual(document.link_status, "linked")
 
     def test_llm_with_foreign_domain_id_rejected(self):
+        """Reject another participant's domain."""
         other = create_user(user_id="other", password="testpass12345")
         foreign = create_domain(user=other)
         res = self.client.post(
@@ -82,6 +85,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertIn("domain_id", res.data)
 
     def test_llm_with_blank_domain_id_accepted(self):
+        """Keep older LLM payloads without a domain ID valid."""
         with patch.object(ChatGPTIndex, "save", autospec=True) as save:
             save.side_effect = self.fake_elasticsearch_save
             res = self.client.post(LLM_URL, LLM_PAYLOAD, format="json")
@@ -91,6 +95,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertEqual(document.link_status, "")
 
     def test_llm_stamps_pending_linkage_from_authenticated_user(self):
+        """Derive LLM linkage ownership and status on the server."""
         payload = {
             **LLM_PAYLOAD,
             "domain_session_id": "global-session-test-windowId-1-tabId-2-domain-example.com",
@@ -109,6 +114,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertEqual(document.domain_session_id, payload["domain_session_id"])
 
     def test_llm_with_garbage_domain_id_rejected(self):
+        """Reject malformed domain UUIDs."""
         res = self.client.post(
             LLM_URL,
             {**LLM_PAYLOAD, "domain_id": "not-a-real-uuid-xyz"},
@@ -117,6 +123,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_social_with_own_domain_id_accepted(self):
+        """Accept social events for an owned domain."""
         with patch.object(TwitterIndex, "save", autospec=True) as save:
             save.side_effect = self.fake_elasticsearch_save
             res = self.client.post(
@@ -130,6 +137,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertEqual(document.link_status, "linked")
 
     def test_social_with_foreign_domain_id_rejected(self):
+        """Reject social events referencing another participant's domain."""
         other = create_user(user_id="other", password="testpass12345")
         foreign = create_domain(user=other)
         res = self.client.post(
@@ -141,6 +149,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertIn("domain_id", res.data)
 
     def test_social_with_blank_domain_id_accepted(self):
+        """Keep older social payloads without a domain ID valid."""
         with patch.object(TwitterIndex, "save", autospec=True) as save:
             save.side_effect = self.fake_elasticsearch_save
             res = self.client.post(SOCIAL_URL, SOCIAL_PAYLOAD, format="json")
@@ -150,6 +159,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertEqual(document.link_status, "")
 
     def test_social_stamps_pending_linkage_from_authenticated_user(self):
+        """Derive social linkage ownership and status on the server."""
         payload = {
             **SOCIAL_PAYLOAD,
             "domain_session_id": "global-session-test-windowId-1-tabId-2-domain-example.com",
@@ -168,6 +178,7 @@ class WaveletDomainIdOwnershipTests(APITestCase):
         self.assertEqual(document.domain_session_id, payload["domain_session_id"])
 
     def test_all_wavelet_indexes_inherit_keyword_linkage_fields(self):
+        """Verify linkage fields in every concrete index mapping."""
         index_classes = set(LLM_INDEX_MAPPING.values())
         index_classes.update(
             index_class
@@ -177,7 +188,9 @@ class WaveletDomainIdOwnershipTests(APITestCase):
 
         for index_class in index_classes:
             with self.subTest(index=index_class.__name__):
-                mapping = index_class._doc_type.mapping.to_dict()["properties"]
+                mapping = index_class._doc_type.mapping.to_dict()[  # pylint: disable=protected-access
+                    "properties"
+                ]
                 for field in ("domain_session_id", "user_id", "link_status"):
                     self.assertEqual(mapping[field], {"type": "keyword"})
                 self.assertTrue(issubclass(index_class, BaseIndex))
