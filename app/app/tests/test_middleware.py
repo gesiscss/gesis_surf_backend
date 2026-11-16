@@ -113,3 +113,21 @@ class TestLoggingMiddleware(TestCase):
             auth_header=auth_header
         )
         self.assertEqual(detail, "Anonymous (Invalid Token)")
+
+    def test_invalid_token_is_masked_in_logs(self) -> None:
+        """
+        Invalid-token warnings must not contain the raw token
+        (audit P2 #13: raw Authorization headers went to Logstash).
+
+        The log line may only carry the scheme plus the first 4
+        characters of the token.
+        """
+        secret_token = "topsecret1234567890abcdef"
+        auth_header = f"Token {secret_token}"
+        with self.assertLogs("app.middleware", level="WARNING") as captured:
+            self.middleware._get_user_detail(  # pylint: disable=protected-access
+                auth_header=auth_header
+            )
+        output = "\n".join(captured.output)
+        self.assertNotIn(secret_token, output)
+        self.assertIn("Token tops****", output)

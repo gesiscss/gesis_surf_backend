@@ -1,0 +1,40 @@
+# Dependabot always targets `dev` — the development starting point.
+# Bumps then flow through the normal promotion chain: dev -> main -> prod.
+# (This pins the target explicitly so a changed repo default branch
+# can never retarget dependency PRs to main or prod.)
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build(deps)"
+      prefix-development: "build(deps-dev)"
+    groups:
+      pip-production:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "black"
+          - "flake8"
+          - "isort"
+          - "pylint"
+          - "mypy"
+          - "django-stubs"
+          - "djangorestframework-stubs"
+      pip-dev-tools:
+        patterns:
+          - "black"
+          - "flake8"
+          - "isort"
+          - "pylint"
+          - "mypy"
+          - "django-stubs"
+          - "djangorestframework-stubs"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"

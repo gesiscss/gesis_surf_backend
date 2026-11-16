@@ -28,6 +28,7 @@ class ExtensionSerializer(serializers.ModelSerializer):
             "extension_browser",
             "extension_data_collection",
             "host_version",
+            "selector_version",
         )
         read_only_fields = ("id",)
 
@@ -92,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         model = get_user_model()
         fields = ("user_id", "password", "waves", "privacy", "extension")
-        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
+        extra_kwargs = {"password": {"write_only": True, "min_length": 10}}
 
     def to_representation(self, instance):
         """
