@@ -133,7 +133,7 @@ class PrivateMobilePolicyApiTests(TestCase):
         create_release(is_active=True)
         etag = self.client.get(POLICY_URL)["ETag"]
 
-        response = self.client.get(POLICY_URL, HTTP_IF_NONE_MATCH=etag)
+        response = self.client.get(POLICY_URL, headers={"if-none-match": etag})
 
         self.assertEqual(response.status_code, status.HTTP_304_NOT_MODIFIED)
         self.assertEqual(response["ETag"], etag)
@@ -148,7 +148,9 @@ class PrivateMobilePolicyApiTests(TestCase):
 
         for header in (f"W/{etag}", f'"other", {etag}', "*"):
             with self.subTest(header=header):
-                response = self.client.get(POLICY_URL, HTTP_IF_NONE_MATCH=header)
+                response = self.client.get(
+                    POLICY_URL, headers={"if-none-match": header}
+                )
                 self.assertEqual(response.status_code, status.HTTP_304_NOT_MODIFIED)
 
     def test_other_etag_gets_the_full_response(self) -> None:
@@ -157,7 +159,7 @@ class PrivateMobilePolicyApiTests(TestCase):
         """
         create_release(is_active=True)
 
-        response = self.client.get(POLICY_URL, HTTP_IF_NONE_MATCH='"other"')
+        response = self.client.get(POLICY_URL, headers={"if-none-match": '"other"'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -171,7 +173,7 @@ class PrivateMobilePolicyApiTests(TestCase):
         old.save()
         create_release("2026.10.2", policy_hash="sha256:" + "b" * 64, is_active=True)
 
-        response = self.client.get(POLICY_URL, HTTP_IF_NONE_MATCH=etag)
+        response = self.client.get(POLICY_URL, headers={"if-none-match": etag})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["policy_version"], "2026.10.2")
@@ -187,7 +189,7 @@ class PrivateMobilePolicyApiTests(TestCase):
         other_etag = other_client.get(POLICY_URL)["ETag"]
 
         MobileClient.objects.filter(user=self.user).update(data_collection=False)
-        response = self.client.get(POLICY_URL, HTTP_IF_NONE_MATCH=etag)
+        response = self.client.get(POLICY_URL, headers={"if-none-match": etag})
         other_response = other_client.get(POLICY_URL, HTTP_IF_NONE_MATCH=other_etag)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -246,8 +248,11 @@ class PrivateMobilePolicyApiTests(TestCase):
 
     def test_openapi_schema_lists_the_endpoint(self) -> None:
         """
-        Tests the endpoint is documented.
+        Tests the endpoint is documented in the admin-only schema.
         """
+        admin = create_user(user_id="admin", is_staff=True, password="test123")
+        self.client.force_authenticate(admin)
+
         response = self.client.get("/api/schema/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

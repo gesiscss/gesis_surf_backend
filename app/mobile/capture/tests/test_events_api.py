@@ -379,8 +379,12 @@ class RefuseMobileEventsTests(MobileEventsTestCase):
 
     def test_openapi_schema_lists_the_endpoint(self) -> None:
         """
-        Tests the endpoint is documented.
+        Tests the endpoint is documented in the admin-only schema.
         """
+        admin = create_user(user_id="admin", is_staff=True, password="test123")
+        self.client.force_authenticate(admin)
+
         response = self.client.get("/api/schema/")
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn(b"/api/mobile/events/", response.content)
