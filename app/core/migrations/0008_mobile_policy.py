@@ -10,7 +10,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0006_selectorconfig_extension_selector_version_and_more"),
+        ("core", "0007_d9_fingerprint_unique_domain_in_tab"),
     ]
 
     operations = [
