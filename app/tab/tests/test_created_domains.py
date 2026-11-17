@@ -18,6 +18,8 @@ from tab.serializers import DomainSerializer
 
 
 class CreatedDomainsTests(APITestCase):
+    """Keep creation results local to the current tab write."""
+
     def setUp(self):
         self.user = create_user(user_id="created-domains-owner")
         self.client.force_authenticate(self.user)
@@ -44,6 +46,7 @@ class CreatedDomainsTests(APITestCase):
         }
 
     def test_post_returns_created_domains_in_existing_domain_shape(self):
+        """Serialize newly created domains without exposing their owner."""
         response = self.client.post(
             reverse("tab:tab-list"), self.payload, format="json"
         )
@@ -60,6 +63,7 @@ class CreatedDomainsTests(APITestCase):
         self.assertNotIn("user", response.data["created_domains"][0])
 
     def test_patch_excludes_historical_domains(self):
+        """Exclude previously attached domains from creation results."""
         historical = create_domain(user=self.user)
         self.tab.domains.add(historical)
         response = self.client.patch(
@@ -73,6 +77,7 @@ class CreatedDomainsTests(APITestCase):
         )
 
     def test_post_retry_returns_same_domain_uuid(self):
+        """Recover the same domain when a tab creation is retried."""
         first = self.client.post(reverse("tab:tab-list"), self.payload, format="json")
         second = self.client.post(
             reverse("tab:tab-list"),
@@ -85,6 +90,7 @@ class CreatedDomainsTests(APITestCase):
         self.assertEqual(Domain.objects.count(), 1)
 
     def test_patch_retry_returns_same_domain_uuid(self):
+        """Keep nested domain updates idempotent."""
         first = self.client.patch(self.url, {"domains": [self.domain]}, format="json")
         second = self.client.patch(self.url, {"domains": [self.domain]}, format="json")
         self.assertEqual(first.status_code, status.HTTP_200_OK)
@@ -93,6 +99,7 @@ class CreatedDomainsTests(APITestCase):
         self.assertEqual(Domain.objects.count(), 1)
 
     def test_multiple_nested_domains_are_deduplicated_in_input_order(self):
+        """Preserve first occurrence order when repeated domains are sent."""
         second = {
             **self.domain,
             "domain_url": "https://example.com/other",
@@ -112,6 +119,7 @@ class CreatedDomainsTests(APITestCase):
         self.assertEqual(Domain.objects.count(), 2)
 
     def test_reads_have_no_request_created_domains(self):
+        """Do not report prior write results in read responses."""
         self.client.patch(self.url, {"domains": [self.domain]}, format="json")
         detail = self.client.get(self.url)
         listing = self.client.get(reverse("tab:tab-list"))
@@ -123,6 +131,7 @@ class CreatedDomainsTests(APITestCase):
         )
 
     def test_no_nested_domains_returns_empty_result(self):
+        """Return no creation results when no domains are submitted."""
         for payload in ({}, {"domains": []}, {"tab_num": "updated"}):
             with self.subTest(payload=payload):
                 response = self.client.patch(self.url, payload, format="json")
@@ -136,6 +145,7 @@ class CreatedDomainsTests(APITestCase):
         self.assertEqual(response.data["created_domains"], [])
 
     def test_domain_ids_attachment_is_not_reported_as_creation(self):
+        """Distinguish attaching a domain ID from nested creation."""
         domain = create_domain(user=self.user)
         response = self.client.patch(
             self.url, {"domain_ids": [str(domain.pk)]}, format="json"
@@ -145,6 +155,7 @@ class CreatedDomainsTests(APITestCase):
         self.assertEqual(len(response.data["domains"]), 1)
 
     def test_created_domains_input_is_ignored(self):
+        """Treat creation results as a read-only response field."""
         response = self.client.patch(
             self.url,
             {"created_domains": [self.domain]},

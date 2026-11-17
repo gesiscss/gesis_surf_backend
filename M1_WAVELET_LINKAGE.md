@@ -51,12 +51,12 @@ extension blocks private/full-deny wavelets before submission.
 One periodic task, registered as `wavelets.tasks.resolve_pending_wavelets`.
 Do not enqueue a separate retry chain for every wavelet.
 
-| Component | Responsibility |
-|---|---|
-| B3 resolver | Look up Domain UUID by owner UUID and exact session hint |
-| Celery worker | Execute bounded resolution batches |
-| Celery Beat | Enqueue the task periodically |
-| Shared lock | Prevent overlapping runs, including retries |
+| Component     | Responsibility                                           |
+| ------------- | -------------------------------------------------------- |
+| B3 resolver   | Look up Domain UUID by owner UUID and exact session hint |
+| Celery worker | Execute bounded resolution batches                       |
+| Celery Beat   | Enqueue the task periodically                            |
+| Shared lock   | Prevent overlapping runs, including retries              |
 
 Initial implementation defaults:
 
@@ -169,8 +169,7 @@ configuration can be checked without starting Beat or submitting work.
 5. Enable the single Beat schedule and monitor batch progress, errors, and expiry.
 
 Enable the schedule by setting `WAVELET_LINKAGE_ENABLED=1` on the Beat process
-and restarting it after acceptance. Worker commands are `celery -A app worker
--l info`; the single scheduler command is `celery -A app beat -l info`. Integrate
+and restarting it after acceptance. Worker commands are `celery -A app worker -l info`; the single scheduler command is `celery -A app beat -l info`. Integrate
 these with the M1 service manager rather than assuming a worker-named container
 runs the correct command.
 

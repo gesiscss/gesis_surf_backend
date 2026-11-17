@@ -51,7 +51,9 @@ class AdminSchemaApiTests(TestCase):
 
     def setUp(self) -> None:
         self.client = APIClient()
-        self.admin = create_user(user_id="admin", is_staff=True, password="adminpass123")
+        self.admin = create_user(
+            user_id="admin", is_staff=True, password="adminpass123"
+        )
         self.admin.is_superuser = True
         self.admin.save()
         self.client.force_authenticate(self.admin)

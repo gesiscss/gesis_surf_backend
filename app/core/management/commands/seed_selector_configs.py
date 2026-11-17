@@ -4,15 +4,14 @@ Run with: python manage.py seed_selector_configs
 Use --force to overwrite existing entries.
 """
 
-from django.core.management.base import BaseCommand
-from django.db.models.signals import post_save
-
 from core.models import SelectorConfig
 from core.signals import update_extension_selector_versions
 from core.tasks import (
     SELECTOR_VERSION_PROPAGATION_DELAY_SECONDS,
     update_selector_bundle_version_task,
 )
+from django.core.management.base import BaseCommand
+from django.db.models.signals import post_save
 
 SELECTOR_CONFIGS = [
     {
@@ -190,7 +189,7 @@ SELECTOR_CONFIGS = [
                 "div[aria-label='Me gusta']",
                 "div[aria-label='Like']",
                 "div[aria-label='Gefällt mir']",
-                "div[aria-label=\"J'aime\"]",
+                'div[aria-label="J\'aime"]',
                 "div[aria-label='Curtir']",
                 "[data-ad-rendering-role='like_button']",
             ],

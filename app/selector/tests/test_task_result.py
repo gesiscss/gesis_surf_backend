@@ -7,17 +7,15 @@ The result is single-use: it is forgotten from the backend right after
 it is fetched (audit P0 #5, A-lite decision).
 """
 
+from unittest.mock import patch
+
+from core.tests.helpers import create_user
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from unittest.mock import patch
 
-from core.tests.helpers import create_user
-
-ASYNC_SELECTORS_URL = reverse(
-    "selector:selectorconfig-async-selectors"
-)
+ASYNC_SELECTORS_URL = reverse("selector:selectorconfig-async-selectors")
 
 
 class SelectorTaskResultTests(TestCase):
@@ -45,13 +43,16 @@ class SelectorTaskResultTests(TestCase):
                 self.fetched = False
 
             def ready(self):
+                """Report availability until the result is consumed."""
                 return not self.fetched
 
             @property
             def result(self):
+                """Expose the task payload."""
                 return self._payload
 
             def forget(self):
+                """Mark this result as consumed."""
                 self.fetched = True
 
         fake = SingleUseTaskResult([{"provider": "facebook"}])
@@ -79,7 +80,5 @@ class SelectorTaskResultTests(TestCase):
         Anonymous access is rejected.
         """
         client = APIClient()
-        res = client.get(
-            reverse("selector:selector-task-result", args=["any-id"])
-        )
+        res = client.get(reverse("selector:selector-task-result", args=["any-id"]))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)

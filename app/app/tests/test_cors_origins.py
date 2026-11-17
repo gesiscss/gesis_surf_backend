@@ -7,10 +7,10 @@ env var appends extras; an unset or empty value must not break the
 default list (RC-4 boot-crash guard).
 """
 
-from django.test import TestCase, override_settings
-from django.test.utils import isolate_apps
 from importlib import reload
 from unittest.mock import patch
+
+from django.test import TestCase
 
 import app.settings as app_settings
 
@@ -60,9 +60,7 @@ class CorsOriginsSettingsTests(TestCase):
         """
         reload(app_settings)
         try:
-            self.assertEqual(
-                app_settings.CORS_ALLOWED_ORIGINS, DEFAULT_ORIGINS
-            )
+            self.assertEqual(app_settings.CORS_ALLOWED_ORIGINS, DEFAULT_ORIGINS)
         finally:
             reload(app_settings)
 

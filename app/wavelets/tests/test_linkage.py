@@ -3,7 +3,7 @@ Regression tests for bounded wavelet resolution and task orchestration.
 """
 
 from datetime import timedelta
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from uuid import uuid4
 
 from celery.exceptions import Retry
@@ -18,30 +18,40 @@ from elasticsearch_dsl import connections
 from redis import Redis
 from redis.exceptions import LockError, LockNotOwnedError
 from wavelets.linkage import resolve_domain_id
-from wavelets.tasks import LOCK_SECONDS, _index_patterns, resolve_pending_wavelets
+from wavelets.tasks import (
+    LOCK_SECONDS,
+    _index_patterns,
+    resolve_pending_wavelets,
+)
 
 
 class ResolverTests(TestCase):
+    """Resolve only exact, unambiguous hints owned by the participant."""
+
     def setUp(self):
         self.user = create_user(user_id="linkage-owner")
         self.hint = "global-session-example-windowId-1-tabId-2-domain-host-visit-time"
 
     def test_exact_owned_match(self):
+        """Resolve an exact owned hint."""
         domain = create_domain(user=self.user, domain_session_id=self.hint)
         self.assertEqual(
             resolve_domain_id(self.user.pk, self.hint), (domain.pk, "matched")
         )
 
     def test_other_participants_match_is_not_returned(self):
+        """Keep another participant's matching hint private."""
         other = create_user(user_id="linkage-other")
         create_domain(user=other, domain_session_id=self.hint)
         self.assertEqual(resolve_domain_id(self.user.pk, self.hint), (None, "missing"))
 
     def test_similar_hint_is_not_a_match(self):
+        """Do not resolve a partial hint match."""
         create_domain(user=self.user, domain_session_id=f"{self.hint}-different")
         self.assertEqual(resolve_domain_id(self.user.pk, self.hint), (None, "missing"))
 
     def test_repeated_hint_is_ambiguous(self):
+        """Refuse to choose between multiple matching visits."""
         create_domain(user=self.user, domain_session_id=self.hint)
         create_domain(
             user=self.user,
@@ -54,6 +64,8 @@ class ResolverTests(TestCase):
 
 
 class RepairTaskTests(TestCase):
+    """Exercise bounded repair, ownership, retries, and lock handling."""
+
     def setUp(self):
         self.user = create_user(user_id="repair-owner")
         self.redis_patch = patch("wavelets.tasks.Redis.from_url")
@@ -80,6 +92,7 @@ class RepairTaskTests(TestCase):
         self.set_hits(self.hit)
 
     def set_hits(self, *hits):
+        """Provide a complete mocked search response."""
         self.client.search.return_value = {
             "hits": {"hits": list(hits)},
             "timed_out": False,
@@ -87,9 +100,11 @@ class RepairTaskTests(TestCase):
         }
 
     def run_task(self):
+        """Run repair synchronously with mocked dependencies."""
         return resolve_pending_wavelets.run()
 
     def test_missing_stays_pending_then_domain_arrives(self):
+        """Link a pending event once its domain is stored."""
         self.assertEqual(self.run_task()["pending"], 1)
         domain = create_domain(
             user=self.user,
@@ -105,6 +120,7 @@ class RepairTaskTests(TestCase):
         self.assertEqual(call["if_primary_term"], 1)
 
     def test_final_lookup_links_even_after_deadline(self):
+        """Prefer a final exact match over expiration."""
         self.hit["_source"]["created_at"] = (
             timezone.now() - timedelta(days=2)
         ).isoformat()
@@ -115,6 +131,7 @@ class RepairTaskTests(TestCase):
         self.assertEqual(self.run_task()["linked"], 1)
 
     def test_missing_expires_after_window(self):
+        """Expire unresolved events after the repair window."""
         self.hit["_source"]["created_at"] = (
             timezone.now() - timedelta(minutes=6)
         ).isoformat()
@@ -124,6 +141,7 @@ class RepairTaskTests(TestCase):
         )
 
     def test_ambiguity_is_reported_without_guessing(self):
+        """Report ambiguity without assigning a domain."""
         hint = self.hit["_source"]["domain_session_id"]
         create_domain(user=self.user, domain_session_id=hint)
         create_domain(
@@ -138,6 +156,7 @@ class RepairTaskTests(TestCase):
         self.assertNotIn("domain_id", self.client.update.call_args.kwargs["doc"])
 
     def test_malformed_record_does_not_block_healthy_record(self):
+        """Continue processing after a malformed event."""
         malformed = {**self.hit, "_id": "malformed", "_source": {}}
         self.set_hits(malformed, self.hit)
         with self.assertLogs("wavelets.tasks", level="WARNING"):
@@ -147,6 +166,7 @@ class RepairTaskTests(TestCase):
         self.assertEqual(self.client.update.call_count, 2)
 
     def test_existing_domain_id_is_not_overwritten(self):
+        """Preserve previously assigned relationships."""
         self.hit["_source"]["domain_id"] = str(uuid4())
         with self.assertLogs("wavelets.tasks", level="WARNING"):
             result = self.run_task()
@@ -154,17 +174,20 @@ class RepairTaskTests(TestCase):
         self.assertNotIn("domain_id", self.client.update.call_args.kwargs["doc"])
 
     def test_lock_contention_skips_search(self):
+        """Skip repair when another worker owns the lock."""
         self.lock.acquire.return_value = False
         self.assertEqual(self.run_task()["status"], "locked")
         self.client.search.assert_not_called()
         self.lock.release.assert_not_called()
 
     def test_lease_is_renewed_and_released_by_owner(self):
+        """Renew and release the worker's own lease."""
         self.run_task()
         self.lock.extend.assert_called_once_with(LOCK_SECONDS, replace_ttl=True)
         self.lock.release.assert_called_once()
 
     def test_lost_lease_prevents_write_and_does_not_release_replacement(self):
+        """Stop writes without releasing a replacement worker's lock."""
         self.lock.extend.side_effect = LockNotOwnedError("Lost lock")
         self.lock.owned.return_value = False
         with patch.object(resolve_pending_wavelets, "retry", side_effect=Retry):
@@ -174,6 +197,7 @@ class RepairTaskTests(TestCase):
         self.lock.release.assert_not_called()
 
     def test_database_failure_retries_without_expiring(self):
+        """Retry database failures without expiring unresolved events."""
         self.hit["_source"]["created_at"] = (
             timezone.now() - timedelta(days=2)
         ).isoformat()
@@ -187,6 +211,7 @@ class RepairTaskTests(TestCase):
         self.lock.release.assert_called_once()
 
     def test_update_failure_retries_and_releases_lock(self):
+        """Release the lock before retrying an Elasticsearch failure."""
         meta = ApiResponseMeta(
             status=503,
             http_version="1.1",
@@ -201,6 +226,7 @@ class RepairTaskTests(TestCase):
         self.lock.release.assert_called_once()
 
     def test_version_conflict_does_not_retry_over_existing_relationship(self):
+        """Respect a concurrent relationship update."""
         meta = ApiResponseMeta(
             status=409,
             http_version="1.1",
@@ -213,6 +239,7 @@ class RepairTaskTests(TestCase):
         self.assertEqual(self.client.update.call_count, 1)
 
     def test_partial_search_fails_without_writes(self):
+        """Do not process incomplete search responses."""
         self.client.search.return_value["timed_out"] = True
         with patch.object(resolve_pending_wavelets, "retry", side_effect=Retry):
             with self.assertRaises(Retry):
@@ -221,6 +248,7 @@ class RepairTaskTests(TestCase):
         self.lock.release.assert_called_once()
 
     def test_expired_ambiguity_is_not_linked_arbitrarily(self):
+        """Expire an ambiguous event without guessing a relationship."""
         hint = self.hit["_source"]["domain_session_id"]
         create_domain(user=self.user, domain_session_id=hint)
         create_domain(
@@ -238,12 +266,14 @@ class RepairTaskTests(TestCase):
         self.assertNotIn("domain_id", self.client.update.call_args.kwargs["doc"])
 
     def test_time_budget_stops_work_before_task_deadline(self):
+        """Stop repair before exhausting the task time limit."""
         with patch("wavelets.tasks.monotonic", side_effect=[0, 81]):
             self.assertEqual(self.run_task()["examined"], 0)
         self.client.update.assert_not_called()
         self.lock.release.assert_called_once()
 
     def test_selection_is_pending_only_and_rotates_oldest_checked_first(self):
+        """Bound each batch and avoid starving older pending events."""
         self.run_task()
         query = self.client.search.call_args.kwargs
         self.assertEqual(query["query"], {"term": {"link_status": "pending"}})
@@ -255,6 +285,7 @@ class RepairTaskTests(TestCase):
         self.assertIn("facebook_reels_index_*", _index_patterns())
 
     def test_schedule_is_disabled_by_default(self):
+        """Require explicit configuration before enabling repair."""
         self.assertFalse(settings.WAVELET_LINKAGE_ENABLED)
         self.assertNotIn("resolve-pending-wavelets", settings.CELERY_BEAT_SCHEDULE)
 
@@ -290,6 +321,7 @@ class RepairIntegrationTests(TestCase):
         self.addCleanup(lock_patch.stop)
 
     def write(self, doc_id, **fields):
+        """Index a pending test event with optional field overrides."""
         source = {
             "user_id": str(self.user.pk),
             "domain_session_id": "scope-windowId-1-tabId-2-domain-host-visit-time",
@@ -302,6 +334,7 @@ class RepairIntegrationTests(TestCase):
         return source
 
     def test_late_arrival_links_and_legacy_stays_untouched(self):
+        """Repair late-arriving domains without changing legacy events."""
         source = self.write("pending")
         legacy = {"domain_id": "", "message_content": "historical document"}
         self.client.index(index=self.index, id="legacy", document=legacy, refresh=True)
@@ -322,10 +355,11 @@ class RepairIntegrationTests(TestCase):
         self.assertEqual(resolve_pending_wavelets.run()["examined"], 0)
 
     def test_concurrent_link_is_not_overwritten(self):
+        """Preserve a relationship written after the search snapshot."""
         self.write("pending")
         concurrent_id = str(uuid4())
 
-        def link_concurrently(owner, hint):
+        def link_concurrently(_owner, _hint):
             self.client.update(
                 index=self.index,
                 id="pending",
@@ -340,6 +374,7 @@ class RepairIntegrationTests(TestCase):
         self.assertEqual(stored["domain_id"], concurrent_id)
 
     def test_bounded_batches_rotate_including_malformed_documents(self):
+        """Rotate bounded batches past malformed and unresolved events."""
         self.write("first", user_id="invalid-uuid")
         self.write("second")
         self.write("third", created_at=(timezone.now() - timedelta(days=2)).isoformat())
@@ -353,6 +388,7 @@ class RepairIntegrationTests(TestCase):
         self.assertEqual(sum(result["expired"] for result in results), 1)
 
     def test_real_redis_lock_release_preserves_new_owner(self):
+        """Ensure an old lease cannot extend or release its replacement."""
         with Redis.from_url(settings.CELERY_BROKER_URL) as redis:
             key = f"wavelets:test:{uuid4().hex}"
             first = redis.lock(key, timeout=30, thread_local=False)

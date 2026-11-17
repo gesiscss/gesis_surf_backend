@@ -5,7 +5,6 @@ Test for tab APIs.
 from datetime import datetime, timezone
 from typing import Any
 
-import django.db
 from core.models import Domain, GlobalSession, Tab, Window
 from core.tests.helpers import (
     create_domain,
@@ -40,7 +39,7 @@ class PublicTabApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class PrivateTabApiTests(APITestCase):
+class PrivateTabApiTests(APITestCase):  # pylint: disable=too-many-public-methods
     """
     Test authenticated Tab API access.
     """
@@ -636,9 +635,7 @@ class PrivateTabApiTests(APITestCase):
         tab = create_tab(user=self.user, window=window)
 
         url = detail_url("tab", tab.id)
-        res = self.client.patch(
-            url, {"domain_ids": [str(domain_b.id)]}, format="json"
-        )
+        res = self.client.patch(url, {"domain_ids": [str(domain_b.id)]}, format="json")
 
         tab.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -656,9 +653,7 @@ class PrivateTabApiTests(APITestCase):
         tab = create_tab(user=self.user, window=window)
 
         url = detail_url("tab", tab.id)
-        res = self.client.patch(
-            url, {"domain_ids": [str(domain.id)]}, format="json"
-        )
+        res = self.client.patch(url, {"domain_ids": [str(domain.id)]}, format="json")
 
         tab.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -682,9 +677,7 @@ class PrivateTabApiTests(APITestCase):
         domain_keys = set(res.data["domains"][0].keys())
         self.assertNotIn("user", domain_keys)
         for key in domain_keys:
-            self.assertNotIn(
-                key, ["user"], "owner field must not be serialized"
-            )
+            self.assertNotIn(key, ["user"], "owner field must not be serialized")
 
     def test_create_tab_with_long_url_domain(self) -> None:
         """
@@ -762,9 +755,7 @@ class PrivateTabApiTests(APITestCase):
         self.assertEqual(second.status_code, status.HTTP_201_CREATED)
 
         # Exactly one domain row; the resend attached the same one.
-        self.assertEqual(
-            Domain.objects.filter(domain_title="Retry Domain").count(), 1
-        )
+        self.assertEqual(Domain.objects.filter(domain_title="Retry Domain").count(), 1)
 
     def test_two_users_same_domain_url_time_both_save(self) -> None:
         """
