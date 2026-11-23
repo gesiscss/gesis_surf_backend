@@ -3,9 +3,9 @@
 # Runs next to the regular staging stack on the same host without clashing:
 #   - own Compose project name (networks/volumes are prefixed with it)
 #   - no container_name (so names never collide with the other stack)
-#   - the only published port is the HTTP proxy (MOBILE_HTTP_PORT)
-#   - TLS and the public hostname are provided by an upstream reverse proxy
-#     (IT), which forwards to http://<host>:MOBILE_HTTP_PORT
+#   - the only published ports are the proxy's: plain HTTP on MOBILE_HTTP_PORT
+#     and HTTPS on MOBILE_HTTPS_PORT (HTTPS starts once the Let's Encrypt
+#     certificate for MOBILE_DOMAIN exists, see docker/proxy/mobile-staging-cert.sh)
 #
 # Usage (from the repo root on the server):
 #   cp .env.mobile-staging.sample .env   # then fill in secrets (.env is gitignored)
@@ -59,20 +59,30 @@ services:
       - redis
       - elasticsearch
 
-  # Plain-HTTP proxy in front of uwsgi. TLS is terminated upstream.
+  # Proxy in front of uwsgi. Always serves plain HTTP (VPN testing). Serves
+  # HTTPS too once the Let's Encrypt certificate for MOBILE_DOMAIN exists in
+  # the certbot-certs volume (see docker/proxy/mobile-staging-cert.sh).
   proxy:
     image: nginx:1.23.0-alpine
     restart: unless-stopped
     depends_on:
       - app
+    entrypoint: ["/bin/sh", "/mobile-staging-entrypoint.sh"]
+    environment:
+      - MOBILE_DOMAIN=${MOBILE_DOMAIN:-}
     ports:
       - "${MOBILE_HTTP_BIND:-0.0.0.0}:${MOBILE_HTTP_PORT:-18473}:80"
+      - "${MOBILE_HTTPS_BIND:-0.0.0.0}:${MOBILE_HTTPS_PORT:-18443}:443"
     volumes:
+      - ./docker/proxy/mobile-staging-entrypoint.sh:/mobile-staging-entrypoint.sh:ro
       - ./docker/proxy/nginx/mobile-staging.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/proxy/nginx/mobile-staging-tls.conf.tpl:/etc/nginx/mobile-staging-tls.conf.tpl:ro
       - ./docker/proxy/nginx/uwsgi_params:/etc/nginx/uwsgi_params:ro
       - static-data:/vol/static:ro
+      - certbot-certs:/etc/letsencrypt:ro
 
 volumes:
   static-data:
   postgres-data:
   elasticsearch-data:
+  certbot-certs:
